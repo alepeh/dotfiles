@@ -8,5 +8,5 @@ yq() {
 
 shell() {
 		docker run -it --rm \
-			--name shell -v ~/.gitconfig:/etc/gitconfig  -v ~/org/:/home/user/workspace/ -v ~/.ssh:/home/user/.ssh  alepeh/shell sh -l
+			--name shell -v ~/.gitconfig:/etc/gitconfig  -v ~/org/:/home/user/workspace/ -v ~/.ssh:/home/user/.ssh  ${DOCKER_REPO_PREFIX}/shell sh -l
 }
