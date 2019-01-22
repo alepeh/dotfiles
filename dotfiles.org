@@ -1,0 +1,66 @@
+* Installation
+** Create symlinks to all scripts in your home directory
+=make=
+** source ~/.bash_profile
+Ensure that the generated .bash_profile is loaded in your shell
+even when you're not using bash.
+On some machines I use zsh, so I simply add it to ~/.zshrc
+
+* Sourcing generated files
+
+#+BEGIN_SRC sh :tangle .bash_profile
+#!/bin/bash
+for file in ~/.{dockerfunc,extra}; do
+	if [[ -r "$file" ]] && [[ -f "$file" ]]; then
+		source "$file"
+	fi
+done
+unset file
+#+END_SRC
+
+* Makefile
+
+#+BEGIN_SRC sh :tangle Makefile
+.PHONY: all
+all:
+	for file in $(shell find $(CURDIR) -name ".*" -not -name ".gitignore"  -not -name ".git" -not -name ".*.swp"); do \
+		f=$$(basename $$file); \
+		ln -sfn $$file $(HOME)/$$f; \
+	done;
+#+END_SRC
+
+* Dockerfunc
+Run-commands for all docker containers.
+
+Set variables
+#+BEGIN_SRC sh :tangle .dockerfunc
+export DOCKER_REPO_PREFIX=alepeh
+#+END_SRC
+
+** yq 
+yml parser, wraps [[https://stedolan.github.io/jq/][jq]], so you can apply all of jq's filters.
+
+Usage:
+#+BEGIN_EXAMPLE
+cat <file> | yq <filter>
+#+END_EXAMPLE
+
+#+BEGIN_SRC sh :tangle .dockerfunc
+yq() {
+	docker run -i --rm \
+		--name yq \
+		${DOCKER_REPO_PREFIX}/yq "$@"
+}
+
+#+END_SRC
+
+** shell
+my personal shell with some productivity tools like todotxt
+
+#+BEGIN_SRC sh :tangle .dockerfunc
+shell() {
+		docker run -it --rm \
+			--name shell -v ~/.gitconfig:/etc/gitconfig  -v ~/org/:/home/user/workspace/ -v ~/.ssh:/home/user/.ssh  alepeh/shell sh -l
+}
+
+#+END_SRC
