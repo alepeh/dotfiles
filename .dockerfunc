@@ -6,9 +6,10 @@ jq() {
 		${DOCKER_REPO_PREFIX}/jq "$@"
 }
 
-shell() {
+t() {
 		docker run -it --rm \
-			--name shell -v ~/.gitconfig:/etc/gitconfig  -v ~/org/:/home/user/workspace/ -v ~/.ssh:/home/user/.ssh  ${DOCKER_REPO_PREFIX}/shell sh -l
+			--name todotxt -v ${TODOTXT_TODO_DIR}:/home/user/workspace/ \
+			${DOCKER_REPO_PREFIX}/todotxt "todo.sh $@"
 }
 
 yq() {

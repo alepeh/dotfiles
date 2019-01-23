@@ -53,13 +53,15 @@ jq() {
 }
 #+END_SRC
 
-** shell
-my personal shell with some productivity tools like todotxt
+** todotxt
+Required environment vars in your .extra file:
+TODOTXT_TODO_DIR
 
 #+BEGIN_SRC sh :tangle .dockerfunc
-shell() {
+t() {
 		docker run -it --rm \
-			--name shell -v ~/.gitconfig:/etc/gitconfig  -v ~/org/:/home/user/workspace/ -v ~/.ssh:/home/user/.ssh  ${DOCKER_REPO_PREFIX}/shell sh -l
+			--name todotxt -v ${TODOTXT_TODO_DIR}:/home/user/workspace/ \
+			${DOCKER_REPO_PREFIX}/todotxt "todo.sh $@"
 }
 #+END_SRC
 
