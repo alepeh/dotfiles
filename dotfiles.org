@@ -37,6 +37,32 @@ Set variables
 export DOCKER_REPO_PREFIX=alepeh
 #+END_SRC
 
+** jq
+json parser [[https://stedolan.github.io/jq/][jq]]
+
+Usage:
+#+BEGIN_EXAMPLE
+cat <file> | jq <filter>
+#+END_EXAMPLE
+
+#+BEGIN_SRC sh :tangle .dockerfunc
+jq() {
+	docker run -i --rm \
+		--name jq \
+		${DOCKER_REPO_PREFIX}/jq "$@"
+}
+#+END_SRC
+
+** shell
+my personal shell with some productivity tools like todotxt
+
+#+BEGIN_SRC sh :tangle .dockerfunc
+shell() {
+		docker run -it --rm \
+			--name shell -v ~/.gitconfig:/etc/gitconfig  -v ~/org/:/home/user/workspace/ -v ~/.ssh:/home/user/.ssh  ${DOCKER_REPO_PREFIX}/shell sh -l
+}
+#+END_SRC
+
 ** yq 
 yml parser, wraps [[https://stedolan.github.io/jq/][jq]], so you can apply all of jq's filters.
 
@@ -51,16 +77,4 @@ yq() {
 		--name yq \
 		${DOCKER_REPO_PREFIX}/yq "$@"
 }
-
-#+END_SRC
-
-** shell
-my personal shell with some productivity tools like todotxt
-
-#+BEGIN_SRC sh :tangle .dockerfunc
-shell() {
-		docker run -it --rm \
-			--name shell -v ~/.gitconfig:/etc/gitconfig  -v ~/org/:/home/user/workspace/ -v ~/.ssh:/home/user/.ssh  ${DOCKER_REPO_PREFIX}/shell sh -l
-}
-
 #+END_SRC

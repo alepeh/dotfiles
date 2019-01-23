@@ -1,12 +1,18 @@
 export DOCKER_REPO_PREFIX=alepeh
 
-yq() {
+jq() {
 	docker run -i --rm \
-		--name yq \
-		${DOCKER_REPO_PREFIX}/yq "$@"
+		--name jq \
+		${DOCKER_REPO_PREFIX}/jq "$@"
 }
 
 shell() {
 		docker run -it --rm \
 			--name shell -v ~/.gitconfig:/etc/gitconfig  -v ~/org/:/home/user/workspace/ -v ~/.ssh:/home/user/.ssh  ${DOCKER_REPO_PREFIX}/shell sh -l
+}
+
+yq() {
+	docker run -i --rm \
+		--name yq \
+		${DOCKER_REPO_PREFIX}/yq "$@"
 }
