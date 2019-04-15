@@ -7,6 +7,7 @@ jq() {
 }
 
 t() {
+    sort ${TODOTXT_TODO_DIR}/todo/todo.txt -o ${TODOTXT_TODO_DIR}/todo/todo.txt
 		docker run -it --rm \
 			--name todotxt -v ${TODOTXT_TODO_DIR}:/home/user/workspace/ \
 			${DOCKER_REPO_PREFIX}/todotxt "todo.sh $@"
