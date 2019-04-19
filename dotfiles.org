@@ -32,9 +32,17 @@ all:
 * Dockerfunc
 Run-commands for all docker containers.
 
-Set variables
+** Set variables
 #+BEGIN_SRC sh :tangle .dockerfunc
-export DOCKER_REPO_PREFIX=alepeh
+  export DOCKER_REPO_PREFIX=alepeh
+#+END_SRC
+** Set alias to run spacemacs
+This container needs to deal with X11, so it's more difficult to set it up.
+On macOS, you need to have XQuartz 2.7.10 installed (the newer version does not work with docker).
+The command passes the current directory, spacemacs starts in deft mode and lists all contained files
+(if the file-ending matches the filter). 
+#+BEGIN_SRC sh :tangle .dockerfunc
+  alias s='~/.spacemacs $PWD'
 #+END_SRC
 ** jq
 json parser [[https://stedolan.github.io/jq/][jq]]
@@ -51,7 +59,6 @@ jq() {
 		${DOCKER_REPO_PREFIX}/jq "$@"
 }
 #+END_SRC
-
 
 ** todotxt
 Required environment vars in your .extra file:
