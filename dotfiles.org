@@ -36,7 +36,6 @@ Set variables
 #+BEGIN_SRC sh :tangle .dockerfunc
 export DOCKER_REPO_PREFIX=alepeh
 #+END_SRC
-
 ** jq
 json parser [[https://stedolan.github.io/jq/][jq]]
 
@@ -53,19 +52,25 @@ jq() {
 }
 #+END_SRC
 
+
 ** todotxt
 Required environment vars in your .extra file:
 TODOTXT_TODO_DIR
 
 #+BEGIN_SRC sh :tangle .dockerfunc
 t() {
-    sort ${TODOTXT_TODO_DIR}/todo/todo.txt -o ${TODOTXT_TODO_DIR}/todo/todo.txt
 		docker run -it --rm \
 			--name todotxt -v ${TODOTXT_TODO_DIR}:/home/user/workspace/ \
 			${DOCKER_REPO_PREFIX}/todotxt "$@"
 }
 #+END_SRC
 
+sort the todotxt file
+#+BEGIN_SRC sh :tangle .dockerfunc 
+ts() {
+    sort ${TODOTXT_TODO_DIR}/todo/todo.txt -o ${TODOTXT_TODO_DIR}/todo/todo.txt
+}
+#+END_SRC
 ** yq 
 yml parser, wraps [[https://stedolan.github.io/jq/][jq]], so you can apply all of jq's filters.
 
