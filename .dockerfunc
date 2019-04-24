@@ -1,7 +1,5 @@
 export DOCKER_REPO_PREFIX=alepeh
 
-alias s='~/.spacemacs $PWD'
-
 jq() {
 	docker run -i --rm \
 		--name jq \

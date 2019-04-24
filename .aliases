@@ -1,0 +1,8 @@
+alias c='cal -A 2'
+
+alias s='~/.spacemacs $PWD'
+
+#list open tasks for the different contexts
+alias tp='t ls @psc'
+alias th='t ls @home'
+alias tr='t ls @rfk'

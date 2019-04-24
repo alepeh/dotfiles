@@ -10,7 +10,7 @@ On some machines I use zsh, so I simply add it to ~/.zshrc
 
 #+BEGIN_SRC sh :tangle .bash_profile
 #!/bin/bash
-for file in ~/.{dockerfunc,extra}; do
+for file in ~/.{dockerfunc,aliases,extra}; do
 	if [[ -r "$file" ]] && [[ -f "$file" ]]; then
 		source "$file"
 	fi
@@ -35,14 +35,6 @@ Run-commands for all docker containers.
 ** Set variables
 #+BEGIN_SRC sh :tangle .dockerfunc
   export DOCKER_REPO_PREFIX=alepeh
-#+END_SRC
-** Set alias to run spacemacs
-This container needs to deal with X11, so it's more difficult to set it up.
-On macOS, you need to have XQuartz 2.7.10 installed (the newer version does not work with docker).
-The command passes the current directory, spacemacs starts in deft mode and lists all contained files
-(if the file-ending matches the filter). 
-#+BEGIN_SRC sh :tangle .dockerfunc
-  alias s='~/.spacemacs $PWD'
 #+END_SRC
 ** jq
 json parser [[https://stedolan.github.io/jq/][jq]]
@@ -92,4 +84,28 @@ yq() {
 		--name yq \
 		${DOCKER_REPO_PREFIX}/yq "$@"
 }
+#+END_SRC
+* Aliases
+** calendar
+Display a calendar of the current plus the next two months using the built-in =cal= utility.
+
+#+BEGIN_SRC sh :tangle .aliases
+alias c='cal -A 2'
+#+END_SRC
+
+** spacemacs
+This container needs to deal with X11, so it's more difficult to set it up.
+On macOS, you need to have XQuartz 2.7.10 installed (the newer version does not work with docker).
+The command passes the current directory, spacemacs starts in deft mode and lists all contained files
+(if the file-ending matches the filter). 
+#+BEGIN_SRC sh :tangle .aliases
+alias s='~/.spacemacs $PWD'
+#+END_SRC
+** todotxt
+todotxt cli is assumed to be availabe via a function =t=
+#+BEGIN_SRC sh :tangle .aliases
+#list open tasks for the different contexts
+alias tp='t ls @psc'
+alias th='t ls @home'
+alias tr='t ls @rfk'
 #+END_SRC

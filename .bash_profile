@@ -1,5 +1,5 @@
 #!/bin/bash
-for file in ~/.{dockerfunc,extra}; do
+for file in ~/.{dockerfunc,aliases,extra}; do
 	if [[ -r "$file" ]] && [[ -f "$file" ]]; then
 		source "$file"
 	fi
