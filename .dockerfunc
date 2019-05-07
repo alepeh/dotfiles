@@ -6,6 +6,14 @@ jq() {
 		${DOCKER_REPO_PREFIX}/jq "$@"
 }
 
+oagen(){
+	docker run --rm \
+  		-v ${PWD}:/local openapitools/openapi-generator-cli generate \
+  		-i "local/$@" \
+  		-g java \
+  		-o /local/out/
+}
+
 t() {
 		docker run -it --rm \
 			--name todotxt -v ${TODOTXT_TODO_DIR}:/home/user/workspace/ \

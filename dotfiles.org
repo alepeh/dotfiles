@@ -52,6 +52,20 @@ jq() {
 }
 #+END_SRC
 
+** openapi generator
+https://openapi-generator.tech/docs/installation
+Go to the directory wehere you openapi yaml file is located
+and run =oagen <openapispecfile>.yaml=
+
+#+BEGIN_SRC sh :tangle .dockerfunc
+oagen(){
+	docker run --rm \
+  		-v ${PWD}:/local openapitools/openapi-generator-cli generate \
+  		-i "local/$@" \
+  		-g java \
+  		-o /local/out/
+}
+#+END_SRC
 ** todotxt
 Required environment vars in your .extra file:
 TODOTXT_TODO_DIR
