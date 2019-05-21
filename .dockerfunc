@@ -6,6 +6,12 @@ jq() {
 		${DOCKER_REPO_PREFIX}/jq "$@"
 }
 
+jrnl(){
+    docker run -it --rm \
+      --name jrnl -v ${JRNL_JOURNAL_DIR}:/home/user/workspace \
+    ${DOCKER_REPO_PREFIX}/jrnl "$@"
+}
+
 oagen(){
 	docker run --rm \
   		-v ${PWD}:/local openapitools/openapi-generator-cli generate \

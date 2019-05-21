@@ -52,6 +52,17 @@ jq() {
 }
 #+END_SRC
 
+** jrnl
+Required environment vars in your .extra file:
+JRNL_JOURNAL_DIR
+
+#+BEGIN_SRC sh :tangle .dockerfunc
+jrnl(){
+    docker run -it --rm \
+      --name jrnl -v ${JRNL_JOURNAL_DIR}:/home/user/workspace \
+    ${DOCKER_REPO_PREFIX}/jrnl "$@"
+}
+#+END_SRC
 ** openapi generator
 https://openapi-generator.tech/docs/installation
 Go to the directory wehere you openapi yaml file is located
