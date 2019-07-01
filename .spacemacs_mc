@@ -17,4 +17,4 @@ function startx() {
  
 startx 
 xhost + $ip
-docker run -e DISPLAY=$ip:0 -e TZ=Europe/Vienna -e UNAME=alepeh -v /tmp/.X11-unix:/tmp/.X11-unix -v "$ORG_DIR":/mnt/workspace alepeh/spacemacs:latest 
+docker run -e DISPLAY=$ip:0 -e TZ=Europe/Vienna -e UNAME=alepeh -v /tmp/.X11-unix:/tmp/.X11-unix -v $DOCKERFILES_DIR/spacemacs/.spacemacs.el:/home/emacs/.spacemacs -v $DOCKERFILES_DIR/spacemacs/layers/ap-org:/home/emacs/.emacs.d/private/ap-org -v "$ORG_DIR":/mnt/workspace alepeh/spacemacs:latest 

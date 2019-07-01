@@ -1,3 +1,7 @@
+dcleanup(){
+  docker ps -a --filter status=exited --format {{.ID}} | xargs docker rm
+}
+
 export DOCKER_REPO_PREFIX=alepeh
 
 jq() {

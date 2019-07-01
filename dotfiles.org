@@ -31,7 +31,14 @@ all:
 
 * Dockerfunc
 Run-commands for all docker containers.
-
+** Cleanup functions
+Remove exited containers.
+Need to expand this to also remove volumes and dangling images.
+#+begin_src sh :tangle .dockerfunc
+dcleanup(){
+  docker ps -a --filter status=exited --format {{.ID}} | xargs docker rm
+}
+#+end_src
 ** Set variables
 #+BEGIN_SRC sh :tangle .dockerfunc
   export DOCKER_REPO_PREFIX=alepeh
@@ -125,6 +132,15 @@ The command passes the current directory, spacemacs starts in deft mode and list
 (if the file-ending matches the filter). 
 #+BEGIN_SRC sh :tangle .aliases
 alias s='~/.spacemacs $PWD'
+#+END_SRC
+
+The following mounts the =.spacemacs.el= and the =ap-org= layer configuration from the file system to the container.
+This is handy during development. If you change the configs outside the container, you need to restart the container
+to pickup the changes.
+Make sure that the =DOCKERFILES_DIR= environment variable is set and points to the absolute path of your dockerfile
+directory.
+#+BEGIN_SRC sh :tangle .aliases
+alias smc='~/.spacemacs_mc $PWD'
 #+END_SRC
 ** todotxt
 todotxt cli is assumed to be availabe via a function =t=
