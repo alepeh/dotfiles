@@ -34,6 +34,12 @@ ts() {
     sort ${TODOTXT_TODO_DIR}/todo/todo.txt -o ${TODOTXT_TODO_DIR}/todo/todo.txt
 }
 
+youtube-dl() {
+		docker run -it --rm \
+			--name youtubedl -v ${YOUTUBE_DL_DOWNLOAD_DIR}:/home/app/ \
+			${DOCKER_REPO_PREFIX}/youtube-dl "$@"
+}
+
 yq() {
 	docker run -i --rm \
 		--name yq \

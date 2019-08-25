@@ -7,6 +7,7 @@ fi
 
 # X11 settings for docker
 export ip=`ifconfig en0 | grep "inet " | cut -d " " -f2`
+#export ip=`ifconfig en8 | grep "inet " | cut -d " " -f2`
 
 function startx() {
 	if [ -z "$(ps -ef|grep XQuartz|grep -v grep)" ] ; then

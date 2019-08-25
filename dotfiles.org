@@ -102,6 +102,21 @@ ts() {
     sort ${TODOTXT_TODO_DIR}/todo/todo.txt -o ${TODOTXT_TODO_DIR}/todo/todo.txt
 }
 #+END_SRC
+** youtube-dl
+youtube downloader written in python
+https://www.shellhacks.com/download-youtube-video-linux-command-line/
+
+Required environment vars in your .extra file:
+YOUTUBE_DL_DOWNLOAD_DIR
+
+#+begin_src sh :tangle .dockerfunc
+youtube-dl() {
+		docker run -it --rm \
+			--name youtubedl -v ${YOUTUBE_DL_DOWNLOAD_DIR}:/home/app/ \
+			${DOCKER_REPO_PREFIX}/youtube-dl "$@"
+}
+#+end_src
+
 ** yq 
 yml parser, wraps [[https://stedolan.github.io/jq/][jq]], so you can apply all of jq's filters.
 
@@ -126,6 +141,14 @@ alias c='cal -A 2'
 #+END_SRC
 
 ** spacemacs
+Set the location to the org directory and launch spacemacs from there, the loacation has to be the same
+on all devices.
+#+begin_src sh :tangle .aliases 
+export ORG_DIR='~/nas/drive/org'
+alias org='cd $ORG_DIR'
+alias sorg='~/.spacemacs $ORG_DIR'
+#+end_src
+
 This container needs to deal with X11, so it's more difficult to set it up.
 On macOS, you need to have XQuartz 2.7.10 installed (the newer version does not work with docker).
 The command passes the current directory, spacemacs starts in deft mode and lists all contained files
@@ -142,6 +165,11 @@ directory.
 #+BEGIN_SRC sh :tangle .aliases
 alias smc='~/.spacemacs_mc $PWD'
 #+END_SRC
+
+Org-mode needs practice, so the following copies my version of an org tutorial and launches spacemacs.
+#+begin_src sh :tangle .aliases
+alias orgtutor='mkdir -p /tmp/orgtutor && cp .orgtutor.org /tmp/orgtutor/tutor.org && ~/.spacemacs /tmp/orgtutor/'
+#+end_src
 ** todotxt
 todotxt cli is assumed to be availabe via a function =t=
 #+BEGIN_SRC sh :tangle .aliases
