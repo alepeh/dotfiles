@@ -14,3 +14,5 @@ alias orgtutor='mkdir -p /tmp/orgtutor && cp .orgtutor.org /tmp/orgtutor/tutor.o
 alias tp='t ls @psc'
 alias th='t ls @home'
 alias tr='t ls @rfk'
+
+alias note='~/.task_open_note'
