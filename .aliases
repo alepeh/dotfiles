@@ -14,3 +14,6 @@ alias orgtutor='mkdir -p /tmp/orgtutor && cp .orgtutor.org /tmp/orgtutor/tutor.o
 alias tp='t ls @psc'
 alias th='t ls @home'
 alias tr='t ls @rfk'
+
+alias amacs='export SPACEMACS_WORKSPACE=$ORG_DIR; emacs &'
+alias paymacs='export SPACEMACS_WORKSPACE=$PSC_ORG_DIR; emacs &'
