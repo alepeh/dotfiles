@@ -113,6 +113,9 @@ ts() {
 Required environment vars in your .extra file:
 TASK_DATA_DIR
 
+It's important to not run attach a terminal (-t) to the container
+as this will print a carriage return on its output.
+
 #+BEGIN_SRC sh :tangle .dockerfunc
 task() {
 		docker run -i --rm \
