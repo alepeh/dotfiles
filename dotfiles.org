@@ -109,6 +109,18 @@ ts() {
     sort ${TODOTXT_TODO_DIR}/todo/todo.txt -o ${TODOTXT_TODO_DIR}/todo/todo.txt
 }
 #+END_SRC
+** task
+Required environment vars in your .extra file:
+TASK_DATA_DIR
+
+#+BEGIN_SRC sh :tangle .dockerfunc
+task() {
+		docker run -it --rm \
+			--name task -v ${TASK_DATA_DIR}:/home/user/.task/ \
+			${DOCKER_REPO_PREFIX}/task "$@"
+}
+#+END_SRC
+
 ** youtube-dl
 youtube downloader written in python
 https://www.shellhacks.com/download-youtube-video-linux-command-line/

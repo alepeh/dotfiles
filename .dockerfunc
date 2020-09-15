@@ -34,6 +34,12 @@ ts() {
     sort ${TODOTXT_TODO_DIR}/todo/todo.txt -o ${TODOTXT_TODO_DIR}/todo/todo.txt
 }
 
+task() {
+		docker run -it --rm \
+			--name task -v ${TASK_DATA_DIR}:/home/user/.task/ \
+			${DOCKER_REPO_PREFIX}/task "$@"
+}
+
 youtube-dl() {
 		docker run -it --rm \
 			--name youtubedl -v ${YOUTUBE_DL_DOWNLOAD_DIR}:/home/app/ \

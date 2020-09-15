@@ -319,7 +319,6 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   ;; Deft settings
   (setq deft-directory (getenv "SPACEMACS_WORKSPACE"))
-  (setq deft-use-filter-string-for-filename t)
   (setq deft-use-filename-as-title nil)
   ;; Start emacs server
   (server-start)
