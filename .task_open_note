@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Copyright (C) 2016-present Arctic Ice Studio <development@arcticicestudio.com>
 # Copyright (C) 2016-present Sven Greb <development@svengreb.de>
@@ -14,6 +14,12 @@
 #   https://en.wikibooks.org/wiki/Regular_Expressions/POSIX-Extended_Regular_Expressions
 
 set -e
+
+task() {
+		docker run -i --rm \
+			--name task -v ${TASK_DATA_DIR}:/home/user/.task/ \
+			${DOCKER_REPO_PREFIX}/task "$@"
+}
 
 cleanup() {
   unset -f log_error validate_parameter get_task_uuid open_notes
@@ -40,7 +46,7 @@ get_task_uuid() {
   local task_id=$1
   local uuid="$(task _get $task_id.uuid)"
   if [ -z $uuid ]; then
-    log_error "No task found with for specified ID '$task_id'!"
+    log_error "No task found for specified ID '$task_id'!"
     exit 1
   fi
   printf "$uuid"
@@ -50,7 +56,7 @@ get_task_description() {
   local task_id=$1
   local description="$(task _get $task_id.description)"
   if [ -z $description ]; then
-    log_error "No task found with for specified ID '$task_id'!"
+    log_error "No task found for specified ID '$task_id'!"
     exit 1
   fi
   printf "$description"
@@ -59,7 +65,7 @@ get_task_description() {
 open_notes() {
   declare -a local task_uuids
   local task_uuid
-  local note_path="/Users/michalex/nas/drive/org"
+  local note_path="${TASK_DATA_DIR}"
   local editor_cmd="emacsclient"
   local note_file_ext="org"
 

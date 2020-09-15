@@ -115,7 +115,7 @@ TASK_DATA_DIR
 
 #+BEGIN_SRC sh :tangle .dockerfunc
 task() {
-		docker run -it --rm \
+		docker run -i --rm \
 			--name task -v ${TASK_DATA_DIR}:/home/user/.task/ \
 			${DOCKER_REPO_PREFIX}/task "$@"
 }
