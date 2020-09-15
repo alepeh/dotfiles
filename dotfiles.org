@@ -6,6 +6,12 @@ Ensure that the generated .bash_profile is loaded in your shell
 even when you're not using bash.
 On some machines I use zsh, so I simply add it to ~/.zshrc
 
+** Taskwarrior setup
+On macos you can install Taskwarrior via =brew install task=
+We need to set the data location. This command persists it in =.taskrc=
+#+begin_src sh 
+task config data.location ~/nas/drive/task
+#+end_src
 * Sourcing generated files
 
 #+BEGIN_SRC sh :tangle .bash_profile
@@ -27,6 +33,7 @@ all:
 		f=$$(basename $$file); \
 		ln -sfn $$file $(HOME)/$$f; \
 	done;
+
 #+END_SRC
 
 * Dockerfunc
@@ -178,3 +185,9 @@ alias tp='t ls @psc'
 alias th='t ls @home'
 alias tr='t ls @rfk'
 #+END_SRC
+** taskwarrior
+This adds a note to a Taskwarrior task using its uuid as filename
+and the description as title.
+#+begin_src sh :tangle .aliases
+alias note='~/.task_open_note'
+#+end_src

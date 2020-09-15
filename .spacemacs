@@ -317,11 +317,12 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  ;; Open deft on startup
   ;; Deft settings
   (setq deft-directory (getenv "SPACEMACS_WORKSPACE"))
   (setq deft-use-filter-string-for-filename t)
-  (deft)
+  (setq deft-use-filename-as-title nil)
+  ;; Start emacs server
+  (server-start)
 )
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.

@@ -15,5 +15,5 @@ alias tp='t ls @psc'
 alias th='t ls @home'
 alias tr='t ls @rfk'
 
+alias note='~/.task_open_note'
 alias amacs='export SPACEMACS_WORKSPACE=$ORG_DIR; emacs &'
-alias paymacs='export SPACEMACS_WORKSPACE=$PSC_ORG_DIR; emacs &'
