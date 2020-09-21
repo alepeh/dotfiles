@@ -17,7 +17,7 @@ set -e
 
 task() {
 		docker run -i --rm \
-			--name task -v ${TASK_DATA_DIR}:/home/user/.task/ \
+			--name task -v "${TASK_DATA_DIR}":/home/user/.task/ \
 			${DOCKER_REPO_PREFIX}/task "$@"
 }
 
@@ -65,7 +65,7 @@ get_task_description() {
 open_notes() {
   declare -a local task_uuids
   local task_uuid
-  local note_path="${TASK_DATA_DIR}"
+  local note_path="${SPACEMACS_WORKSPACE}"
   local editor_cmd="emacsclient"
   local note_file_ext="org"
 
@@ -74,7 +74,7 @@ open_notes() {
     task_uuid="$(get_task_uuid $task_id)"
     task_description="$(get_task_description $task_id)"
     if ! [ -z $task_uuid ]; then
-      if ! [ -z "$note_path/$task_uuid.$note_file_ext" ]; then
+      if ! [ -f "$note_path/$task_uuid.$note_file_ext" ]; then
             echo "#+TITLE: $task_description" > "$note_path/$task_uuid.$note_file_ext"
       fi
       $editor_cmd "$note_path/$task_uuid.$note_file_ext"

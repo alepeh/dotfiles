@@ -16,3 +16,4 @@ alias th='t ls @home'
 alias tr='t ls @rfk'
 
 alias note='~/.task_open_note'
+alias paymacs="emacs &"
