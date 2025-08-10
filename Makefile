@@ -73,3 +73,12 @@ doctor: ## Quick sanity checks
 clean: ## Remove symlinked iTerm2 profile (non-destructive)
 	@rm -f "$(ITERM_PROFILE_LINK)"
 	@echo "✓ Removed iTerm2 profile link."
+
+.PHONY: nvim
+
+nvim:
+	@echo "→ Ensuring Neovim config is repo-managed and linked"
+	@[ -d "$(DOTFILES)/nvim" ] || (echo "→ Installing LazyVim to $(DOTFILES)/nvim" && git clone https://github.com/LazyVim/starter "$(DOTFILES)/nvim" && rm -rf "$(DOTFILES)/nvim/.git")
+	@mkdir -p "$(HOME)/.config"
+	@ln -sfn "$(DOTFILES)/nvim" "$(HOME)/.config/nvim"
+	@echo "✓ ~/.config/nvim → $(DOTFILES)/nvim"

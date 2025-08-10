@@ -22,6 +22,7 @@ Minimal, reproducible shell setup for macOS:
 * **Productive fuzzy find**: `fzf` with `fd`/`rg` backends and file previews via `bat`.
 * **Nice defaults**: `eza`, `ripgrep`, `bat`, `zoxide` (optional) and helpful aliases.
 * **iTerm2 profile**: Pre-configured font/colors; linked via Dynamic Profiles.
+* **Neovim + LazyVim**: repo‑managed config at $DOTFILES/nvim, symlinked to ~/.config/nvim with automatic backups/migration.
 
 ---
 
@@ -47,7 +48,7 @@ git submodule update --init --recursive
 git commit -m "Add OMZ + P10k + plugins as submodules"
 ```
 
-### 2) Install (backs up your current Zsh files and iTerm prefs)
+### 2) Install (backs up your current Zsh files and iTerm prefs and nvim config)
 
 **Option A: via Makefile**
 
@@ -69,6 +70,10 @@ What happens:
 * Existing `~/.zshrc`, `~/.zshenv`, `~/.p10k.zsh` are backed up (timestamped) and replaced with symlinks.
 * iTerm2 profile JSON is linked into `~/Library/Application Support/iTerm2/DynamicProfiles/`.
 * Default shell is set to `zsh` if needed.
+* nvim
+   ** If ~/.config/nvim exists: it’s backed up (.bak.<timestamp>), and when the repo doesn’t have nvim/ yet, your config is migrated into $DOTFILES/nvim.
+   ** If neither exists: LazyVim starter is cloned into $DOTFILES/nvim.
+   ** In all cases, we symlink ~/.config/nvim → $DOTFILES/nvim.
 
 Restart your terminal or run:
 
