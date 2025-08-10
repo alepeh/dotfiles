@@ -1,0 +1,25 @@
+# Fast startup
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+
+# Left: directory + VCS; Right: status, duration, jobs, runtimes, time
+typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs)
+typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs nodeenv pyenv goenv time)
+
+typeset -g POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=false
+typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
+typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+
+typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=$'\UE0A0 ' # 
+typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=800
+
+typeset -g POWERLEVEL9K_OK_ICON=$'\u279C'   # ➜
+typeset -g POWERLEVEL9K_FAIL_ICON=$'\u2717' # ✗
+
+typeset -g POWERLEVEL9K_DIR_FOREGROUND=45
+typeset -g POWERLEVEL9K_VCS_FOREGROUND=141
+typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_VIINS_CONTENT_EXPANSION='➜'
+typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_VIINS_CONTENT_EXPANSION='✗'
+
+typeset -g POWERLEVEL9K_TIME_FORMAT='%H:%M'
+typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=true

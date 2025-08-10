@@ -1,0 +1,69 @@
+{
+  "Profiles": [
+    {
+      "Guid": "D9C0B3A2-3C7B-4B6E-9C6B-33A7A7D8A0F1",
+      "Name": "Dotfiles - Minimal P10k",
+      "Description": "Lean profile for OMZ + Powerlevel10k + Meslo Nerd Font",
+      "Badge Color": { "Red Component": 0.2, "Green Component": 0.6, "Blue Component": 1.0, "Alpha Component": 0.0 },
+      "Badge Text": "",
+      "Transparency": 0,
+      "Use Transparency": false,
+
+      "Normal Font": "MesloLGMNerdFontComplete-Regular 13",
+      "Non Ascii Font": "MesloLGMNerdFontComplete-Regular 13",
+      "Use Non-ASCII Font": true,
+
+      "Horizontal Spacing": 1.0,
+      "Vertical Spacing": 1.0,
+
+      "Cursor Type": 2,
+      "Blinking Cursor": false,
+      "Cursor Guide": true,
+
+      "Unlimited Scrollback": true,
+      "Scrollback Lines": 100000,
+
+      "Option Key Sends": 2,
+      "Left Option Key Sends": 2,
+      "Right Option Key Sends": 2,
+
+      "Disable Window Resizing": false,
+      "Use Lion Style Fullscreen": true,
+      "Window Type": 0,
+
+      "ASCII Ligatures": true,
+      "Draw Powerline Glyphs": true,
+
+      "Blur": false,
+      "Terminal Type": "xterm-256color",
+
+      "Use Bright Bold": true,
+      "Bold Color": { "Red Component": 0.8, "Green Component": 0.8, "Blue Component": 0.8 },
+
+      "Background Color": { "Red Component": 0.058, "Green Component": 0.058, "Blue Component": 0.062 },
+      "Foreground Color": { "Red Component": 0.86, "Green Component": 0.86, "Blue Component": 0.86 },
+      "Cursor Text Color": { "Red Component": 0.0, "Green Component": 0.0, "Blue Component": 0.0 },
+      "Cursor Color": { "Red Component": 0.86, "Green Component": 0.86, "Blue Component": 0.86 },
+
+      "Selection Color": { "Red Component": 0.275, "Green Component": 0.353, "Blue Component": 0.424 },
+
+      "Ansi 0 Color":  { "Red Component": 0.0,   "Green Component": 0.0,   "Blue Component": 0.0   },
+      "Ansi 1 Color":  { "Red Component": 0.86,  "Green Component": 0.196, "Blue Component": 0.184 },
+      "Ansi 2 Color":  { "Red Component": 0.325, "Green Component": 0.596, "Blue Component": 0.216 },
+      "Ansi 3 Color":  { "Red Component": 0.769, "Green Component": 0.627, "Blue Component": 0.196 },
+      "Ansi 4 Color":  { "Red Component": 0.196, "Green Component": 0.431, "Blue Component": 0.769 },
+      "Ansi 5 Color":  { "Red Component": 0.58,  "Green Component": 0.345, "Blue Component": 0.675 },
+      "Ansi 6 Color":  { "Red Component": 0.196, "Green Component": 0.596, "Blue Component": 0.596 },
+      "Ansi 7 Color":  { "Red Component": 0.86,  "Green Component": 0.86,  "Blue Component": 0.86  },
+
+      "Ansi 8 Color":  { "Red Component": 0.196, "Green Component": 0.196, "Blue Component": 0.196 },
+      "Ansi 9 Color":  { "Red Component": 1.0,   "Green Component": 0.298, "Blue Component": 0.298 },
+      "Ansi 10 Color": { "Red Component": 0.463, "Green Component": 0.796, "Blue Component": 0.318 },
+      "Ansi 11 Color": { "Red Component": 0.933, "Green Component": 0.824, "Blue Component": 0.353 },
+      "Ansi 12 Color": { "Red Component": 0.318, "Green Component": 0.584, "Blue Component": 0.886 },
+      "Ansi 13 Color": { "Red Component": 0.753, "Green Component": 0.502, "Blue Component": 0.886 },
+      "Ansi 14 Color": { "Red Component": 0.451, "Green Component": 0.796, "Blue Component": 0.796 },
+      "Ansi 15 Color": { "Red Component": 1.0,   "Green Component": 1.0,   "Blue Component": 1.0   }
+    }
+  ]
+}
