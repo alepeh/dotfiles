@@ -57,4 +57,10 @@ if [ "$SHELL" != "$(command -v zsh)" ]; then
   chsh -s "$(command -v zsh)" || echo "   Run manually: chsh -s $(command -v zsh)"
 fi
 
+echo "→ Installing  Claude Code CLI..."
+npm install -g @anthropic-ai/claude-code
+
+echo "→ Install Codex CLI..."
+npm install -g @openai/codex
+
 echo "✓ Install complete. Restart terminal or run: exec zsh"
