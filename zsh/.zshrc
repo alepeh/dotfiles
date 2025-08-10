@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 ##### Core paths (macOS) #####
 export DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 export ZSH="$DOTFILES/omz/ohmyzsh"
@@ -86,3 +93,6 @@ ff() { ${EDITOR} "$(fzf)"; }
 if command -v brew >/dev/null 2>&1; then
   eval "$(brew shellenv)"
 fi
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
