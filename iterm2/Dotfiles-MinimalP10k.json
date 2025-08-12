@@ -23,9 +23,9 @@
       "Unlimited Scrollback": true,
       "Scrollback Lines": 100000,
 
-      "Option Key Sends": 2,
+      "Option Key Sends": 0,
       "Left Option Key Sends": 2,
-      "Right Option Key Sends": 2,
+      "Right Option Key Sends": 0,
 
       "Disable Window Resizing": false,
       "Use Lion Style Fullscreen": true,
