@@ -57,7 +57,7 @@ fi
 if [ ! -d "$NVIM_REPO" ]; then
   echo "→ Installing LazyVim into repo ($NVIM_REPO)..."
   git clone https://github.com/LazyVim/starter "$NVIM_REPO"
-  rm -rf "$NVIM_REPO/.git"   # keep it as your config, not a git sub-repo
+  rm -rf "$NVIM_REPO/.git" # keep it as your config, not a git sub-repo
 else
   echo "✓ Repo Neovim config present at $NVIM_REPO"
 fi
@@ -71,8 +71,8 @@ echo "→ Installing fzf keybindings/completions..."
 "$(brew --prefix)/opt/fzf/install" --key-bindings --completion --no-update-rc
 
 echo "→ Linking dotfiles (with backups if needed)..."
-backup_and_link "$DOTFILES/zsh/.zshenv"    "$HOME/.zshenv"
-backup_and_link "$DOTFILES/zsh/.zshrc"     "$HOME/.zshrc"
+backup_and_link "$DOTFILES/zsh/.zshenv" "$HOME/.zshenv"
+backup_and_link "$DOTFILES/zsh/.zshrc" "$HOME/.zshrc"
 backup_and_link "$DOTFILES/p10k/.p10k.zsh" "$HOME/.p10k.zsh"
 
 # Link iTerm2 Dynamic Profile
@@ -88,8 +88,27 @@ if [ "$SHELL" != "$(command -v zsh)" ]; then
   chsh -s "$(command -v zsh)" || echo "   Run manually: chsh -s $(command -v zsh)"
 fi
 
-echo "→ Installing  Claude Code CLI..."
-npm install -g @anthropic-ai/claude-code
+echo "→ Installing MCP servers..."
+if have uv; then
+  uv tool install mcp-obsidian
+  echo "✓ Installed mcp-obsidian"
+else
+  echo "   uv not found, will be installed via Homebrew"
+fi
+
+echo "→ Installing GitHub MCP server..."
+if have go; then
+  echo "   Installing github-mcp-server via go..."
+  go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest
+  echo "✓ Installed github-mcp-server"
+else
+  echo "   go not found, GitHub MCP server will use Docker fallback"
+fi
+
+echo "→ Linking Claude desktop config..."
+CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
+mkdir -p "$CLAUDE_CONFIG_DIR"
+backup_and_link "$DOTFILES/claude/claude_desktop_config.json" "$CLAUDE_CONFIG_DIR/claude_desktop_config.json"
 
 echo "→ Install Codex CLI..."
 npm install -g @openai/codex

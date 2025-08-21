@@ -7,6 +7,7 @@ Minimal, reproducible shell setup for macOS:
 * **fzf** with sane defaults (`fd`/`rg`, previews via `bat`/`eza`)
 * **zsh-autosuggestions**, **zsh-completions**, **zsh-syntax-highlighting** (pinned)
 * **iTerm2 Dynamic Profile** (Meslo Nerd Font, dark palette)
+* **Claude MCP Servers** (Obsidian, Todoist, GitHub) with secure config
 * **Homebrew Bundle** to install all dependencies
 * Safe **backups** of existing Zsh configs and iTerm2 prefs
 
@@ -23,6 +24,7 @@ Minimal, reproducible shell setup for macOS:
 * **Nice defaults**: `eza`, `ripgrep`, `bat`, `zoxide` (optional) and helpful aliases.
 * **iTerm2 profile**: Pre-configured font/colors; linked via Dynamic Profiles.
 * **Neovim + LazyVim**: repo‑managed config at $DOTFILES/nvim, symlinked to ~/.config/nvim with automatic backups/migration.
+* **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, and GitHub integration.
 
 ---
 
@@ -69,9 +71,10 @@ What happens:
 * `fzf` keybindings/completions are installed.
 * Existing `~/.zshrc`, `~/.zshenv`, `~/.p10k.zsh` are backed up (timestamped) and replaced with symlinks.
 * iTerm2 profile JSON is linked into `~/Library/Application Support/iTerm2/DynamicProfiles/`.
+* Claude MCP servers are installed and configuration is linked.
 * Default shell is set to `zsh` if needed.
 * nvim
-   ** If ~/.config/nvim exists: it’s backed up (.bak.<timestamp>), and when the repo doesn’t have nvim/ yet, your config is migrated into $DOTFILES/nvim.
+   ** If ~/.config/nvim exists: it's backed up (.bak.<timestamp>), and when the repo doesn't have nvim/ yet, your config is migrated into $DOTFILES/nvim.
    ** If neither exists: LazyVim starter is cloned into $DOTFILES/nvim.
    ** In all cases, we symlink ~/.config/nvim → $DOTFILES/nvim.
 
@@ -79,6 +82,53 @@ Restart your terminal or run:
 
 ```bash
 exec zsh
+```
+
+### MCP Server Setup
+
+After installation, you need to configure your API keys for Claude Desktop to access the MCP servers:
+
+1. Copy the environment template:
+   ```bash
+   cp claude/.env.template ~/.env
+   ```
+
+2. Edit `~/.env` and replace the placeholder values with your actual API keys:
+   - **OBSIDIAN_API_KEY**: Your Obsidian Local REST API key
+   - **TODOIST_API_KEY**: Your Todoist API token  
+   - **GITHUB_PERSONAL_ACCESS_TOKEN**: GitHub PAT with repo/read permissions
+
+3. **Update file paths in Claude configuration** (Important: paths must be absolute):
+   Edit `claude/claude_desktop_config.json` and replace any `${HOME}` variables with your actual home directory path:
+   ```json
+   {
+     "mcpServers": {
+       "mcp-obsidian": {
+         "command": "/Users/yourusername/.pyenv/shims/uvx",
+         ...
+       },
+       "todoist-mcp": {
+         "args": ["/Users/yourusername/code/todoist-mcp/build/index.js"],
+         ...
+       },
+       "mcp-server-github": {
+         "command": "/Users/yourusername/go/bin/github-mcp-server",
+         ...
+       }
+     }
+   }
+   ```
+
+4. Set the environment variables for Claude Desktop:
+   ```bash
+   ./scripts/set-claude-env.sh
+   ```
+
+5. Restart Claude Desktop or restart your Mac for the changes to take effect.
+
+The script automatically reads your `~/.env` file and makes the environment variables available to Claude Desktop using `launchctl`. You can verify the setup with:
+```bash
+launchctl getenv OBSIDIAN_API_KEY
 ```
 
 ---
