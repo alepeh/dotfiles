@@ -61,6 +61,12 @@ if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
 fi
 
+##### jenv (Java version management) #####
+if command -v jenv >/dev/null 2>&1; then
+  export PATH="$HOME/.jenv/bin:$PATH"
+  eval "$(jenv init -)"
+fi
+
 ##### Completion UX tweaks #####
 autoload -Uz compinit
 COMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
@@ -85,6 +91,17 @@ command -v bat >/dev/null 2>&1 && alias cat='bat -p'
 command -v rg  >/dev/null 2>&1 && alias grep='rg'
 alias ..='cd ..'
 alias ...='cd ../..'
+
+# Java version switching aliases (jenv)
+if command -v jenv >/dev/null 2>&1; then
+  alias j17='jenv global 17'
+  alias j21='jenv global 21'
+  alias j24='jenv global 24'
+  alias jversions='jenv versions'
+  alias jlocal='jenv local'
+  alias jglobal='jenv global'
+  alias jwhich='jenv which java'
+fi
 
 : ${EDITOR:=nvim}
 ff() { ${EDITOR} "$(fzf)"; }

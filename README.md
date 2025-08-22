@@ -25,6 +25,7 @@ Minimal, reproducible shell setup for macOS:
 * **iTerm2 profile**: Pre-configured font/colors; linked via Dynamic Profiles.
 * **Neovim + LazyVim**: repo‑managed config at $DOTFILES/nvim, symlinked to ~/.config/nvim with automatic backups/migration.
 * **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, and GitHub integration.
+* **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
 
 ---
 
@@ -129,6 +130,41 @@ After installation, you need to configure your API keys for Claude Desktop to ac
 The script automatically reads your `~/.env` file and makes the environment variables available to Claude Desktop using `launchctl`. You can verify the setup with:
 ```bash
 launchctl getenv OBSIDIAN_API_KEY
+```
+
+### Java Version Management
+
+The installation includes jenv for managing multiple JDK versions (17, 21, 24). After installation, JDKs are automatically discovered and added to jenv.
+
+**Quick version switching:**
+```bash
+j17          # Switch to Java 17 globally
+j21          # Switch to Java 21 globally  
+j24          # Switch to Java 24 globally
+```
+
+**Project-specific Java versions:**
+```bash
+jlocal 17    # Set Java 17 for current directory only
+echo "17" > .java-version  # Alternative: create version file
+```
+
+**Utility commands:**
+```bash
+jversions    # List all available Java versions
+jglobal 21   # Set global Java version
+jwhich       # Show current Java executable path
+java -version # Verify current Java version
+```
+
+**Manual JDK installation:**
+If JDKs weren't installed automatically (requires sudo), install them manually:
+```bash
+brew install --cask temurin@17 temurin@21 temurin
+```
+Then run the jenv configuration:
+```bash
+./scripts/install.sh  # Re-run to configure jenv with new JDKs
 ```
 
 ---

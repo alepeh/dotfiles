@@ -113,4 +113,30 @@ backup_and_link "$DOTFILES/claude/claude_desktop_config.json" "$CLAUDE_CONFIG_DI
 echo "→ Install Codex CLI..."
 npm install -g @openai/codex
 
+echo "→ Configuring jenv (Java version management)..."
+if have jenv; then
+  # Initialize jenv first
+  export PATH="$HOME/.jenv/bin:$PATH"
+  eval "$(jenv init -)"
+  
+  # Auto-discover and add installed JDKs to jenv
+  echo "   Discovering installed Java versions..."
+  for java_home in /Library/Java/JavaVirtualMachines/*/Contents/Home; do
+    if [ -d "$java_home" ]; then
+      version_info=$("$java_home/bin/java" -version 2>&1 | head -1)
+      echo "   Found Java at: $java_home"
+      echo "   Version: $version_info"
+      jenv add "$java_home" 2>/dev/null || echo "   (already added to jenv)"
+    fi
+  done
+  
+  # Show available versions
+  echo "   Available Java versions in jenv:"
+  jenv versions
+  
+  echo "✓ jenv configured"
+else
+  echo "   jenv not found, install via Homebrew first"
+fi
+
 echo "✓ Install complete. Restart terminal or run: exec zsh"
