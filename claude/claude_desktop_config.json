@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "mcp-obsidian": {
-      "command": "/Users/alexanderpehm/.pyenv/shims/uvx",
+      "command": "/opt/homebrew/bin/uvx",
       "args": [
         "mcp-obsidian"
       ],
