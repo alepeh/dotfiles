@@ -105,7 +105,7 @@ After installation, you need to configure your API keys for Claude Desktop to ac
    {
      "mcpServers": {
        "mcp-obsidian": {
-         "command": "/Users/yourusername/.pyenv/shims/uvx",
+         "command": "/opt/homebrew/bin/uvx",
          ...
        },
        "todoist-mcp": {
