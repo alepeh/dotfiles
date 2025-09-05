@@ -82,3 +82,9 @@ nvim:
 	@mkdir -p "$(HOME)/.config"
 	@ln -sfn "$(DOTFILES)/nvim" "$(HOME)/.config/nvim"
 	@echo "✓ ~/.config/nvim → $(DOTFILES)/nvim"
+
+zed: ## Link Zed editor configuration
+	@echo "→ Linking Zed configuration"
+	@mkdir -p "$(HOME)/.config/zed"
+	@ln -sfn "$(REPO_DIR)/zed/settings.json" "$(HOME)/.config/zed/settings.json"
+	@echo "✓ ~/.config/zed/settings.json → $(REPO_DIR)/zed/settings.json"
