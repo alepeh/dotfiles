@@ -1,4 +1,5 @@
 {
+  "globalShortcut": "Alt+C",
   "mcpServers": {
     "mcp-obsidian": {
       "command": "/opt/homebrew/bin/uvx",
@@ -30,5 +31,7 @@
       }
     }
   },
-  "globalShortcut": ""
+  "preferences": {
+    "menuBarEnabled": true
+  }
 }
