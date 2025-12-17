@@ -261,6 +261,21 @@ eval "$(zoxide init zsh)"
 
 You can remove `z` from OMZ plugins if you prefer `zoxide` exclusively.
 
+### Machine-specific environment variables
+
+For environment variables that should only apply to this machine (e.g., API keys, local paths), create `~/.zshrc.local`:
+
+```bash
+# ~/.zshrc.local
+export MY_API_KEY="secret-key-for-this-machine"
+export CUSTOM_PATH="/path/to/something/local"
+export MACHINE_SPECIFIC_VAR="value"
+```
+
+This file is automatically sourced by `.zshrc` if it exists. Since it's gitignored and lives in your home directory (not in the dotfiles repo), it won't be committed to version control.
+
+**Note:** After creating or modifying `~/.zshrc.local`, restart your terminal or run `exec zsh` to load the changes.
+
 ### Change prompt look
 
 Run:

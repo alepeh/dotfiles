@@ -113,3 +113,8 @@ fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+export PATH="$HOME/.local/bin:$PATH"
+
+# Machine-specific environment variables (not tracked in git)
+# Create ~/.zshrc.local to add variables that should only apply to this machine
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
