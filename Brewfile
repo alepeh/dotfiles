@@ -12,6 +12,7 @@ brew "neovim"
 brew "uv"        # Python package installer (for MCP servers)
 brew "go"        # For GitHub MCP server
 brew "jenv"       # Java version manager
+brew "mvn"
 cask "temurin@17"   # Eclipse Temurin JDK 17 (LTS)
 cask "temurin@21"   # Eclipse Temurin JDK 21 (LTS)
 cask "temurin"      # Eclipse Temurin JDK 24 (latest)

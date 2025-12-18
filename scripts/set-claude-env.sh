@@ -1,6 +1,16 @@
 #!/bin/bash
 
+# ============================================================================
+# DEPRECATED: This script uses the old launchctl method
+# ============================================================================
+# The new setup uses wrapper scripts instead, which is more reliable.
+# See: claude/README.md for the updated approach
+#
+# This script is kept for backward compatibility and migration purposes.
+# ============================================================================
+
 # Script to set environment variables for Claude Desktop from ~/.env file
+# Note: This uses launchctl which requires re-running after each reboot
 
 ENV_FILE="$HOME/.env"
 

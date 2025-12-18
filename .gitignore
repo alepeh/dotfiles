@@ -1,2 +1,12 @@
 backups
 .zshrc.local
+
+# Environment files with secrets
+.env
+.env.local
+.env.mcp
+.env.*
+!.env.template
+
+# MCP wrapper scripts with secrets
+.mcp-wrappers/

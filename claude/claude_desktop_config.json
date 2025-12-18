@@ -2,36 +2,20 @@
   "globalShortcut": "Alt+C",
   "mcpServers": {
     "mcp-obsidian": {
-      "command": "/opt/homebrew/bin/uvx",
-      "args": [
-        "mcp-obsidian"
-      ],
-      "env": {
-        "OBSIDIAN_API_KEY": "${OBSIDIAN_API_KEY}",
-        "OBSIDIAN_HOST": "${OBSIDIAN_HOST:-127.0.0.1}",
-        "OBSIDIAN_PORT": "${OBSIDIAN_PORT:-27124}"
-      }
+      "command": "/Users/alexanderpehm/.mcp-wrappers/obsidian-wrapper.sh",
+      "args": []
     },
     "todoist-mcp": {
-      "command": "node",
-      "args": [
-        "/Users/alexanderpehm/code/todoist-mcp/build/index.js"
-      ],
-      "env": {
-        "TODOIST_API_KEY": "${TODOIST_API_KEY}"
-      }
+      "command": "/Users/alexanderpehm/.mcp-wrappers/todoist-wrapper.sh",
+      "args": []
     },
     "mcp-server-github": {
-      "command": "/Users/alexanderpehm/go/bin/github-mcp-server",
-      "args": [
-        "stdio"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
-      }
+      "command": "/Users/alexanderpehm/.mcp-wrappers/github-wrapper.sh",
+      "args": []
     }
   },
   "preferences": {
-    "menuBarEnabled": true
+    "menuBarEnabled": true,
+    "quickEntryDictationShortcut": "capslock"
   }
 }

@@ -87,50 +87,70 @@ exec zsh
 
 ### MCP Server Setup
 
-After installation, you need to configure your API keys for Claude Desktop to access the MCP servers:
+After installation, configure your API keys for Claude Desktop to access the MCP servers securely:
 
-1. Copy the environment template:
+#### Secure Configuration Architecture
+
+This setup uses **wrapper scripts** to keep secrets out of git while maintaining a clean, reproducible configuration:
+
+- **`claude/claude_desktop_config.json`**: Safe to commit (contains only wrapper script paths)
+- **`~/.mcp-wrappers/*.sh`**: Wrapper scripts that load secrets and start MCP servers
+- **`~/.env.mcp`**: Your actual API keys (never committed, chmod 600)
+- **`claude/.env.template`**: Template for required keys (committed as reference)
+
+#### Setup Steps
+
+1. **Create your secrets file** from the template:
    ```bash
-   cp claude/.env.template ~/.env
+   cp claude/.env.template ~/.env.mcp
+   chmod 600 ~/.env.mcp
    ```
 
-2. Edit `~/.env` and replace the placeholder values with your actual API keys:
+2. **Edit `~/.env.mcp`** and replace placeholder values with your actual API keys:
    - **OBSIDIAN_API_KEY**: Your Obsidian Local REST API key
-   - **TODOIST_API_KEY**: Your Todoist API token  
-   - **GITHUB_PERSONAL_ACCESS_TOKEN**: GitHub PAT with repo/read permissions
+   - **TODOIST_API_KEY**: Your Todoist API token from https://todoist.com/prefs/integrations
+   - **GITHUB_PERSONAL_ACCESS_TOKEN**: GitHub PAT with `repo`, `read:org`, `read:user` scopes
+     Create at: https://github.com/settings/tokens
 
-3. **Update file paths in Claude configuration** (Important: paths must be absolute):
-   Edit `claude/claude_desktop_config.json` and replace any `${HOME}` variables with your actual home directory path:
-   ```json
-   {
-     "mcpServers": {
-       "mcp-obsidian": {
-         "command": "/opt/homebrew/bin/uvx",
-         ...
-       },
-       "todoist-mcp": {
-         "args": ["/Users/yourusername/code/todoist-mcp/build/index.js"],
-         ...
-       },
-       "mcp-server-github": {
-         "command": "/Users/yourusername/go/bin/github-mcp-server",
-         ...
-       }
-     }
-   }
-   ```
+3. **Wrapper scripts are already created** at `~/.mcp-wrappers/`:
+   - `obsidian-wrapper.sh` - Loads secrets and starts mcp-obsidian
+   - `todoist-wrapper.sh` - Loads secrets and starts todoist-mcp
+   - `github-wrapper.sh` - Loads secrets and starts mcp-server-github
 
-4. Set the environment variables for Claude Desktop:
-   ```bash
-   ./scripts/set-claude-env.sh
-   ```
+4. **Restart Claude Desktop** for changes to take effect.
 
-5. Restart Claude Desktop or restart your Mac for the changes to take effect.
+#### How It Works
 
-The script automatically reads your `~/.env` file and makes the environment variables available to Claude Desktop using `launchctl`. You can verify the setup with:
+Each wrapper script:
+1. Sources `~/.env.mcp` to load your secrets into the environment
+2. Executes the actual MCP server with those variables available
+3. Keeps `claude_desktop_config.json` clean and git-safe
+
+Example wrapper script:
 ```bash
-launchctl getenv OBSIDIAN_API_KEY
+#!/bin/bash
+# Load environment variables from secure location
+if [ -f ~/.env.mcp ]; then
+    source ~/.env.mcp
+fi
+# Start the actual MCP server
+exec /opt/homebrew/bin/uvx mcp-obsidian
 ```
+
+#### Verification
+
+Test that your MCP servers are working by checking Claude Desktop's MCP server status, or test a wrapper script manually:
+```bash
+# Test obsidian wrapper (should connect to your Obsidian instance)
+~/.mcp-wrappers/obsidian-wrapper.sh
+```
+
+#### Security Notes
+
+- `~/.env.mcp` is protected with `chmod 600` (owner read/write only)
+- Never commit `~/.env.mcp` to git (protected by `.gitignore`)
+- The `claude/claude_desktop_config.json` is **safe to commit** to public repos
+- Wrapper scripts can be regenerated if needed
 
 ### Java Version Management
 
