@@ -103,8 +103,47 @@ if command -v jenv >/dev/null 2>&1; then
   alias jwhich='jenv which java'
 fi
 
-: ${EDITOR:=nvim}
+: ${EDITOR:=hx}
+
+##### Terminal IDE workflow #####
+# Quick file find and open
 ff() { ${EDITOR} "$(fzf)"; }
+
+# Interactive grep with preview
+fgr() {
+  rg --line-number --color=always "$@" | \
+    fzf --ansi --delimiter ':' \
+        --preview 'bat --color=always --highlight-line {2} {1}' \
+        --preview-window '+{2}-5' | \
+    cut -d':' -f1-2 | \
+    xargs -I{} sh -c 'hx "$(echo {} | cut -d: -f1):$(echo {} | cut -d: -f2)"'
+}
+
+# Zellij workflow aliases
+if command -v zellij >/dev/null 2>&1; then
+  alias zj='zellij'
+  alias zja='zellij attach'
+  alias zjl='zellij list-sessions'
+  # Start Claude Code dev session
+  alias dev='zellij --layout claude-dev'
+  alias devmin='zellij --layout minimal'
+fi
+
+# Lazygit alias
+command -v lazygit >/dev/null 2>&1 && alias lg='lazygit'
+
+# Yazi - change directory on exit
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
+
+# Tree view alias using eza
+alias tree='eza --tree --level=3 --icons'
 
 # Ensure brew env (useful in login shells)
 if command -v brew >/dev/null 2>&1; then

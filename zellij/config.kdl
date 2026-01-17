@@ -1,0 +1,73 @@
+// Zellij configuration
+// Docs: https://zellij.dev/documentation/configuration
+
+// Use 24-bit color
+simplified_ui true
+
+// Copy to system clipboard
+copy_on_select true
+
+// Default shell
+default_shell "zsh"
+
+// Default layout for new sessions
+default_layout "claude-dev"
+
+// Theme
+theme "catppuccin-mocha"
+
+// Mouse support
+mouse_mode true
+
+// Pane frames (borders)
+pane_frames true
+
+// Session serialization (for persistence)
+session_serialization true
+
+// Scrollback lines
+scrollback_lines_to_serialize 10000
+
+// Keybindings - keep defaults but add some convenience
+keybinds {
+    // Unbind default Ctrl+o (conflicts with some editors)
+    unbind "Ctrl o"
+
+    shared_except "locked" {
+        // Quick session actions
+        bind "Alt n" { NewPane; }
+        bind "Alt h" { MoveFocus "Left"; }
+        bind "Alt l" { MoveFocus "Right"; }
+        bind "Alt j" { MoveFocus "Down"; }
+        bind "Alt k" { MoveFocus "Up"; }
+        bind "Alt [" { PreviousSwapLayout; }
+        bind "Alt ]" { NextSwapLayout; }
+
+        // Ctrl+Space as leader - comfortable on Mac
+        bind "Ctrl Space" { SwitchToMode "pane"; }
+    }
+
+    // Pane mode - accessed via Ctrl+Space
+    pane {
+        bind "h" { MoveFocus "Left"; SwitchToMode "normal"; }
+        bind "l" { MoveFocus "Right"; SwitchToMode "normal"; }
+        bind "j" { MoveFocus "Down"; SwitchToMode "normal"; }
+        bind "k" { MoveFocus "Up"; SwitchToMode "normal"; }
+        bind "n" { NewPane; SwitchToMode "normal"; }
+        bind "x" { CloseFocus; SwitchToMode "normal"; }
+        bind "f" { ToggleFloatingPanes; SwitchToMode "normal"; }
+        bind "w" { ToggleFloatingPanes; SwitchToMode "normal"; }
+        bind "d" { Detach; }
+        bind "q" { Quit; }
+        bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        // Tab navigation
+        bind "t" { SwitchToMode "tab"; }
+        bind "1" { GoToTab 1; SwitchToMode "normal"; }
+        bind "2" { GoToTab 2; SwitchToMode "normal"; }
+        bind "3" { GoToTab 3; SwitchToMode "normal"; }
+        bind "Tab" { GoToNextTab; SwitchToMode "normal"; }
+        // Escape back to normal
+        bind "Esc" { SwitchToMode "normal"; }
+        bind "Ctrl Space" { SwitchToMode "normal"; }
+    }
+}

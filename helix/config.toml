@@ -1,0 +1,58 @@
+# Helix editor configuration
+# Docs: https://docs.helix-editor.com/configuration.html
+
+theme = "catppuccin_mocha"
+
+[editor]
+line-number = "relative"
+mouse = true
+bufferline = "multiple"
+cursorline = true
+color-modes = true
+true-color = true
+rulers = [100]
+idle-timeout = 200
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.statusline]
+left = ["mode", "spinner", "file-name", "file-modification-indicator"]
+center = []
+right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
+separator = "│"
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+[editor.indent-guides]
+render = true
+character = "▏"
+skip-levels = 1
+
+[editor.file-picker]
+hidden = false
+
+[editor.soft-wrap]
+enable = true
+
+[keys.normal]
+# Quick save
+"C-s" = ":w"
+# Quick quit
+"C-q" = ":q"
+# Buffer navigation
+"C-h" = "jump_view_left"
+"C-l" = "jump_view_right"
+"C-j" = "jump_view_down"
+"C-k" = "jump_view_up"
+# Tab/buffer switching
+"H" = "goto_previous_buffer"
+"L" = "goto_next_buffer"
+
+[keys.insert]
+# Quick escape
+"j" = { "k" = "normal_mode" }

@@ -1,0 +1,46 @@
+# Git configuration
+# Machine-specific settings (name, email) should go in ~/.gitconfig.local
+
+[include]
+    path = ~/.gitconfig.local
+
+[core]
+    pager = delta
+    editor = hx
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    line-numbers = true
+    side-by-side = true
+    syntax-theme = Catppuccin Mocha
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = true
+
+[push]
+    autoSetupRemote = true
+
+[rerere]
+    enabled = true
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    ci = commit
+    lg = log --oneline --graph --decorate
+    last = log -1 HEAD
+    unstage = reset HEAD --
+    amend = commit --amend --no-edit
