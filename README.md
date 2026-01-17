@@ -1,15 +1,14 @@
-# macOS Dotfiles — Zsh + Oh My Zsh + Powerlevel10k
+# macOS Dotfiles — Terminal IDE for Claude Code
 
-Minimal, reproducible shell setup for macOS:
+Minimal, reproducible terminal setup for macOS optimized for AI-assisted development with Claude Code:
 
-* **Oh My Zsh** (pinned as submodule)
-* **Powerlevel10k** theme (pinned)
+* **Terminal IDE Workflow**: Zellij multiplexer + Helix editor + lazygit + yazi
+* **Oh My Zsh** + **Powerlevel10k** (pinned as submodules)
 * **fzf** with sane defaults (`fd`/`rg`, previews via `bat`/`eza`)
-* **zsh-autosuggestions**, **zsh-completions**, **zsh-syntax-highlighting** (pinned)
-* **iTerm2 Dynamic Profile** (Meslo Nerd Font, dark palette)
+* **delta** for beautiful git diffs
 * **Claude MCP Servers** (Obsidian, Todoist, GitHub) with secure config
 * **Homebrew Bundle** to install all dependencies
-* Safe **backups** of existing Zsh configs and iTerm2 prefs
+* Safe **backups** of existing configs
 
 > This repo is **macOS-only** by design.
 
@@ -17,13 +16,15 @@ Minimal, reproducible shell setup for macOS:
 
 ## Features
 
+* **Terminal IDE**: Zellij layouts optimized for Claude Code + Helix + yazi workflow.
+* **Helix Editor**: Modern, batteries-included modal editor with LSP support out of the box.
+* **Git Workflow**: lazygit TUI + delta for beautiful side-by-side diffs.
+* **File Navigation**: yazi file manager with preview, fzf for fuzzy finding.
 * **Reproducible**: All plugins and theme are git submodules pinned to commits.
 * **Fast prompt**: Powerlevel10k with instant prompt enabled.
 * **Better completion**: OMZ completions + `zsh-completions`, with refined matching rules.
-* **Productive fuzzy find**: `fzf` with `fd`/`rg` backends and file previews via `bat`.
-* **Nice defaults**: `eza`, `ripgrep`, `bat`, `zoxide` (optional) and helpful aliases.
+* **Nice defaults**: `eza`, `ripgrep`, `bat`, `zoxide` and helpful aliases.
 * **iTerm2 profile**: Pre-configured font/colors; linked via Dynamic Profiles.
-* **Neovim + LazyVim**: repo‑managed config at $DOTFILES/nvim, symlinked to ~/.config/nvim with automatic backups/migration.
 * **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, and GitHub integration.
 * **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
 
@@ -51,7 +52,7 @@ git submodule update --init --recursive
 git commit -m "Add OMZ + P10k + plugins as submodules"
 ```
 
-### 2) Install (backs up your current Zsh files and iTerm prefs and nvim config)
+### 2) Install (backs up existing configs)
 
 **Option A: via Makefile**
 
@@ -70,14 +71,25 @@ What happens:
 * Homebrew is installed if missing, then `brew bundle` installs CLI tools and Meslo Nerd Font.
 * Submodules are initialized/updated.
 * `fzf` keybindings/completions are installed.
-* Existing `~/.zshrc`, `~/.zshenv`, `~/.p10k.zsh` are backed up (timestamped) and replaced with symlinks.
+* Existing configs are backed up (timestamped) and replaced with symlinks:
+  - `~/.zshrc`, `~/.zshenv`, `~/.p10k.zsh`
+  - `~/.config/helix` → Helix editor config
+  - `~/.config/zellij` → Zellij multiplexer config + layouts
+  - `~/.gitconfig` → Git config with delta integration
+* **Git settings migration**: If you have an existing `~/.gitconfig`, your user identity (name, email, signing key) and credential helper are automatically extracted to `~/.gitconfig.local` before replacing.
 * iTerm2 profile JSON is linked into `~/Library/Application Support/iTerm2/DynamicProfiles/`.
 * Claude MCP servers are installed and configuration is linked.
 * Default shell is set to `zsh` if needed.
-* nvim
-   ** If ~/.config/nvim exists: it's backed up (.bak.<timestamp>), and when the repo doesn't have nvim/ yet, your config is migrated into $DOTFILES/nvim.
-   ** If neither exists: LazyVim starter is cloned into $DOTFILES/nvim.
-   ** In all cases, we symlink ~/.config/nvim → $DOTFILES/nvim.
+
+If you're on a fresh machine (no existing git config), create your identity:
+
+```bash
+cat > ~/.gitconfig.local << 'EOF'
+[user]
+    name = Your Name
+    email = your@email.com
+EOF
+```
 
 Restart your terminal or run:
 
@@ -186,6 +198,95 @@ Then run the jenv configuration:
 ```bash
 ./scripts/install.sh  # Re-run to configure jenv with new JDKs
 ```
+
+---
+
+## Terminal IDE Workflow
+
+This setup provides an IDE-like experience in the terminal, optimized for working with Claude Code.
+
+### Layout
+
+```
+┌─────────────────────┬──────────────────────┐
+│                     │                      │
+│   Claude Code       │   Helix Editor       │
+│   (main agent)      │   (review/edit)      │
+│                     │                      │
+├─────────────────────┴──────────────────────┤
+│   yazi (files) / lazygit / shell           │
+└────────────────────────────────────────────┘
+```
+
+### Quick Start
+
+```bash
+dev       # Start the Claude Code IDE layout (Claude + Helix + yazi)
+devmin    # Start minimal layout (Claude + shell)
+```
+
+### Key Commands
+
+| Command | Description |
+|---------|-------------|
+| `dev` | Full IDE layout with Claude, Helix, and yazi |
+| `devmin` | Minimal layout with Claude and shell |
+| `lg` | Launch lazygit for visual git operations |
+| `y` | Launch yazi file manager (changes dir on exit) |
+| `ff` | Fuzzy find and open file in Helix |
+| `fgr <pattern>` | Interactive grep with preview, open in Helix |
+| `tree` | Tree view using eza |
+
+### Zellij Navigation
+
+**Leader key: `Ctrl+Space`**
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+Space` then `h/j/k/l` | Move focus between panes |
+| `Ctrl+Space` then `n` | New pane |
+| `Ctrl+Space` then `x` | Close pane |
+| `Ctrl+Space` then `f` | Toggle floating pane (for shell commands) |
+| `Ctrl+Space` then `z` | Zoom/fullscreen current pane |
+| `Ctrl+Space` then `1/2/3` | Go to tab 1/2/3 (dev/git/shell) |
+| `Ctrl+Space` then `Tab` | Next tab |
+| `Ctrl+Space` then `d` | Detach session |
+| `Alt+h/j/k/l` | Move focus (direct, no leader) |
+| `Alt+n` | New pane (direct) |
+
+### Helix Basics
+
+Helix uses Kakoune-style selection-first editing. Key differences from Vim:
+
+| Action | Helix | Vim |
+|--------|-------|-----|
+| Find file | `Space f` | `:Telescope` |
+| File tree | `Space e` | `:NERDTree` |
+| Go to definition | `gd` | `gd` |
+| References | `gr` | `gr` |
+| Symbol search | `Space s` | - |
+| Save | `Ctrl+s` or `:w` | `:w` |
+| Quit | `Ctrl+q` or `:q` | `:q` |
+
+**Escape insert mode:** Type `jk` quickly, or press `Esc`.
+
+### Typical Workflow
+
+1. **Start session**: `dev` to launch the IDE layout
+2. **Claude writes code**: Work with Claude in the left pane
+3. **Review changes**: `Ctrl+Space 2` for git tab, or `Ctrl+Space f` for floating shell then `lg`
+4. **Quick edits**: Use Helix in the right pane for manual tweaks
+5. **Navigate files**: `y` (yazi) or `ff` (fzf) to explore the codebase
+6. **Detach/reattach**: `Ctrl+Space d` to detach, `zja` to reattach later
+
+### Git with Delta
+
+Delta provides side-by-side diffs with syntax highlighting. It's automatically used for:
+
+- `git diff`
+- `git show`
+- `git log -p`
+- lazygit diff views
 
 ---
 
@@ -315,8 +416,12 @@ exec zsh
 ## Troubleshooting
 
 * **Weird glyphs**: Set *MesloLGM Nerd Font* in iTerm2 → Profiles → Text.
-* **“insecure completion-dependent directories”**: We set `ZSH_DISABLE_COMPFIX=true` and manage `fpath`/`compinit`; if warnings persist, check permissions on your repo path.
+* **"insecure completion-dependent directories"**: We set `ZSH_DISABLE_COMPFIX=true` and manage `fpath`/`compinit`; if warnings persist, check permissions on your repo path.
 * **fzf bindings not active**: Ensure `brew install fzf` ran and `$(brew --prefix)/opt/fzf/install` executed (installer does this). Restart the terminal.
+* **Helix LSP not working**: Run `hx --health` to check language server status. Install missing servers with your package manager.
+* **Zellij layout not found**: Ensure `~/.config/zellij` is symlinked correctly. Run `make zellij` to re-link.
+* **Delta not showing colors**: Ensure your terminal supports 24-bit color. Check with `echo $COLORTERM` (should be `truecolor`).
+* **Verify all tools installed**: Run `make doctor` to check for missing dependencies.
 
 ---
 
@@ -325,7 +430,8 @@ exec zsh
 * Remove symlinks:
 
 ```bash
-rm ~/.zshrc ~/.zshenv ~/.p10k.zsh
+rm ~/.zshrc ~/.zshenv ~/.p10k.zsh ~/.gitconfig
+rm -rf ~/.config/helix ~/.config/zellij
 ```
 
 Backups remain alongside them as `*.bak.YYYYMMDD_HHMMSS`.

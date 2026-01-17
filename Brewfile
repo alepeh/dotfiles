@@ -8,7 +8,11 @@ brew "eza"
 brew "jq"
 brew "zoxide"       # optional: smarter cd
 brew "node"
-brew "neovim"
+brew "helix"          # Modern modal editor, batteries-included
+brew "zellij"         # Terminal multiplexer with modern defaults
+brew "lazygit"        # Git TUI for reviewing changes
+brew "yazi"           # Terminal file manager with preview
+brew "git-delta"      # Better git diffs
 brew "uv"        # Python package installer (for MCP servers)
 brew "go"        # For GitHub MCP server
 brew "jenv"       # Java version manager

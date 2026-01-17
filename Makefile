@@ -11,7 +11,7 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor restore-iterm
+.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor restore-iterm helix zellij git-config zed
 
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
@@ -66,22 +66,38 @@ fonts: ## Ensure Nerd Font (if glyphs look off)
 doctor: ## Quick sanity checks
 	@command -v zsh >/dev/null || (echo "zsh not found" && exit 1)
 	@command -v brew >/dev/null || (echo "Homebrew not found" && exit 1)
+	@command -v hx >/dev/null || (echo "helix not found - run: brew install helix" && exit 1)
+	@command -v zellij >/dev/null || (echo "zellij not found - run: brew install zellij" && exit 1)
+	@command -v lazygit >/dev/null || (echo "lazygit not found - run: brew install lazygit" && exit 1)
+	@command -v yazi >/dev/null || (echo "yazi not found - run: brew install yazi" && exit 1)
+	@command -v delta >/dev/null || (echo "delta not found - run: brew install git-delta" && exit 1)
 	@[ -d "$(REPO_DIR)/omz/ohmyzsh" ] || (echo "oh-my-zsh submodule missing" && exit 1)
 	@[ -f "$(REPO_DIR)/zsh/.zshrc" ] || (echo ".zshrc missing" && exit 1)
+	@[ -d "$(REPO_DIR)/helix" ] || (echo "helix config missing" && exit 1)
+	@[ -d "$(REPO_DIR)/zellij" ] || (echo "zellij config missing" && exit 1)
 	@echo "✓ Doctor OK."
 
 clean: ## Remove symlinked iTerm2 profile (non-destructive)
 	@rm -f "$(ITERM_PROFILE_LINK)"
 	@echo "✓ Removed iTerm2 profile link."
 
-.PHONY: nvim
-
-nvim:
-	@echo "→ Ensuring Neovim config is repo-managed and linked"
-	@[ -d "$(DOTFILES)/nvim" ] || (echo "→ Installing LazyVim to $(DOTFILES)/nvim" && git clone https://github.com/LazyVim/starter "$(DOTFILES)/nvim" && rm -rf "$(DOTFILES)/nvim/.git")
+helix: ## Link Helix editor configuration
+	@echo "→ Linking Helix configuration"
 	@mkdir -p "$(HOME)/.config"
-	@ln -sfn "$(DOTFILES)/nvim" "$(HOME)/.config/nvim"
-	@echo "✓ ~/.config/nvim → $(DOTFILES)/nvim"
+	@ln -sfn "$(REPO_DIR)/helix" "$(HOME)/.config/helix"
+	@echo "✓ ~/.config/helix → $(REPO_DIR)/helix"
+
+zellij: ## Link Zellij configuration
+	@echo "→ Linking Zellij configuration"
+	@mkdir -p "$(HOME)/.config"
+	@ln -sfn "$(REPO_DIR)/zellij" "$(HOME)/.config/zellij"
+	@echo "✓ ~/.config/zellij → $(REPO_DIR)/zellij"
+
+git-config: ## Link Git configuration (delta, aliases)
+	@echo "→ Linking Git configuration"
+	@ln -sfn "$(REPO_DIR)/git/config" "$(HOME)/.gitconfig"
+	@echo "✓ ~/.gitconfig → $(REPO_DIR)/git/config"
+	@echo "   Note: Add machine-specific settings to ~/.gitconfig.local"
 
 zed: ## Link Zed editor configuration
 	@echo "→ Linking Zed configuration"
