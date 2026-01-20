@@ -1,10 +1,10 @@
-// Minimal layout - just Claude Code with a shell below
+// Minimal layout - just Claude Code with stacked shells below
 // ┌────────────────────────────────────────────┐
 // │                                            │
 // │   Claude Code                              │
 // │                                            │
 // ├────────────────────────────────────────────┤
-// │   Shell                                    │
+// │   Shell (stacked)                          │
 // └────────────────────────────────────────────┘
 
 layout {
@@ -23,6 +23,9 @@ layout {
             command "claude"
             focus true
         }
-        pane name="shell" size="30%"
+        pane stacked=true size="30%" {
+            pane name="shell"
+            pane name="shell2"
+        }
     }
 }

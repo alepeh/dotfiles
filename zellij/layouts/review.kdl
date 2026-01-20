@@ -1,0 +1,41 @@
+// Code Review Layout - Editor-focused with Claude and shell below
+// ┌────────────────────────────────────────────┐
+// │                                            │
+// │   Helix Editor (70%)                       │
+// │                                            │
+// ├─────────────────────┬──────────────────────┤
+// │   Claude (50%)      │   Shell (50%)        │
+// └─────────────────────┴──────────────────────┘
+
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="review" focus=true {
+        pane name="editor" size="70%" {
+            command "hx"
+            args "."
+            focus true
+        }
+        pane split_direction="vertical" size="30%" {
+            pane name="claude" size="50%" {
+                command "claude"
+            }
+            pane name="shell" size="50%"
+        }
+    }
+
+    tab name="git" {
+        pane name="lazygit" {
+            command "lazygit"
+            start_suspended true
+        }
+    }
+}
