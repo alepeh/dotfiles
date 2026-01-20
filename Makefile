@@ -11,7 +11,7 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor restore-iterm helix zellij git-config zed claude-code
+.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor restore-iterm helix zellij git-config zed claude-code claude-code-mcp
 
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
@@ -111,3 +111,15 @@ claude-code: ## Link Claude Code global instructions (CLAUDE.md)
 	@ln -sfn "$(REPO_DIR)/claude-code/CLAUDE.md" "$(HOME)/.claude/CLAUDE.md"
 	@echo "✓ ~/.claude/CLAUDE.md → $(REPO_DIR)/claude-code/CLAUDE.md"
 	@echo "  Note: This provides git workflow best practices for Claude Code"
+
+claude-code-mcp: ## Sync Claude Code MCP servers from settings.json to ~/.claude.json
+	@echo "→ Syncing Claude Code MCP servers"
+	@command -v jq >/dev/null || (echo "Error: jq not found - run: brew install jq" && exit 1)
+	@if [ ! -f "$(HOME)/.claude.json" ]; then \
+	  echo "Error: ~/.claude.json not found. Run 'claude' first to initialize."; \
+	  exit 1; \
+	fi
+	@jq -s '.[0] * {mcpServers: .[1].mcpServers}' "$(HOME)/.claude.json" "$(REPO_DIR)/claude-code/settings.json" > "$(HOME)/.claude.json.tmp" \
+	  && mv "$(HOME)/.claude.json.tmp" "$(HOME)/.claude.json"
+	@echo "✓ MCP servers synced to ~/.claude.json"
+	@echo "  Servers: $$(jq -r '.mcpServers | keys | join(", ")' "$(REPO_DIR)/claude-code/settings.json")"
