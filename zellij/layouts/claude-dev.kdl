@@ -8,7 +8,7 @@
 // │   Shell (stacked)                          │
 // └────────────────────────────────────────────┘
 //
-// Swap layouts: Alt+[ / Alt+] to toggle between claude-focus and editor-focus
+// Swap layouts: Alt+, / Alt+. to toggle between claude-focus and editor-focus
 
 layout {
     // Default for new tabs
