@@ -12,6 +12,10 @@
     "mcp-server-github": {
       "command": "/Users/alexanderpehm/.mcp-wrappers/github-wrapper.sh",
       "args": []
+    },
+    "mcp-google-sheets": {
+      "command": "/Users/alexanderpehm/.mcp-wrappers/google-sheets-wrapper.sh",
+      "args": []
     }
   },
   "preferences": {
