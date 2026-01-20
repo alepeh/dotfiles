@@ -47,7 +47,9 @@ layout {
                 pane size="70%"
                 pane size="30%"
             }
-            pane stacked=true size="25%"
+            pane stacked=true size="25%" {
+                children
+            }
         }
     }
 
@@ -58,7 +60,9 @@ layout {
                 pane size="30%"
                 pane size="70%"
             }
-            pane stacked=true size="25%"
+            pane stacked=true size="25%" {
+                children
+            }
         }
     }
 
