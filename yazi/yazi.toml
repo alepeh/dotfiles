@@ -1,0 +1,40 @@
+# Yazi configuration
+# See: https://yazi-rs.github.io/docs/configuration/yazi
+
+[mgr]
+ratio = [1, 4, 0]  # Disable preview pane (parent:current:preview = 1:4:0)
+show_hidden = true
+sort_by = "natural"
+sort_dir_first = true
+
+[preview]
+wrap = "no"
+tab_size = 2
+max_width = 0
+max_height = 0
+
+[opener]
+# Open files in adjacent Helix pane (for Zellij layouts)
+edit = [
+    { run = '~/.config/yazi/scripts/open-in-helix.sh "$@"', desc = "Open in Helix pane", for = "unix" },
+]
+open = [
+    { run = '~/.config/yazi/scripts/open-in-helix.sh "$@"', desc = "Open in Helix pane", for = "unix" },
+]
+
+[open]
+rules = [
+    # Text/code files -> open in Helix
+    { mime = "text/*", use = "edit" },
+    { mime = "application/json", use = "edit" },
+    { mime = "application/javascript", use = "edit" },
+    { mime = "application/x-sh", use = "edit" },
+    { mime = "application/toml", use = "edit" },
+    { mime = "application/yaml", use = "edit" },
+    { mime = "application/xml", use = "edit" },
+    { mime = "application/x-lua", use = "edit" },
+    { mime = "inode/x-empty", use = "edit" },
+
+    # Fallback for unknown files
+    { name = "*", use = "edit" },
+]

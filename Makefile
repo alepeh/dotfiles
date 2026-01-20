@@ -11,7 +11,7 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor restore-iterm helix zellij git-config zed claude-code claude-code-mcp
+.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor restore-iterm helix zellij yazi git-config zed claude-code claude-code-mcp
 
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
@@ -75,6 +75,7 @@ doctor: ## Quick sanity checks
 	@[ -f "$(REPO_DIR)/zsh/.zshrc" ] || (echo ".zshrc missing" && exit 1)
 	@[ -d "$(REPO_DIR)/helix" ] || (echo "helix config missing" && exit 1)
 	@[ -d "$(REPO_DIR)/zellij" ] || (echo "zellij config missing" && exit 1)
+	@[ -d "$(REPO_DIR)/yazi" ] || (echo "yazi config missing" && exit 1)
 	@echo "✓ Doctor OK."
 
 clean: ## Remove symlinked iTerm2 profile (non-destructive)
@@ -92,6 +93,12 @@ zellij: ## Link Zellij configuration
 	@mkdir -p "$(HOME)/.config"
 	@ln -sfn "$(REPO_DIR)/zellij" "$(HOME)/.config/zellij"
 	@echo "✓ ~/.config/zellij → $(REPO_DIR)/zellij"
+
+yazi: ## Link Yazi configuration (file manager)
+	@echo "→ Linking Yazi configuration"
+	@mkdir -p "$(HOME)/.config"
+	@ln -sfn "$(REPO_DIR)/yazi" "$(HOME)/.config/yazi"
+	@echo "✓ ~/.config/yazi → $(REPO_DIR)/yazi"
 
 git-config: ## Link Git configuration (delta, aliases)
 	@echo "→ Linking Git configuration"

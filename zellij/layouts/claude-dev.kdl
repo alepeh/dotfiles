@@ -1,14 +1,29 @@
 // Claude Code Development Layout
+//
+// Tab: dev (default)
 // ┌─────────────────────┬──────────────────────┐
 // │                     │                      │
 // │   Claude Code       │   Helix Editor       │
-// │   (main agent)      │   (review/edit)      │
+// │   (main agent)      │   (suspended)        │
 // │                     │                      │
 // ├─────────────────────┴──────────────────────┤
 // │   Shell (stacked)                          │
 // └────────────────────────────────────────────┘
-//
 // Swap layouts: Alt+, / Alt+. to toggle between claude-focus and editor-focus
+//
+// Tab: git
+// ┌────────────────────────────────────────────┐
+// │   lazygit (suspended)                      │
+// └────────────────────────────────────────────┘
+//
+// Tab: files
+// ┌────────────┬───────────────────────────────┐
+// │            │                               │
+// │   Yazi     │   Helix Editor                │
+// │   (30%)    │   (70%)                       │
+// │            │                               │
+// └────────────┴───────────────────────────────┘
+// Select files in Yazi to open them in Helix
 
 layout {
     // Default for new tabs
@@ -80,8 +95,6 @@ layout {
             }
             pane name="editor" size="70%" {
                 command "hx"
-                args "."
-                start_suspended true
             }
         }
     }
