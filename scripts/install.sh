@@ -125,6 +125,56 @@ else
   echo "   go not found, GitHub MCP server will use Docker fallback"
 fi
 
+echo "→ Creating MCP wrapper scripts..."
+mkdir -p ~/.mcp-wrappers
+
+# Obsidian wrapper
+cat > ~/.mcp-wrappers/obsidian-wrapper.sh << 'EOF'
+#!/bin/bash
+if [ -f ~/.env.mcp ]; then
+    source ~/.env.mcp
+fi
+exec /opt/homebrew/bin/uvx mcp-obsidian
+EOF
+
+# Todoist wrapper
+cat > ~/.mcp-wrappers/todoist-wrapper.sh << 'EOF'
+#!/bin/bash
+if [ -f ~/.env.mcp ]; then
+    source ~/.env.mcp
+fi
+exec node ~/code/todoist-mcp/build/index.js
+EOF
+
+# GitHub wrapper
+cat > ~/.mcp-wrappers/github-wrapper.sh << 'EOF'
+#!/bin/bash
+if [ -f ~/.env.mcp ]; then
+    source ~/.env.mcp
+fi
+exec ~/go/bin/github-mcp-server stdio
+EOF
+
+# Google Sheets wrapper
+cat > ~/.mcp-wrappers/google-sheets-wrapper.sh << 'EOF'
+#!/bin/bash
+if [ -f ~/.env.mcp ]; then
+    source ~/.env.mcp
+fi
+export GOOGLE_APPLICATION_CREDENTIALS="$GOOGLE_SHEETS_SERVICE_ACCOUNT_PATH"
+exec /opt/homebrew/bin/uvx mcp-google-sheets
+EOF
+
+chmod +x ~/.mcp-wrappers/*.sh
+echo "✓ Created MCP wrapper scripts"
+
+# Create env template if it doesn't exist
+if [ ! -f ~/.env.mcp ]; then
+  cp "$DOTFILES/claude/.env.template" ~/.env.mcp
+  chmod 600 ~/.env.mcp
+  echo "✓ Created ~/.env.mcp from template (edit to add your API keys)"
+fi
+
 echo "→ Linking Claude desktop config..."
 CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
 mkdir -p "$CLAUDE_CONFIG_DIR"

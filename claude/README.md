@@ -126,6 +126,20 @@ Connects Claude to GitHub repositories, issues, and PRs.
 
 **Note:** Requires github-mcp-server to be installed at `~/go/bin/github-mcp-server`
 
+### mcp-google-sheets
+Connects Claude to Google Sheets for reading and writing spreadsheet data.
+
+**Required variables:**
+- `GOOGLE_SHEETS_SERVICE_ACCOUNT_PATH` - Path to service account JSON key file
+
+**Setup:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/iam-admin/serviceaccounts)
+2. Create a new service account (or use existing)
+3. Create a JSON key and download it
+4. Save to `~/.config/gcloud/sheets-service-account.json`
+5. Enable the Google Sheets API in your project
+6. Share any spreadsheets you want to access with the service account email
+
 ## Troubleshooting
 
 ### MCP Servers Not Starting
