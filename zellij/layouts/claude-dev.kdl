@@ -73,7 +73,16 @@ layout {
         }
     }
 
-    tab name="shell" {
-        pane name="term"
+    tab name="files" {
+        pane split_direction="vertical" {
+            pane name="yazi" size="30%" {
+                command "yazi"
+            }
+            pane name="editor" size="70%" {
+                command "hx"
+                args "."
+                start_suspended true
+            }
+        }
     }
 }
