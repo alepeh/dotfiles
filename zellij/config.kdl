@@ -40,8 +40,8 @@ keybinds {
         bind "Alt l" { MoveFocus "Right"; }
         bind "Alt j" { MoveFocus "Down"; }
         bind "Alt k" { MoveFocus "Up"; }
-        bind "Alt [" { PreviousSwapLayout; }
-        bind "Alt ]" { NextSwapLayout; }
+        bind "Alt ," { PreviousSwapLayout; }
+        bind "Alt ." { NextSwapLayout; }
 
         // Ctrl+Space as leader - comfortable on Mac
         bind "Ctrl Space" { SwitchToMode "pane"; }

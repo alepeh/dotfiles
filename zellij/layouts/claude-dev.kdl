@@ -1,14 +1,29 @@
 // Claude Code Development Layout
+//
+// Tab: dev (default)
 // ┌─────────────────────┬──────────────────────┐
 // │                     │                      │
 // │   Claude Code       │   Helix Editor       │
-// │   (main agent)      │   (review/edit)      │
+// │   (main agent)      │   (suspended)        │
 // │                     │                      │
 // ├─────────────────────┴──────────────────────┤
 // │   Shell (stacked)                          │
 // └────────────────────────────────────────────┘
+// Swap layouts: Alt+, / Alt+. to toggle between claude-focus and editor-focus
 //
-// Swap layouts: Alt+[ / Alt+] to toggle between claude-focus and editor-focus
+// Tab: git
+// ┌────────────────────────────────────────────┐
+// │   lazygit (suspended)                      │
+// └────────────────────────────────────────────┘
+//
+// Tab: files
+// ┌────────────┬───────────────────────────────┐
+// │            │                               │
+// │   Yazi     │   Helix Editor                │
+// │   (30%)    │   (70%)                       │
+// │            │                               │
+// └────────────┴───────────────────────────────┘
+// Select files in Yazi to open them in Helix
 
 layout {
     // Default for new tabs
@@ -73,7 +88,14 @@ layout {
         }
     }
 
-    tab name="shell" {
-        pane name="term"
+    tab name="files" {
+        pane split_direction="vertical" {
+            pane name="yazi" size="30%" {
+                command "yazi"
+            }
+            pane name="editor" size="70%" {
+                command "hx"
+            }
+        }
     }
 }
