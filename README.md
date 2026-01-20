@@ -6,7 +6,7 @@ Minimal, reproducible terminal setup for macOS optimized for AI-assisted develop
 * **Oh My Zsh** + **Powerlevel10k** (pinned as submodules)
 * **fzf** with sane defaults (`fd`/`rg`, previews via `bat`/`eza`)
 * **delta** for beautiful git diffs
-* **Claude MCP Servers** (Obsidian, Todoist, GitHub) with secure config
+* **Claude MCP Servers** (Obsidian, Todoist, GitHub, Google Sheets) with secure config for both Claude Desktop and Claude Code
 * **Homebrew Bundle** to install all dependencies
 * Safe **backups** of existing configs
 
@@ -25,7 +25,7 @@ Minimal, reproducible terminal setup for macOS optimized for AI-assisted develop
 * **Better completion**: OMZ completions + `zsh-completions`, with refined matching rules.
 * **Nice defaults**: `eza`, `ripgrep`, `bat`, `zoxide` and helpful aliases.
 * **iTerm2 profile**: Pre-configured font/colors; linked via Dynamic Profiles.
-* **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, and GitHub integration.
+* **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, GitHub, and Google Sheets - shared between Claude Desktop and Claude Code.
 * **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
 
 ---
@@ -99,7 +99,16 @@ exec zsh
 
 ### MCP Server Setup
 
-After installation, configure your API keys for Claude Desktop to access the MCP servers securely:
+After installation, configure your API keys for Claude Desktop and Claude Code to access the MCP servers securely.
+
+#### Available MCP Servers
+
+| Server | Purpose | Required API Key |
+|--------|---------|------------------|
+| mcp-obsidian | Obsidian notes access | OBSIDIAN_API_KEY |
+| todoist-mcp | Task management | TODOIST_API_KEY |
+| mcp-server-github | GitHub operations | GITHUB_PERSONAL_ACCESS_TOKEN |
+| mcp-google-sheets | Google Sheets access | Google OAuth (browser-based) |
 
 #### Secure Configuration Architecture
 
@@ -128,8 +137,26 @@ This setup uses **wrapper scripts** to keep secrets out of git while maintaining
    - `obsidian-wrapper.sh` - Loads secrets and starts mcp-obsidian
    - `todoist-wrapper.sh` - Loads secrets and starts todoist-mcp
    - `github-wrapper.sh` - Loads secrets and starts mcp-server-github
+   - `google-sheets-wrapper.sh` - Starts mcp-google-sheets (uses OAuth)
 
 4. **Restart Claude Desktop** for changes to take effect.
+
+#### Adding MCP Servers to Claude Code
+
+The same wrapper scripts can be shared with Claude Code CLI. Add them globally so they're available across all projects:
+
+```bash
+# Add all MCP servers to Claude Code (user scope = global)
+claude mcp add --scope user mcp-server-github -- ~/.mcp-wrappers/github-wrapper.sh
+claude mcp add --scope user mcp-obsidian -- ~/.mcp-wrappers/obsidian-wrapper.sh
+claude mcp add --scope user todoist-mcp -- ~/.mcp-wrappers/todoist-wrapper.sh
+claude mcp add --scope user mcp-google-sheets -- ~/.mcp-wrappers/google-sheets-wrapper.sh
+
+# Verify servers are connected
+claude mcp list
+```
+
+This adds the servers to `~/.claude.json` (user config), making them available in any Claude Code session.
 
 #### How It Works
 
