@@ -17,6 +17,13 @@ brew "uv"        # Python package installer (for MCP servers)
 brew "go"        # For GitHub MCP server
 brew "jenv"       # Java version manager
 brew "mvn"
+
+# Language Servers for Helix
+brew "pyright"                    # Python LSP
+brew "ruff"                       # Python linter/formatter
+brew "typescript-language-server" # TypeScript/JavaScript LSP
+brew "prettier"                   # JS/TS/JSON formatter
+brew "jdtls"                      # Java LSP (Eclipse JDT)
 cask "temurin@17"   # Eclipse Temurin JDK 17 (LTS)
 cask "temurin@21"   # Eclipse Temurin JDK 21 (LTS)
 cask "temurin"      # Eclipse Temurin JDK 24 (latest)

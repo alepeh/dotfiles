@@ -1,0 +1,101 @@
+# Helix Language Server Configuration
+
+# =============================================================================
+# PYTHON
+# =============================================================================
+[[language]]
+name = "python"
+language-servers = ["pyright", "ruff"]
+auto-format = true
+formatter = { command = "ruff", args = ["format", "-"] }
+
+[language-server.pyright]
+command = "pyright-langserver"
+args = ["--stdio"]
+
+[language-server.pyright.config]
+python.analysis.typeCheckingMode = "basic"
+python.analysis.autoImportCompletions = true
+
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
+# =============================================================================
+# TYPESCRIPT / JAVASCRIPT
+# =============================================================================
+[[language]]
+name = "typescript"
+language-servers = ["typescript-language-server"]
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+
+[[language]]
+name = "javascript"
+language-servers = ["typescript-language-server"]
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "babel"] }
+
+[[language]]
+name = "tsx"
+language-servers = ["typescript-language-server"]
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+
+[[language]]
+name = "jsx"
+language-servers = ["typescript-language-server"]
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "babel"] }
+
+[language-server.typescript-language-server]
+command = "typescript-language-server"
+args = ["--stdio"]
+
+[language-server.typescript-language-server.config]
+hostInfo = "helix"
+
+[language-server.typescript-language-server.config.typescript.inlayHints]
+includeInlayParameterNameHints = "all"
+includeInlayParameterNameHintsWhenArgumentMatchesName = true
+includeInlayFunctionParameterTypeHints = true
+includeInlayVariableTypeHints = true
+includeInlayPropertyDeclarationTypeHints = true
+includeInlayFunctionLikeReturnTypeHints = true
+includeInlayEnumMemberValueHints = true
+
+[language-server.typescript-language-server.config.javascript.inlayHints]
+includeInlayParameterNameHints = "all"
+includeInlayParameterNameHintsWhenArgumentMatchesName = true
+includeInlayFunctionParameterTypeHints = true
+includeInlayVariableTypeHints = true
+includeInlayPropertyDeclarationTypeHints = true
+includeInlayFunctionLikeReturnTypeHints = true
+includeInlayEnumMemberValueHints = true
+
+# =============================================================================
+# JSON (commonly needed with TS/JS projects)
+# =============================================================================
+[[language]]
+name = "json"
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "json"] }
+
+# =============================================================================
+# JAVA
+# =============================================================================
+[[language]]
+name = "java"
+language-servers = ["jdtls"]
+auto-format = true
+
+[language-server.jdtls]
+command = "jdtls"
+
+[language-server.jdtls.config.settings.java]
+home = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home"
+
+[language-server.jdtls.config.settings.java.format]
+enabled = true
+tabSize = 4
+insertSpaces = true
