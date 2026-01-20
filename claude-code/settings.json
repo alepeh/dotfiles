@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "mcp-obsidian": {
+      "type": "stdio",
+      "command": "/Users/alexanderpehm/.mcp-wrappers/obsidian-wrapper.sh",
+      "args": [],
+      "env": {}
+    },
+    "todoist-mcp": {
+      "type": "stdio",
+      "command": "/Users/alexanderpehm/.mcp-wrappers/todoist-wrapper.sh",
+      "args": [],
+      "env": {}
+    },
+    "mcp-google-sheets": {
+      "type": "stdio",
+      "command": "/Users/alexanderpehm/.mcp-wrappers/google-sheets-wrapper.sh",
+      "args": [],
+      "env": {}
+    }
+  }
+}
