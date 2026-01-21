@@ -51,7 +51,6 @@ layout {
         }
         pane stacked=true size="25%" {
             pane name="shell"
-            pane name="shell2"
         }
     }
 
