@@ -9,7 +9,7 @@
 // ├─────────────────────┴──────────────────────┤
 // │   Shell (stacked)                          │
 // └────────────────────────────────────────────┘
-// Swap layouts: Alt+, / Alt+. to toggle between claude-focus and editor-focus
+// Resize panes: Ctrl+Space r, then h/l to resize left/right (H/L for larger steps)
 //
 // Tab: git
 // ┌────────────────────────────────────────────┐
@@ -51,32 +51,6 @@ layout {
         }
         pane stacked=true size="25%" {
             pane name="shell"
-        }
-    }
-
-    // Swap layout: Claude focused (70/30)
-    swap_tiled_layout name="claude-focus" {
-        tab {
-            pane split_direction="vertical" {
-                pane size="70%"
-                pane size="30%"
-            }
-            pane stacked=true size="25%" {
-                children
-            }
-        }
-    }
-
-    // Swap layout: Editor focused (30/70)
-    swap_tiled_layout name="editor-focus" {
-        tab {
-            pane split_direction="vertical" {
-                pane size="30%"
-                pane size="70%"
-            }
-            pane stacked=true size="25%" {
-                children
-            }
         }
     }
 
