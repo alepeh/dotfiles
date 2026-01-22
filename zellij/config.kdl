@@ -60,6 +60,8 @@ keybinds {
         bind "d" { Detach; }
         bind "q" { Quit; }
         bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        // Enter resize mode
+        bind "r" { SwitchToMode "resize"; }
         // Tab navigation
         bind "t" { SwitchToMode "tab"; }
         bind "1" { GoToTab 1; SwitchToMode "normal"; }
@@ -68,6 +70,19 @@ keybinds {
         bind "Tab" { GoToNextTab; SwitchToMode "normal"; }
         // Escape back to normal
         bind "Esc" { SwitchToMode "normal"; }
+        bind "Ctrl Space" { SwitchToMode "normal"; }
+    }
+
+    // Resize mode - accessed via Ctrl+Space r
+    resize {
+        bind "h" { Resize "Left"; }
+        bind "l" { Resize "Right"; }
+        bind "j" { Resize "Down"; }
+        bind "k" { Resize "Up"; }
+        bind "=" { Resize "Increase"; }
+        bind "-" { Resize "Decrease"; }
+        bind "Esc" { SwitchToMode "normal"; }
+        bind "Enter" { SwitchToMode "normal"; }
         bind "Ctrl Space" { SwitchToMode "normal"; }
     }
 }
