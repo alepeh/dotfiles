@@ -11,7 +11,7 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor restore-iterm helix zellij yazi git-config zed claude-code claude-code-mcp helix-lsp
+.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp helix-lsp
 
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
@@ -118,6 +118,13 @@ claude-code: ## Link Claude Code global instructions (CLAUDE.md)
 	@ln -sfn "$(REPO_DIR)/claude-code/CLAUDE.md" "$(HOME)/.claude/CLAUDE.md"
 	@echo "✓ ~/.claude/CLAUDE.md → $(REPO_DIR)/claude-code/CLAUDE.md"
 	@echo "  Note: This provides git workflow best practices for Claude Code"
+
+claude-code-commands: ## Link Claude Code slash commands
+	@mkdir -p "$(HOME)/.claude/commands"
+	@for f in $(REPO_DIR)/claude-code/commands/*.md; do \
+	  ln -sfn "$$f" "$(HOME)/.claude/commands/$$(basename $$f)"; \
+	done
+	@echo "✓ Claude Code commands linked to ~/.claude/commands/"
 
 claude-code-mcp: ## Sync Claude Code MCP servers from settings.json to ~/.claude.json
 	@echo "→ Syncing Claude Code MCP servers"

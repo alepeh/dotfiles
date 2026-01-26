@@ -175,6 +175,18 @@ if [ ! -f ~/.env.mcp ]; then
   echo "✓ Created ~/.env.mcp from template (edit to add your API keys)"
 fi
 
+# --- Claude Code global instructions & slash commands ---
+echo "→ Linking Claude Code global instructions..."
+mkdir -p "$HOME/.claude"
+backup_and_link "$DOTFILES/claude-code/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
+echo "→ Linking Claude Code slash commands..."
+mkdir -p "$HOME/.claude/commands"
+for f in "$DOTFILES/claude-code/commands/"*.md; do
+  [ -f "$f" ] && ln -sfn "$f" "$HOME/.claude/commands/$(basename "$f")"
+done
+echo "✓ Claude Code commands linked"
+
 echo "→ Linking Claude desktop config..."
 CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
 mkdir -p "$CLAUDE_CONFIG_DIR"
