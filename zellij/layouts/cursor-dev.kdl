@@ -1,0 +1,74 @@
+// Cursor Agent Development Layout
+//
+// Tab: dev (default)
+// ┌─────────────────────┬──────────────────────┐
+// │                     │                      │
+// │   Cursor Agent      │   Helix Editor       │
+// │   (main agent)      │   (suspended)        │
+// │                     │                      │
+// ├─────────────────────┴──────────────────────┤
+// │   Shell (stacked)                          │
+// └────────────────────────────────────────────┘
+// Resize panes: Ctrl+Space r, then h/l to resize left/right (H/L for larger steps)
+//
+// Tab: git
+// ┌────────────────────────────────────────────┐
+// │   lazygit (suspended)                      │
+// └────────────────────────────────────────────┘
+//
+// Tab: files
+// ┌────────────┬───────────────────────────────┐
+// │            │                               │
+// │   Yazi     │   Helix Editor                │
+// │   (30%)    │   (70%)                       │
+// │            │                               │
+// └────────────┴───────────────────────────────┘
+// Select files in Yazi to open them in Helix
+
+layout {
+    // Default for new tabs
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        children
+        pane size=2 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+
+    tab name="dev" focus=true {
+        pane split_direction="vertical" {
+            pane name="cursor-agent" size="50%" {
+                command "cursor-agent"
+                focus true
+            }
+            pane name="editor" size="50%" {
+                command "hx"
+                args "."
+                start_suspended true
+            }
+        }
+        pane stacked=true size="25%" {
+            pane name="shell"
+        }
+    }
+
+    tab name="git" {
+        pane name="lazygit" {
+            command "lazygit"
+            start_suspended true
+        }
+    }
+
+    tab name="files" {
+        pane split_direction="vertical" {
+            pane name="yazi" size="30%" {
+                command "yazi"
+            }
+            pane name="editor" size="70%" {
+                command "hx"
+            }
+        }
+    }
+}

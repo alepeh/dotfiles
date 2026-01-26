@@ -12,6 +12,7 @@ brew "helix"          # Modern modal editor, batteries-included
 brew "zellij"         # Terminal multiplexer with modern defaults
 brew "lazygit"        # Git TUI for reviewing changes
 brew "yazi"           # Terminal file manager with preview
+brew "gh"             # GitHub CLI
 brew "git-delta"      # Better git diffs
 brew "uv"        # Python package installer (for MCP servers)
 brew "go"        # For GitHub MCP server
@@ -28,4 +29,5 @@ cask "temurin@17"   # Eclipse Temurin JDK 17 (LTS)
 cask "temurin@21"   # Eclipse Temurin JDK 21 (LTS)
 cask "temurin"      # Eclipse Temurin JDK 24 (latest)
 cask "claude-code"
+cask "cursor-cli"
 cask "font-meslo-lg-nerd-font"  # still works as a normal cask

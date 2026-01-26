@@ -127,6 +127,8 @@ if command -v zellij >/dev/null 2>&1; then
   # Start Claude Code dev session
   alias dev='zellij --layout claude-dev'
   alias devmin='zellij --layout minimal'
+  alias cdev='zellij --layout cursor-dev'
+  alias cdevmin='zellij --layout cursor-minimal'
 fi
 
 # Lazygit alias
