@@ -187,6 +187,7 @@ echo "→ Configuring jenv (Java version management)..."
 if have jenv; then
   # Initialize jenv first
   export PATH="$HOME/.jenv/bin:$PATH"
+  export PROMPT_COMMAND="${PROMPT_COMMAND:-}"
   eval "$(jenv init -)"
   
   # Auto-discover and add installed JDKs to jenv
