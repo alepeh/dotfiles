@@ -12,6 +12,7 @@ brew "helix"          # Modern modal editor, batteries-included
 brew "zellij"         # Terminal multiplexer with modern defaults
 brew "lazygit"        # Git TUI for reviewing changes
 brew "yazi"           # Terminal file manager with preview
+brew "gh"             # GitHub CLI
 brew "git-delta"      # Better git diffs
 brew "uv"        # Python package installer (for MCP servers)
 brew "go"        # For GitHub MCP server
