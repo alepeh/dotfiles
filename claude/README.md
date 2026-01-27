@@ -223,7 +223,6 @@ The old method used `launchctl` to set system-wide environment variables:
 
 ```bash
 launchctl setenv OBSIDIAN_API_KEY "your-key"
-launchctl setenv TODOIST_API_KEY "your-key"
 launchctl setenv GITHUB_PERSONAL_ACCESS_TOKEN "your-token"
 ```
 

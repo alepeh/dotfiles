@@ -128,6 +128,12 @@ fi
 echo "→ Creating MCP wrapper scripts..."
 mkdir -p ~/.mcp-wrappers
 
+# Clean up old todoist wrapper (now uses official hosted MCP with OAuth)
+if [ -f ~/.mcp-wrappers/todoist-wrapper.sh ]; then
+  rm -f ~/.mcp-wrappers/todoist-wrapper.sh
+  echo "✓ Removed obsolete todoist-wrapper.sh (now using official hosted MCP)"
+fi
+
 # Obsidian wrapper
 cat > ~/.mcp-wrappers/obsidian-wrapper.sh << 'EOF'
 #!/bin/bash
