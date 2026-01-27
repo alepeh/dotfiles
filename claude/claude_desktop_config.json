@@ -5,9 +5,8 @@
       "command": "/Users/alexanderpehm/.mcp-wrappers/obsidian-wrapper.sh",
       "args": []
     },
-    "todoist-mcp": {
-      "command": "/Users/alexanderpehm/.mcp-wrappers/todoist-wrapper.sh",
-      "args": []
+    "todoist": {
+      "url": "https://ai.todoist.net/mcp"
     },
     "mcp-server-github": {
       "command": "/Users/alexanderpehm/.mcp-wrappers/github-wrapper.sh",
@@ -20,6 +19,10 @@
   },
   "preferences": {
     "menuBarEnabled": true,
-    "quickEntryDictationShortcut": "capslock"
+    "quickEntryDictationShortcut": "capslock",
+    "localAgentModeTrustedFolders": [
+      "/Users/alexanderpehm/Documents/customer-touchpoint-mgmt",
+      "/Users/alexanderpehm/Documents/investment-consult"
+    ]
   }
 }

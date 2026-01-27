@@ -137,15 +137,6 @@ fi
 exec /opt/homebrew/bin/uvx mcp-obsidian
 EOF
 
-# Todoist wrapper
-cat > ~/.mcp-wrappers/todoist-wrapper.sh << 'EOF'
-#!/bin/bash
-if [ -f ~/.env.mcp ]; then
-    source ~/.env.mcp
-fi
-exec node ~/code/todoist-mcp/build/index.js
-EOF
-
 # GitHub wrapper
 cat > ~/.mcp-wrappers/github-wrapper.sh << 'EOF'
 #!/bin/bash

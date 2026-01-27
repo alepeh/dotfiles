@@ -106,7 +106,7 @@ After installation, configure your API keys for Claude Desktop and Claude Code t
 | Server | Purpose | Required API Key |
 |--------|---------|------------------|
 | mcp-obsidian | Obsidian notes access | OBSIDIAN_API_KEY |
-| todoist-mcp | Task management | TODOIST_API_KEY |
+| todoist | Task management | OAuth (browser-based) |
 | mcp-server-github | GitHub operations | GITHUB_PERSONAL_ACCESS_TOKEN |
 | mcp-google-sheets | Google Sheets access | Google OAuth (browser-based) |
 
@@ -129,13 +129,11 @@ This setup uses **wrapper scripts** to keep secrets out of git while maintaining
 
 2. **Edit `~/.env.mcp`** and replace placeholder values with your actual API keys:
    - **OBSIDIAN_API_KEY**: Your Obsidian Local REST API key
-   - **TODOIST_API_KEY**: Your Todoist API token from https://todoist.com/prefs/integrations
    - **GITHUB_PERSONAL_ACCESS_TOKEN**: GitHub PAT with `repo`, `read:org`, `read:user` scopes
      Create at: https://github.com/settings/tokens
 
 3. **Wrapper scripts are already created** at `~/.mcp-wrappers/`:
    - `obsidian-wrapper.sh` - Loads secrets and starts mcp-obsidian
-   - `todoist-wrapper.sh` - Loads secrets and starts todoist-mcp
    - `github-wrapper.sh` - Loads secrets and starts mcp-server-github
    - `google-sheets-wrapper.sh` - Starts mcp-google-sheets (uses OAuth)
 
@@ -149,7 +147,7 @@ The same wrapper scripts can be shared with Claude Code CLI. Add them globally s
 # Add all MCP servers to Claude Code (user scope = global)
 claude mcp add --scope user mcp-server-github -- ~/.mcp-wrappers/github-wrapper.sh
 claude mcp add --scope user mcp-obsidian -- ~/.mcp-wrappers/obsidian-wrapper.sh
-claude mcp add --scope user todoist-mcp -- ~/.mcp-wrappers/todoist-wrapper.sh
+claude mcp add --scope user --transport http todoist https://ai.todoist.net/mcp
 claude mcp add --scope user mcp-google-sheets -- ~/.mcp-wrappers/google-sheets-wrapper.sh
 
 # Verify servers are connected

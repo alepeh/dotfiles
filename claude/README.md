@@ -4,7 +4,7 @@ This directory contains secure configuration for Claude Desktop's Model Context 
 
 ## Overview
 
-MCP servers extend Claude Desktop's capabilities by connecting it to external services like Obsidian, Todoist, and GitHub. This setup keeps your API keys secure and out of version control while maintaining a clean, reproducible configuration.
+MCP servers extend Claude Desktop's capabilities by connecting it to external services like Obsidian, GitHub, and Todoist. This setup keeps your API keys secure and out of version control while maintaining a clean, reproducible configuration. Some servers (like Todoist) use Doist's official hosted MCP with OAuth — no local setup or API key needed.
 
 ## Files
 
@@ -49,7 +49,6 @@ Claude Desktop has known issues with environment variable handling:
 │ ~/.env.mcp (chmod 600, never committed)                     │
 │ ┌─────────────────────────────────────────────────────────┐ │
 │ │ export OBSIDIAN_API_KEY="actual-secret-key"             │ │
-│ │ export TODOIST_API_KEY="actual-secret-key"              │ │
 │ │ export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_..."           │ │
 │ └─────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
@@ -79,7 +78,6 @@ nano ~/.env.mcp
 
 Replace these placeholders:
 - `your_obsidian_api_key_here` → Your Obsidian Local REST API key
-- `your_todoist_api_key_here` → Your Todoist API token
 - `your_github_pat_here` → Your GitHub Personal Access Token
 
 ### Getting API Keys
@@ -88,11 +86,6 @@ Replace these placeholders:
 1. Install the "Local REST API" plugin in Obsidian
 2. Enable the plugin in Settings → Community Plugins
 3. Copy the API key from plugin settings
-
-**Todoist API Key:**
-1. Go to https://todoist.com/prefs/integrations
-2. Scroll to "API token" section
-3. Copy your token
 
 **GitHub Personal Access Token:**
 1. Go to https://github.com/settings/tokens
@@ -110,13 +103,12 @@ Connects Claude to your Obsidian vault via the Local REST API plugin.
 - `OBSIDIAN_HOST` (optional, defaults to 127.0.0.1)
 - `OBSIDIAN_PORT` (optional, defaults to 27124)
 
-### todoist-mcp
-Integrates Claude with your Todoist tasks.
+### todoist (official hosted)
+Integrates Claude with your Todoist tasks via [Doist's official hosted MCP server](https://github.com/Doist/todoist-ai).
 
-**Required variables:**
-- `TODOIST_API_KEY` (required)
+**URL:** `https://ai.todoist.net/mcp`
 
-**Note:** Requires the todoist-mcp server to be installed at `~/code/todoist-mcp/`
+**Authentication:** OAuth (browser-based). No API key or local installation required. On first use, you'll be prompted to authenticate via your browser.
 
 ### mcp-server-github
 Connects Claude to GitHub repositories, issues, and PRs.
@@ -171,7 +163,6 @@ Connects Claude to Google Sheets for reading and writing spreadsheet data.
 5. **Verify MCP server binaries are installed:**
    ```bash
    /opt/homebrew/bin/uvx mcp-obsidian --help
-   node ~/code/todoist-mcp/build/index.js --help
    ~/go/bin/github-mcp-server --help
    ```
 
