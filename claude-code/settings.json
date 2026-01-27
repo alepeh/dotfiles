@@ -6,11 +6,9 @@
       "args": [],
       "env": {}
     },
-    "todoist-mcp": {
-      "type": "stdio",
-      "command": "/Users/alexanderpehm/.mcp-wrappers/todoist-wrapper.sh",
-      "args": [],
-      "env": {}
+    "todoist": {
+      "type": "http",
+      "url": "https://ai.todoist.net/mcp"
     },
     "mcp-google-sheets": {
       "type": "stdio",
