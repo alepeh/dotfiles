@@ -5,9 +5,6 @@
       "command": "/Users/alexanderpehm/.mcp-wrappers/obsidian-wrapper.sh",
       "args": []
     },
-    "todoist": {
-      "url": "https://ai.todoist.net/mcp"
-    },
     "mcp-server-github": {
       "command": "/Users/alexanderpehm/.mcp-wrappers/github-wrapper.sh",
       "args": []
