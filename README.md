@@ -27,6 +27,7 @@ Minimal, reproducible terminal setup for macOS optimized for AI-assisted develop
 * **iTerm2 profile**: Pre-configured font/colors; linked via Dynamic Profiles.
 * **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, GitHub, and Google Sheets - shared between Claude Desktop and Claude Code.
 * **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
+* **Cursor IDE**: AI-powered code editor with CLI (`cursor` command) for GUI-based development.
 
 ---
 
