@@ -15,6 +15,12 @@
       "command": "/Users/alexanderpehm/.mcp-wrappers/google-sheets-wrapper.sh",
       "args": [],
       "env": {}
+    },
+    "mcp-gsuite": {
+      "type": "stdio",
+      "command": "/Users/alexanderpehm/.mcp-wrappers/mcp-gsuite-wrapper.sh",
+      "args": [],
+      "env": {}
     }
   }
 }
