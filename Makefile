@@ -11,7 +11,7 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers helix-lsp
+.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp
 
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
@@ -164,6 +164,14 @@ doctor-mcp: ## Check MCP server credentials and configuration
 	  echo '│    "account_type":"personal",'; \
 	  echo '│    "extra_info":"Primary account"}]}'; \
 	fi
+	@echo "│"
+	@if [ -d "$(HOME)/.local/share/mcp-gsuite-patched" ]; then \
+	  echo "│ ✓ Patched mcp-gsuite installed"; \
+	else \
+	  echo "│ ✗ Patched mcp-gsuite missing"; \
+	  echo "│   Run: make mcp-gsuite-patch"; \
+	  echo "│   (Fixes JSON schema bug - see Issue #47)"; \
+	fi
 	@echo "└─────────────────────────────────────────────────────────────────┘"
 	@echo ""
 	@# Check MCP wrapper scripts
@@ -254,6 +262,21 @@ claude-code-mcp-wrappers: ## Link MCP wrapper scripts to ~/.mcp-wrappers/
 	done
 	@echo "✓ MCP wrappers linked to ~/.mcp-wrappers/"
 	@ls -1 "$(HOME)/.mcp-wrappers/"
+
+mcp-gsuite-patch: ## Clone and patch mcp-gsuite to fix JSON schema bug (Issue #47)
+	@echo "→ Creating patched mcp-gsuite (fixes JSON schema validation error)"
+	@echo "  See: https://github.com/MarkusPfundstein/mcp-gsuite/issues/47"
+	@rm -rf "$(HOME)/.local/share/mcp-gsuite-patched"
+	@mkdir -p "$(HOME)/.local/share"
+	@git clone --depth 1 https://github.com/MarkusPfundstein/mcp-gsuite.git \
+	  "$(HOME)/.local/share/mcp-gsuite-patched" 2>/dev/null || \
+	  (echo "Error: Failed to clone mcp-gsuite" && exit 1)
+	@# Fix: Remove invalid "required": False from property definition
+	@# This violates JSON Schema draft 2020-12 (required should be array at object level)
+	@sed -i '' '/"required": False/d' \
+	  "$(HOME)/.local/share/mcp-gsuite-patched/src/mcp_gsuite/tools_gmail.py"
+	@echo "✓ Patched mcp-gsuite installed to ~/.local/share/mcp-gsuite-patched"
+	@echo "  Note: Wrapper script already configured to use this location"
 
 helix-lsp: ## Install Helix language servers
 	@echo "→ Installing language servers for Helix"
