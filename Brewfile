@@ -16,6 +16,7 @@ brew "gh"             # GitHub CLI
 brew "git-delta"      # Better git diffs
 brew "uv"        # Python package installer (for MCP servers)
 brew "go"        # For GitHub MCP server
+brew "hugo"      # Static site generator for blog
 brew "jenv"       # Java version manager
 brew "mvn"
 

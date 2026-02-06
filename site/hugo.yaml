@@ -1,0 +1,75 @@
+baseURL: https://alepeh.github.io/dotfiles/
+languageCode: en-us
+title: alepeh/dotfiles
+theme: ["github.com/adityatelange/hugo-PaperMod"]
+
+pagination:
+  pagerSize: 10
+
+taxonomies:
+  tag: tags
+
+menu:
+  main:
+    - identifier: home
+      name: Home
+      url: /
+      weight: 10
+    - identifier: writing
+      name: Writing
+      url: /writing/
+      weight: 20
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 30
+    - identifier: archives
+      name: Archives
+      url: /archives/
+      weight: 40
+    - identifier: github
+      name: GitHub
+      url: https://github.com/alepeh/dotfiles
+      weight: 50
+      params:
+        external: true
+
+params:
+  env: production
+  description: "A terminal IDE built from dotfiles — Helix, Zellij, Yazi, Claude Code, and friends."
+  author: alepeh
+
+  defaultTheme: auto
+  ShowReadingTime: true
+  ShowCodeCopyButtons: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowShareButtons: false
+
+  homeInfoParams:
+    Title: "alepeh/dotfiles"
+    Content: >
+      A terminal IDE built from dotfiles — Helix, Zellij, Yazi, Claude Code, and friends.
+
+
+      Opinionated configs for a keyboard-driven workflow on macOS.
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/alepeh/dotfiles"
+
+  profileMode:
+    enabled: true
+    title: "alepeh/dotfiles"
+    subtitle: "A terminal IDE built from dotfiles — Helix, Zellij, Yazi, Claude Code, and friends."
+    buttons:
+      - name: Writing
+        url: /writing/
+      - name: GitHub
+        url: https://github.com/alepeh/dotfiles
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON

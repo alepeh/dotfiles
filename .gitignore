@@ -10,3 +10,8 @@ backups
 
 # MCP wrapper scripts with secrets
 .mcp-wrappers/
+
+# Hugo build artifacts
+site/public/
+site/resources/
+site/.hugo_build.lock
