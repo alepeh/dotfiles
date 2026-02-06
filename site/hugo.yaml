@@ -1,6 +1,6 @@
 baseURL: https://alepeh.github.io/dotfiles/
 languageCode: en-us
-title: alepeh/dotfiles
+title: Alexander Pehm
 theme: ["github.com/adityatelange/hugo-PaperMod"]
 
 pagination:
@@ -23,50 +23,30 @@ menu:
       name: Tags
       url: /tags/
       weight: 30
-    - identifier: archives
-      name: Archives
-      url: /archives/
-      weight: 40
-    - identifier: github
-      name: GitHub
-      url: https://github.com/alepeh/dotfiles
-      weight: 50
-      params:
-        external: true
 
 params:
   env: production
-  description: "A terminal IDE built from dotfiles — Helix, Zellij, Yazi, Claude Code, and friends."
-  author: alepeh
+  description: "Alexander Pehm — developer, architect, chimney sweep."
+  author: Alexander Pehm
 
   defaultTheme: auto
   ShowReadingTime: true
   ShowCodeCopyButtons: true
   ShowPostNavLinks: true
-  ShowBreadCrumbs: true
+  ShowBreadCrumbs: false
   ShowShareButtons: false
 
-  homeInfoParams:
-    Title: "alepeh/dotfiles"
-    Content: >
-      A terminal IDE built from dotfiles — Helix, Zellij, Yazi, Claude Code, and friends.
+  footer:
+    text: "No cookies. No tracking."
 
-
-      Opinionated configs for a keyboard-driven workflow on macOS.
+  profileMode:
+    enabled: false
 
   socialIcons:
     - name: github
-      url: "https://github.com/alepeh/dotfiles"
-
-  profileMode:
-    enabled: true
-    title: "alepeh/dotfiles"
-    subtitle: "A terminal IDE built from dotfiles — Helix, Zellij, Yazi, Claude Code, and friends."
-    buttons:
-      - name: Writing
-        url: /writing/
-      - name: GitHub
-        url: https://github.com/alepeh/dotfiles
+      url: "https://github.com/alepeh"
+    - name: linkedin
+      url: "https://www.linkedin.com/in/alexanderpehm/"
 
 outputs:
   home:
