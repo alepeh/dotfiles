@@ -11,7 +11,7 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp
+.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-build site-new
 
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
@@ -283,3 +283,14 @@ helix-lsp: ## Install Helix language servers
 	@brew install pyright ruff typescript-language-server prettier jdtls
 	@echo "✓ Language servers installed"
 	@echo "→ Run 'hx --health python typescript java' to verify"
+
+site-serve: ## Serve Hugo site locally with drafts and live reload
+	@cd "$(REPO_DIR)/site" && hugo server --buildDrafts --navigateToChanged
+
+site-build: ## Build Hugo site for production
+	@cd "$(REPO_DIR)/site" && hugo --gc --minify
+
+site-new: ## Create a new writing post (usage: make site-new TITLE=my-post-title)
+	@test -n "$(TITLE)" || (echo "Usage: make site-new TITLE=my-post-title" && exit 1)
+	@cd "$(REPO_DIR)/site" && hugo new "writing/$(TITLE).md"
+	@echo "✓ Created site/content/writing/$(TITLE).md"
