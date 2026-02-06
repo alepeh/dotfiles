@@ -2,7 +2,7 @@
 
 ## Branch Strategy
 
-- Always create feature branches for new work - never commit directly to main/master
+- Always create feature branches for new work - never commit directly to main
 - Branch naming conventions:
   - `feature/` - new functionality
   - `fix/` - bug fixes
@@ -41,7 +41,7 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 
 Before each commit, verify:
 
-- [ ] Working on a feature branch (not main/master)
+- [ ] Working on a feature branch (not main)
 - [ ] Tests written for new code
 - [ ] All tests pass locally
 - [ ] Code follows project style guidelines
