@@ -11,8 +11,7 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-build site-new
-
+.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
 	@$(REPO_DIR)/scripts/install.sh
@@ -285,7 +284,10 @@ helix-lsp: ## Install Helix language servers
 	@echo "→ Run 'hx --health python typescript java' to verify"
 
 site-serve: ## Serve Hugo site locally with drafts and live reload
-	@cd "$(REPO_DIR)/site" && hugo server --buildDrafts --navigateToChanged
+	@cd "$(REPO_DIR)/site" && hugo server --buildDrafts --navigateToChanged --baseURL http://localhost:1313/
+
+site-preview: ## Build and open Hugo site in browser (live reload + drafts)
+	@cd "$(REPO_DIR)/site" && open http://localhost:1313/ && hugo server --buildDrafts --navigateToChanged --baseURL http://localhost:1313/
 
 site-build: ## Build Hugo site for production
 	@cd "$(REPO_DIR)/site" && hugo --gc --minify
