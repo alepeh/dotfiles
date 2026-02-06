@@ -54,3 +54,27 @@ Before each commit, verify:
 - Include a clear description of changes
 - Reference related issues when applicable
 - Ensure CI checks pass before requesting review
+
+# Project Management
+
+## Roadmap
+- Check ROADMAP.md at the start of each session before doing significant work
+- Use checkbox progression: `[ ]` → `[-]` → `[x]` with date stamps
+- Move completed items to "Recently Completed" section
+- Track small fixes in reference/AD_HOC_TASKS.md
+- Never commit ROADMAP.md changes in the same commit as code changes
+
+## Task Workflow
+- Use TaskCreate only for complex multi-step features with real dependencies
+  (e.g., "design schema" blocks "build API" blocks "write tests")
+- For straightforward sequential work, just work naturally — don't create tasks as a focus aid
+- When using tasks: set addBlockedBy for sequential phases, mark in_progress before starting,
+  mark completed only after verification
+
+## Workflow Commands
+- `/init-roadmap` — Bootstrap a new project with ROADMAP.md and tracking files
+- `/next-task` — Pick and start the highest priority roadmap item
+- `/update-roadmap` — Sync roadmap with recent git activity
+- `/retrospective` — End-of-session learnings capture
+
+See `claude-code/WORKFLOW.md` for the full workflow guide.
