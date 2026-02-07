@@ -11,7 +11,7 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new
+.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp amp site-serve site-preview site-build site-new
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
 	@$(REPO_DIR)/scripts/install.sh
@@ -70,6 +70,7 @@ doctor: ## Quick sanity checks
 	@command -v lazygit >/dev/null || (echo "lazygit not found - run: brew install lazygit" && exit 1)
 	@command -v yazi >/dev/null || (echo "yazi not found - run: brew install yazi" && exit 1)
 	@command -v delta >/dev/null || (echo "delta not found - run: brew install git-delta" && exit 1)
+	@command -v amp >/dev/null || (echo "amp not found - run: npm install -g @sourcegraph/amp" && exit 1)
 	@[ -d "$(REPO_DIR)/omz/ohmyzsh" ] || (echo "oh-my-zsh submodule missing" && exit 1)
 	@[ -f "$(REPO_DIR)/zsh/.zshrc" ] || (echo ".zshrc missing" && exit 1)
 	@[ -d "$(REPO_DIR)/helix" ] || (echo "helix config missing" && exit 1)
@@ -276,6 +277,13 @@ mcp-gsuite-patch: ## Clone and patch mcp-gsuite to fix JSON schema bug (Issue #4
 	  "$(HOME)/.local/share/mcp-gsuite-patched/src/mcp_gsuite/tools_gmail.py"
 	@echo "✓ Patched mcp-gsuite installed to ~/.local/share/mcp-gsuite-patched"
 	@echo "  Note: Wrapper script already configured to use this location"
+
+amp: ## Link Amp Code configuration (Sourcegraph AI coding agent)
+	@echo "→ Linking Amp Code configuration"
+	@mkdir -p "$(HOME)/.config/amp"
+	@ln -sfn "$(REPO_DIR)/amp/settings.json" "$(HOME)/.config/amp/settings.json"
+	@echo "✓ ~/.config/amp/settings.json → $(REPO_DIR)/amp/settings.json"
+	@echo "  Note: Run 'amp' to authenticate via browser, or set AMP_API_KEY in ~/.env.mcp"
 
 helix-lsp: ## Install Helix language servers
 	@echo "→ Installing language servers for Helix"
