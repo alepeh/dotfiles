@@ -75,6 +75,7 @@ Before each commit, verify:
 - `/init-roadmap` — Bootstrap a new project with ROADMAP.md and tracking files
 - `/next-task` — Pick and start the highest priority roadmap item
 - `/update-roadmap` — Sync roadmap with recent git activity
+- `/new-diff` — Create a short-form changelog entry for the Hugo site
 - `/retrospective` — End-of-session learnings capture
 
 See `claude-code/WORKFLOW.md` for the full workflow guide.
