@@ -19,6 +19,10 @@ menu:
       name: Writing
       url: /writing/
       weight: 20
+    - identifier: diff
+      name: Diff
+      url: /diff/
+      weight: 25
     - identifier: tags
       name: Tags
       url: /tags/
