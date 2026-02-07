@@ -1,6 +1,6 @@
 ---
 title: "Task Management with Claude Code"
-date: 2026-02-06
+date: 2026-02-07
 draft: false
 tags: ["Claude Code", "Workflow", "Productivity", "Tooling"]
 summary: "A three-tier system for roadmap-driven development with Claude Code — using CLAUDE.md, custom slash commands, and built-in task tracking to keep multi-session projects on rails."
