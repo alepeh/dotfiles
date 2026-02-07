@@ -189,8 +189,13 @@ CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
 mkdir -p "$CLAUDE_CONFIG_DIR"
 backup_and_link "$DOTFILES/claude/claude_desktop_config.json" "$CLAUDE_CONFIG_DIR/claude_desktop_config.json"
 
-echo "→ Install Codex CLI..."
+echo "→ Linking Amp Code configuration..."
+mkdir -p "$HOME/.config/amp"
+backup_and_link "$DOTFILES/amp/settings.json" "$HOME/.config/amp/settings.json"
+
+echo "→ Installing AI coding agents..."
 npm install -g @openai/codex
+npm install -g @sourcegraph/amp
 
 echo "→ Configuring jenv (Java version management)..."
 if have jenv; then
