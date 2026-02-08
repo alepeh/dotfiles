@@ -2,6 +2,17 @@
 
 Review the day against the morning brief, capture what happened, and set up tomorrow.
 
+## Link Formats
+
+When presenting items, always include a clickable link to the source:
+
+- **Todoist tasks**: `[task title](https://app.todoist.com/showTask?id={task_id})`
+- **Gmail emails**: `[subject](https://mail.google.com/mail/u/0/#all/{email_id})` — use the `id` field from `query_gmail_emails`
+- **Obsidian notes**: `[note title](obsidian://open?vault=brain&file={filepath_without_extension})` — e.g., `obsidian://open?vault=brain&file=journals/2026-02-08`
+- **Google Calendar events**: `[event title](https://calendar.google.com/calendar/u/0/r/day/{YYYY}/{MM}/{DD})` — link to the day view
+
+Include links in both the conversation output and the Obsidian journal. In Obsidian, use standard Markdown links (not wikilinks) so they work as clickable URLs.
+
 ## Steps
 
 1. **Determine dates**
@@ -20,10 +31,12 @@ Review the day against the morning brief, capture what happened, and set up tomo
    **Todoist completed** — `find-completed-tasks`
    - Since: TODAY, Until: TODAY
    - Get by: `completion` (when actually completed, not due date)
+   - Capture `id` field for each task for linking
    - Note which tasks had the `chief-of-staff` label (agent-created vs manual)
 
    **Todoist still open** — `find-tasks-by-date`
    - Start date: `today`
+   - Capture `id` field for each task for linking
    - Check which morning priorities are still open
    - Note any new tasks that appeared during the day
 
@@ -31,6 +44,7 @@ Review the day against the morning brief, capture what happened, and set up tomo
    - Account: `alexander@pehm.biz`
    - Query: `is:unread newer_than:12h`
    - Limit: 15
+   - Capture `id` field for each email for linking
    - Identify emails that arrived after the morning brief
 
    **Calendar** — `get_calendar_events`
@@ -41,9 +55,9 @@ Review the day against the morning brief, capture what happened, and set up tomo
 4. **Escalation check** — `find-tasks`
    - Search Todoist for tasks with `chief-of-staff` label that are overdue by 3+ days
    - Search for tasks that have been rescheduled repeatedly (same content, different due dates appearing in recent journal Decisions sections)
-   - Flag escalation items:
-     - Task overdue 3+ days: "This task has been open for [N] days — should we reprioritize, delegate, or drop it?"
-     - Same topic rescheduled 3+ times across journals: "This keeps getting pushed — is there a blocker we should address?"
+   - Flag escalation items with links to the task:
+     - Task overdue 3+ days: "[Task](link) has been open for [N] days — should we reprioritize, delegate, or drop it?"
+     - Same topic rescheduled 3+ times across journals: "[Task](link) keeps getting pushed — is there a blocker we should address?"
      - Many overdue items in one Todoist project: "[Project] has [N] overdue items — is this project stalled?"
 
 5. **Check for CoS Feedback**
@@ -53,25 +67,26 @@ Review the day against the morning brief, capture what happened, and set up tomo
 6. **Compare morning plan vs. reality** — Produce the following sections:
 
    **Completed Today**
-   - List completed Todoist tasks with 🟢 indicator
+   - List completed Todoist tasks with 🟢 indicator and linked titles
+   - Example: `🟢 [Angebot Burggrabengasse erstellen](https://app.todoist.com/showTask?id=12345)`
    - Note morning priorities that were accomplished
    - Include any wins or notable completions
 
    **Still Open**
-   - Morning priorities that weren't addressed, with status indicators:
+   - Morning priorities that weren't addressed, with status indicators and linked titles:
      - 🔴 Was URGENT and still not done
      - 🟡 Was OPERATIVE, can carry to tomorrow
      - ⚪ Was STRATEGIC, no change expected
    - For each, briefly note why (if apparent from context) — meeting-heavy day, new urgent items displaced them, etc.
 
    **Escalations**
-   - Items flagged in step 4 (only if any exist)
+   - Items flagged in step 4 (only if any exist), each with a link to the task
    - Present each with a concrete suggestion: reprioritize, delegate, break into smaller tasks, or drop
 
    **New Items That Appeared**
-   - Emails that arrived after the morning brief needing attention
+   - Emails that arrived after the morning brief needing attention, each linked: `[Subject](https://mail.google.com/mail/u/0/#all/{email_id})`
    - **Implicit to-do detection**: flag emails that imply an action even if not explicit
-   - Tasks added during the day (not from morning brief)
+   - Tasks added during the day (not from morning brief), linked to Todoist
    - Anything that disrupted the planned day
 
    **Tomorrow's Setup**
@@ -79,6 +94,7 @@ Review the day against the morning brief, capture what happened, and set up tomo
      - **URGENT** — overdue carry-overs, hard deadlines tomorrow
      - **OPERATIVE** — routine items, follow-ups
      - **STRATEGIC** — longer-term items worth scheduling time for
+   - Each item linked to its Todoist task or source email
    - Any prep needed for tomorrow's first meeting
    - Upcoming deadlines in the next 2-3 days
 
@@ -88,6 +104,7 @@ Review the day against the morning brief, capture what happened, and set up tomo
      - If no: use `obsidian_patch_content` to append to the file, or `obsidian_append_content` if simpler
    - Format as Markdown under a `# Evening Recap` heading
    - Include a timestamp: `*Generated at HH:MM on YYYY-MM-DD*`
+   - All links (Todoist, Gmail, Calendar) should be included as standard Markdown links
    - Include the full recap (completed, still open, escalations, new items, tomorrow's setup)
 
 8. **Offer carry-over actions**
@@ -99,7 +116,7 @@ Review the day against the morning brief, capture what happened, and set up tomo
    - Never auto-create — always confirm first
 
 9. **Present the recap**
-   - Show a formatted summary in the conversation
+   - Show a formatted summary in the conversation (with clickable links)
    - Highlight the day's completion rate (e.g. "3 of 5 morning priorities completed")
    - Show escalation items prominently if any exist
    - List proposed carry-over actions with numbers
@@ -107,12 +124,12 @@ Review the day against the morning brief, capture what happened, and set up tomo
 
 10. **Execute approved carry-overs**
     - For approved tasks: use `add-tasks` or `update-tasks` with label `chief-of-staff`, due tomorrow
-    - Report what was created or rescheduled
+    - Report what was created or rescheduled, including links to the Todoist tasks
 
 11. **Log decisions and follow-ups to Obsidian**
     - Update today's journal with two sections (or create them if they don't exist):
-    - `## Decisions` — append evening decisions to existing morning decisions (e.g., "Carried over task X to tomorrow", "Dropped task Y — no longer relevant")
-    - `## Follow-up Next Session` — replace with updated list of items for tomorrow's morning brief (e.g., "Check if reply from X arrived", "Review document Y before Thursday meeting")
+    - `## Decisions` — append evening decisions to existing morning decisions, with links (e.g., "Carried over [task](https://app.todoist.com/showTask?id=12345) to tomorrow", "Dropped [task](link) — no longer relevant")
+    - `## Follow-up Next Session` — replace with updated list of items for tomorrow's morning brief, with source links (e.g., "Check if reply from [email](https://mail.google.com/mail/u/0/#all/{id}) arrived")
     - Use `obsidian_patch_content` with heading-based replace for Follow-up; use append for Decisions (to preserve morning entries)
 
 ## Guardrails

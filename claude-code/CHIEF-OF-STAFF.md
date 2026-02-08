@@ -8,6 +8,20 @@ A semi-autonomous daily briefing loop built on Claude Code slash commands and fo
 - **Human in the loop.** The agent reads freely but never acts without approval. Emails are drafted, never sent. Tasks are proposed, then confirmed. Calendar is read-only.
 - **Obsidian is the state store.** There is no separate database. The daily journal (`journals/YYYY-MM-DD.md`) persists state between runs via structured headings.
 - **Idempotent re-runs.** Running a command twice on the same day replaces the existing section rather than duplicating it.
+- **Everything is linked.** Every item in the brief links back to its source — Todoist task, Gmail email, Obsidian note, or Calendar day view. Clickable in both the terminal and Obsidian.
+
+## Link Formats
+
+All items reference their source with clickable links, in both the conversation and the Obsidian journal output.
+
+| Source | URL Template | ID Source |
+|--------|-------------|-----------|
+| Todoist task | `https://app.todoist.com/showTask?id={task_id}` | `id` field from `find-tasks-by-date` / `find-completed-tasks` |
+| Gmail email | `https://mail.google.com/mail/u/0/#all/{email_id}` | `id` field from `query_gmail_emails` |
+| Obsidian note | `obsidian://open?vault=brain&file={path_without_extension}` | Known path, e.g. `journals/2026-02-08` |
+| Google Calendar | `https://calendar.google.com/calendar/u/0/r/day/{YYYY}/{MM}/{DD}` | Date-based (individual event URLs not available via MCP) |
+
+In Obsidian output, use standard Markdown links (`[text](url)`) rather than wikilinks, so external URLs (Gmail, Todoist) are clickable.
 
 ## Commands
 
@@ -35,62 +49,65 @@ Each daily journal (`journals/YYYY-MM-DD.md`) accumulates the following headings
 *Generated at 07:30 on 2026-02-08*
 
 ### Task Overview
-🔴 Overdue: ...
-🟡 Due today: ...
-🟢 In progress: ...
+🔴 [Zulassungsprüfung Pelletsofen](https://app.todoist.com/showTask?id=8401) — overdue since Feb 5
+🟡 [Angebot Burggrabengasse](https://app.todoist.com/showTask?id=8402) — due today, p1
+🟢 [Kehrbuch Q1 vorbereiten](https://app.todoist.com/showTask?id=8403) — in progress
+⚪ [Website-Relaunch planen](https://app.todoist.com/showTask?id=8404) — due Feb 15
 
 ### Priorities
 **URGENT**
-- ...
+- [Zulassungsprüfung Pelletsofen](https://app.todoist.com/showTask?id=8401) — overdue, client waiting (Todoist)
+- [Re: Pelletskesselofen 42kW](https://mail.google.com/mail/u/0/#all/19c3e37951ba05c2) — needs reply, vendor sent specs (Gmail)
 **OPERATIVE**
-- ...
+- [Angebot Burggrabengasse](https://app.todoist.com/showTask?id=8402) — deadline today (Todoist)
 **STRATEGIC**
-- ...
+- Website-Relaunch — recurring theme, appeared 3x this week ([Feb 5](obsidian://open?vault=brain&file=journals/2026-02-05), [Feb 6](obsidian://open?vault=brain&file=journals/2026-02-06), [Feb 7](obsidian://open?vault=brain&file=journals/2026-02-07))
 
 ### Today's Schedule
-- 09:00 — Meeting title (context)
-- ...
+- 09:00 — Teammeeting (weekly standup, 30min)
+- 14:00 — Kundenbesichtigung Meidling (external, prep needed)
 
 ### Emails Needing Attention
 **Needs Reply**
-- ...
+- [Re: Pelletskesselofen 42kW](https://mail.google.com/mail/u/0/#all/19c3e37951ba05c2) — Mijajlovic sent product links → implied to-do: check Austrian certification
 **FYI Only**
-- ...
+- [Rechnung Jänner](https://mail.google.com/mail/u/0/#all/19c3e12345678) — accounting, no action needed
 
 ### Carry-overs & Follow-ups
-- ...
+- From [yesterday's recap](obsidian://open?vault=brain&file=journals/2026-02-07): Wartungsprotokoll review still pending
 
 ## Decisions
-- Created task for X based on email from Y
-- Drafted reply to Z
-- Skipped newsletter from W
+- Created [Zulassungsstatus prüfen](https://app.todoist.com/showTask?id=8410) based on [Mijajlovic email](https://mail.google.com/mail/u/0/#all/19c3e37951ba05c2)
+- Drafted reply to Mijajlovic ([CoS Draft] in Gmail)
+- Skipped newsletter from Kaminkehrer-Verband
 
 ## Follow-up Next Session
-- Check if reply from X arrived
-- Review document Y before Thursday meeting
+- Check if reply from [Mijajlovic](https://mail.google.com/mail/u/0/#all/19c3e37951ba05c2) arrived
+- Review Besichtigung notes after 14:00 appointment
 
 # Evening Recap
 *Generated at 18:00 on 2026-02-08*
 
 ### Completed Today
-🟢 Task A
-🟢 Task B
+🟢 [Angebot Burggrabengasse](https://app.todoist.com/showTask?id=8402)
+🟢 [Zulassungsstatus prüfen](https://app.todoist.com/showTask?id=8410)
 
 ### Still Open
-🔴 Task C — was URGENT, blocked by ...
-🟡 Task D — OPERATIVE, carry to tomorrow
+🔴 [Zulassungsprüfung Pelletsofen](https://app.todoist.com/showTask?id=8401) — was URGENT, waiting on Mijajlovic reply
+🟡 [Kehrbuch Q1 vorbereiten](https://app.todoist.com/showTask?id=8403) — OPERATIVE, 60% done
 
 ### Escalations
-- Task E has been overdue for 5 days — reprioritize?
+- [Zulassungsprüfung Pelletsofen](https://app.todoist.com/showTask?id=8401) has been open for 4 days — reprioritize or delegate?
 
 ### New Items
-- Email from F about G — implied to-do: ...
+- [Terminanfrage Neubaugasse](https://mail.google.com/mail/u/0/#all/19c3f98765432) — new client, needs scheduling
 
 ### Tomorrow's Setup
 **URGENT**
-- ...
+- [Zulassungsprüfung Pelletsofen](https://app.todoist.com/showTask?id=8401) — follow up with Mijajlovic
 **OPERATIVE**
-- ...
+- [Kehrbuch Q1 vorbereiten](https://app.todoist.com/showTask?id=8403) — finish remaining 40%
+- Schedule appointment for Neubaugasse inquiry
 
 ## CoS Feedback
 (User writes corrections here manually — agent reads on next run)
