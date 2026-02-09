@@ -1,0 +1,19 @@
+{
+  "amp.mcpServers": {
+    "mcp-obsidian": {
+      "command": "$HOME/.mcp-wrappers/obsidian-wrapper.sh",
+      "args": []
+    },
+    "mcp-google-sheets": {
+      "command": "$HOME/.mcp-wrappers/google-sheets-wrapper.sh",
+      "args": []
+    },
+    "mcp-gsuite": {
+      "command": "$HOME/.mcp-wrappers/mcp-gsuite-wrapper.sh",
+      "args": []
+    },
+    "todoist": {
+      "url": "https://ai.todoist.net/mcp"
+    }
+  }
+}
