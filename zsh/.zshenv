@@ -20,4 +20,8 @@ elif [[ -d "/usr/local/bin" ]]; then
 fi
 
 export PATH="$HOME/.local/bin:$PATH"
-. "$HOME/.cargo/env"
+
+# Load Rust/Cargo environment if it exists
+if [[ -f "$HOME/.cargo/env" ]]; then
+  . "$HOME/.cargo/env"
+fi
