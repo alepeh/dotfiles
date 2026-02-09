@@ -30,6 +30,5 @@ cask "temurin@17"   # Eclipse Temurin JDK 17 (LTS)
 cask "temurin@21"   # Eclipse Temurin JDK 21 (LTS)
 cask "temurin"      # Eclipse Temurin JDK 24 (latest)
 cask "claude-code"
-cask "cursor"      # Cursor IDE
-cask "cursor-cli"
+cask "cursor-cli"  # Cursor command-line agent (standalone, doesn't require Cursor IDE)
 cask "font-meslo-lg-nerd-font"  # still works as a normal cask
