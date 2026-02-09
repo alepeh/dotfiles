@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mcp-obsidian": {
+      "command": "$HOME/.mcp-wrappers/obsidian-wrapper.sh",
+      "args": []
+    },
+    "mcp-server-github": {
+      "command": "$HOME/.mcp-wrappers/github-wrapper.sh",
+      "args": []
+    },
+    "mcp-google-sheets": {
+      "command": "$HOME/.mcp-wrappers/google-sheets-wrapper.sh",
+      "args": []
+    }
+  }
+}

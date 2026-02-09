@@ -11,6 +11,10 @@ backups
 # MCP wrapper scripts with secrets
 .mcp-wrappers/
 
+# App-managed configs (machine-specific, track .example files instead)
+claude/claude_desktop_config.json
+amp/settings.json
+
 # Hugo build artifacts
 site/public/
 site/resources/
