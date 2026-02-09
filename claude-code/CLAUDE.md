@@ -77,5 +77,7 @@ Before each commit, verify:
 - `/update-roadmap` — Sync roadmap with recent git activity
 - `/new-diff` — Create a short-form changelog entry for the Hugo site
 - `/retrospective` — End-of-session learnings capture
+- `/morning-brief` — Chief-of-Staff daily briefing (Gmail, Calendar, Todoist, Obsidian)
+- `/evening-recap` — Chief-of-Staff end-of-day review and carry-over planning
 
 See `claude-code/WORKFLOW.md` for the full workflow guide.

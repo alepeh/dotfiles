@@ -9,7 +9,9 @@
 - [-] **Project Development Workflow** - Three-tier roadmap/task/command system 🏗️ 2026-02-06
 
 ## High Priority
+- [ ] **Chief-of-Staff Agent (Phase 1)** - `/morning-brief` and `/evening-recap` slash commands for daily briefing loop via Gmail, Calendar, Todoist, and Obsidian
 - [ ] **Claude Code Skills** - Evaluate skills directory for always-loaded context
+- [ ] **GitHub Repo Hardening** - Review remaining repos for branch protection & settings
 
 ## Backlog
 - [ ] **Additional MCP Servers** - Evaluate new MCP servers as they become available

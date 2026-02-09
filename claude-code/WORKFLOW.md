@@ -8,7 +8,7 @@ A three-tier system for structured project development with Claude Code.
 |------|------|---------|
 | **ROADMAP.md** | Strategic planning file at repo root | Single source of truth for features and priorities |
 | **CLAUDE.md** | Session guidance (project management rules) | Ensures Claude checks the roadmap and follows conventions |
-| **Slash commands** | Workflow automation | `/init-roadmap`, `/next-task`, `/update-roadmap`, `/retrospective` |
+| **Slash commands** | Workflow automation | `/init-roadmap`, `/next-task`, `/update-roadmap`, `/retrospective`, `/morning-brief`, `/evening-recap` |
 
 ## Starting a New Project
 
@@ -55,9 +55,20 @@ A three-tier system for structured project development with Claude Code.
 3. Summarizes priorities for next time
 4. Context is preserved in: ROADMAP.md (git), Tasks (`~/.claude/tasks/`), and session history (`--continue`)
 
+## Chief-of-Staff Briefing Loop
+
+A daily cadence using MCP integrations (Gmail, Calendar, Todoist, Obsidian) to stay on top of priorities.
+
+- **Morning**: `/morning-brief` — fetches unread emails, today's calendar, overdue tasks, and yesterday's journal. Synthesises priorities and presents an approval queue for actions (Todoist tasks, email drafts).
+- **Evening**: `/evening-recap` — compares morning plan vs. what happened, logs completed/open items, and offers to create carry-over tasks for tomorrow.
+- **State**: Obsidian daily journal (`journals/YYYY-MM-DD.md`) is the state store. Morning Brief and Evening Recap are written as headings; re-running replaces existing sections.
+- **Feedback**: Add a `## CoS Feedback` section to any journal entry — the agent reads and applies it on the next run.
+- **Labels**: All agent-created Todoist tasks use the `chief-of-staff` label for tracking and dedup.
+
 ## Day-to-Day Cadence
 
 - **Start**: `claude --continue` → CLAUDE.md loads roadmap instructions → Claude checks ROADMAP.md
+- **Morning brief**: `/morning-brief` → review priorities → approve actions
 - **Work**: `/next-task` → implement → commit → test
-- **Wrap up**: `/update-roadmap` → `/retrospective`
+- **Wrap up**: `/evening-recap` → `/update-roadmap` → `/retrospective`
 - The system is designed to be low-friction — skip steps when they don't add value
