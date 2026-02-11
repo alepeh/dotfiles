@@ -69,9 +69,56 @@ Add a **project-specific context section** to CLAUDE.md (the generic roadmap wor
 
 Only add commands that actually exist in the project.
 
-## Step 5: Summary
+## Step 5: Create Obsidian Project Note
+
+Create a project overview note in Obsidian via MCP (`obsidian_append_content`). This note tracks the project's current state at a glance — it does **not** replace detailed technical documentation in the repository.
+
+**Note path:** `notes/{Project Name}.md` (use the same name as the ROADMAP.md title)
+
+**Content:** Use the `Code Project Template` structure with frontmatter:
+
+```markdown
+---
+category:
+  - "[[Projects]]"
+status: active
+area:
+repo: {github repo URL if known, otherwise leave blank}
+tags:
+  - projects
+  - code
+created: {today YYYY-MM-DD}
+updated: {today YYYY-MM-DD}
+---
+
+# {Project Name}
+
+## Überblick
+{1-2 sentence description of the project based on what was learned in Step 1}
+
+## Stack
+{Bullet list of key technologies discovered in Step 1 — language, framework, database, hosting}
+
+## Aktueller Stand
+Projekt initialisiert. Roadmap erstellt.
+
+## Nächste Prioritäten
+{Top 3-5 items from the roadmap, as a bullet list}
+
+## Letzte Änderungen
+- {today} — Projekt-Setup: ROADMAP.md, CLAUDE.md, Obsidian-Notiz erstellt
+
+## Links
+- Repository: {repo URL or local path}
+- {Any deployment URLs, documentation links, or related Obsidian notes}
+```
+
+Write in German. Keep it concise — this is a status overview, not technical documentation.
+
+## Step 6: Summary
 
 After completing all steps, show me:
 - A summary of files created/modified
 - The current state of ROADMAP.md
+- The name of the Obsidian project note created
 - Remind me to set `CLAUDE_CODE_TASK_LIST_ID=<project-name>` in my shell if I want multi-session task sync

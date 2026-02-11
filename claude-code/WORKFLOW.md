@@ -13,9 +13,9 @@ A three-tier system for structured project development with Claude Code.
 ## Starting a New Project
 
 1. Run `/init-repo` to create the GitHub repo
-2. Run `/init-roadmap` in the new project — creates ROADMAP.md, AD_HOC_TASKS.md, and adds project context to CLAUDE.md
+2. Run `/init-roadmap` in the new project — creates ROADMAP.md, AD_HOC_TASKS.md, adds project context to CLAUDE.md, and creates an Obsidian project note
 3. Answer the interview questions about features, tech debt, and blockers
-4. The roadmap is now your single source of truth
+4. The roadmap is now your single source of truth; the Obsidian note tracks status at a glance
 
 ## Starting Work on a Feature
 
@@ -25,6 +25,7 @@ A three-tier system for structured project development with Claude Code.
 4. For complex features: Claude creates Tasks with dependencies via TaskCreate
 5. For simple features: Claude works through it directly without formal task tracking
 6. Create a feature branch following the naming convention
+7. On completion, the Obsidian project note is automatically updated (current state, priorities, recent changes)
 
 ## Reprioritizing / Amending the Roadmap
 
