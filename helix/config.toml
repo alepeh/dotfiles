@@ -12,7 +12,6 @@ color-modes = true
 true-color = true
 rulers = [100]
 idle-timeout = 200
-auto-reload = true
 
 [editor.cursor-shape]
 insert = "bar"
