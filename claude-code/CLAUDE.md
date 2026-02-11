@@ -55,6 +55,15 @@ Before each commit, verify:
 - Reference related issues when applicable
 - Ensure CI checks pass before requesting review
 
+## Makefile as Project Interface
+
+Every project should have a Makefile (or Justfile) providing a standard command vocabulary:
+- Run `make help` (or `just --list`) first to discover available commands
+- Use `make <target>` instead of raw build/test/lint commands
+- Standard targets: `dev`, `build`, `test`, `lint`, `clean` (not all may be present)
+- When adding new tooling, add a corresponding Make target
+- `/init-roadmap` auto-generates a Makefile if one doesn't exist
+
 # Project Management
 
 ## Roadmap
