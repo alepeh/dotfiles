@@ -11,12 +11,29 @@ ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
 BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
-.PHONY: install backup-iterm update iterm-profile brew-lock brew-update fonts clean doctor doctor-mcp restore-iterm helix zellij yazi git-config zed claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp amp site-serve site-preview site-build site-new
+.DEFAULT_GOAL := help
+
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new clean
+
+help: ## Show available targets
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+##@ Setup
+
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
 	@$(REPO_DIR)/scripts/install.sh
 	@$(MAKE) iterm-profile
 	@echo "✓ Install complete. If iTerm2 was open, quit & relaunch to load the new profile."
+
+update: ## Update Homebrew packages & git submodules
+	@echo "→ Updating Homebrew bundle"
+	@brew bundle --file="$(BREWFILE)"
+	@echo "→ Updating submodules"
+	@$(REPO_DIR)/scripts/update-plugins.sh
+	@echo "✓ Update complete."
+
+##@ iTerm2
 
 backup-iterm: ## Backup iTerm2 preferences plist to repo backups folder
 	@mkdir -p "$(BACKUP_DIR)"
@@ -38,17 +55,12 @@ restore-iterm: ## Restore the most recent iTerm2 prefs backup
 	  echo "No backups found in $(BACKUP_DIR)"; \
 	fi
 
-update: ## Update Homebrew packages & git submodules
-	@echo "→ Updating Homebrew bundle"
-	@brew bundle --file="$(BREWFILE)"
-	@echo "→ Updating submodules"
-	@$(REPO_DIR)/scripts/update-plugins.sh
-	@echo "✓ Update complete."
-
 iterm-profile: ## Link iTerm2 Dynamic Profile JSON
 	@mkdir -p "$(ITERM_DYNAMIC_DIR)"
 	@ln -sfn "$(ITERM_PROFILE)" "$(ITERM_PROFILE_LINK)"
 	@echo "✓ Linked iTerm2 profile → $(ITERM_PROFILE_LINK)"
+
+##@ Homebrew
 
 brew-lock: ## Re-dump current brew state to Brewfile
 	@brew bundle dump --force --file="$(BREWFILE)"
@@ -61,6 +73,8 @@ brew-update: ## brew update/upgrade/cleanup
 fonts: ## Ensure Nerd Font (if glyphs look off)
 	@brew install --cask font-meslo-lg-nerd-font || true
 	@echo "✓ Meslo Nerd Font ensured. Set it in iTerm2 > Profiles > Text."
+
+##@ Health
 
 doctor: ## Quick sanity checks
 	@command -v zsh >/dev/null || (echo "zsh not found" && exit 1)
@@ -194,9 +208,7 @@ doctor-mcp: ## Check MCP server credentials and configuration
 	@echo "Run 'make claude-code-mcp' to sync MCP config to ~/.claude.json"
 	@echo "═══════════════════════════════════════════════════════════════════"
 
-clean: ## Remove symlinked iTerm2 profile (non-destructive)
-	@rm -f "$(ITERM_PROFILE_LINK)"
-	@echo "✓ Removed iTerm2 profile link."
+##@ Configuration
 
 helix: ## Link Helix editor configuration
 	@echo "→ Linking Helix configuration"
@@ -227,6 +239,15 @@ zed: ## Link Zed editor configuration
 	@mkdir -p "$(HOME)/.config/zed"
 	@ln -sfn "$(REPO_DIR)/zed/settings.json" "$(HOME)/.config/zed/settings.json"
 	@echo "✓ ~/.config/zed/settings.json → $(REPO_DIR)/zed/settings.json"
+
+amp: ## Link Amp Code configuration (Sourcegraph AI coding agent)
+	@echo "→ Linking Amp Code configuration"
+	@mkdir -p "$(HOME)/.config/amp"
+	@ln -sfn "$(REPO_DIR)/amp/settings.json" "$(HOME)/.config/amp/settings.json"
+	@echo "✓ ~/.config/amp/settings.json → $(REPO_DIR)/amp/settings.json"
+	@echo "  Note: Run 'amp' to authenticate via browser, or set AMP_API_KEY in ~/.env.mcp"
+
+##@ Claude Code
 
 claude-code: ## Link Claude Code global instructions (CLAUDE.md)
 	@echo "→ Linking Claude Code global instructions"
@@ -278,18 +299,15 @@ mcp-gsuite-patch: ## Clone and patch mcp-gsuite to fix JSON schema bug (Issue #4
 	@echo "✓ Patched mcp-gsuite installed to ~/.local/share/mcp-gsuite-patched"
 	@echo "  Note: Wrapper script already configured to use this location"
 
-amp: ## Link Amp Code configuration (Sourcegraph AI coding agent)
-	@echo "→ Linking Amp Code configuration"
-	@mkdir -p "$(HOME)/.config/amp"
-	@ln -sfn "$(REPO_DIR)/amp/settings.json" "$(HOME)/.config/amp/settings.json"
-	@echo "✓ ~/.config/amp/settings.json → $(REPO_DIR)/amp/settings.json"
-	@echo "  Note: Run 'amp' to authenticate via browser, or set AMP_API_KEY in ~/.env.mcp"
+##@ Language Servers
 
 helix-lsp: ## Install Helix language servers
 	@echo "→ Installing language servers for Helix"
 	@brew install pyright ruff typescript-language-server prettier jdtls
 	@echo "✓ Language servers installed"
 	@echo "→ Run 'hx --health python typescript java' to verify"
+
+##@ Hugo Site
 
 site-serve: ## Serve Hugo site locally with drafts and live reload
 	@cd "$(REPO_DIR)/site" && hugo server --buildDrafts --navigateToChanged --baseURL http://localhost:1313/
@@ -304,3 +322,9 @@ site-new: ## Create a new writing post (usage: make site-new TITLE=my-post-title
 	@test -n "$(TITLE)" || (echo "Usage: make site-new TITLE=my-post-title" && exit 1)
 	@cd "$(REPO_DIR)/site" && hugo new "writing/$(TITLE).md"
 	@echo "✓ Created site/content/writing/$(TITLE).md"
+
+##@ Cleanup
+
+clean: ## Remove symlinked iTerm2 profile (non-destructive)
+	@rm -f "$(ITERM_PROFILE_LINK)"
+	@echo "✓ Removed iTerm2 profile link."
