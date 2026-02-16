@@ -12,7 +12,7 @@ export ZSH_CUSTOM="$DOTFILES/omz/custom"
 export ZSH_DISABLE_COMPFIX=true    # avoid interactive compfix prompts on fresh clones
 
 ##### Put 3rd‑party completions on fpath BEFORE compinit #####
-fpath=("$ZSH_CUSTOM/plugins/zsh-completions/src" $fpath)
+fpath=("$ZSH_CUSTOM/plugins/zsh-completions/src" "$ZSH_CUSTOM/completions" $fpath)
 
 ##### History #####
 HISTFILE="$HOME/.zsh_history"

@@ -62,16 +62,9 @@ Every project should have a Makefile (or Justfile) providing a standard command 
 - Use `make <target>` instead of raw build/test/lint commands
 - Standard targets: `dev`, `build`, `test`, `lint`, `clean` (not all may be present)
 - When adding new tooling, add a corresponding Make target
-- `/init-roadmap` auto-generates a Makefile if one doesn't exist
+- `/init-project` auto-generates a Makefile if one doesn't exist
 
 # Project Management
-
-## Roadmap
-- Check ROADMAP.md at the start of each session before doing significant work
-- Use checkbox progression: `[ ]` → `[-]` → `[x]` with date stamps
-- Move completed items to "Recently Completed" section
-- Track small fixes in reference/AD_HOC_TASKS.md
-- Never commit ROADMAP.md changes in the same commit as code changes
 
 ## Task Workflow
 - Use TaskCreate only for complex multi-step features with real dependencies
@@ -81,34 +74,15 @@ Every project should have a Makefile (or Justfile) providing a standard command 
   mark completed only after verification
 
 ## Workflow Commands
-- `/init-roadmap` — Bootstrap a new project with ROADMAP.md and tracking files
-- `/next-task` — Pick and start the highest priority roadmap item
-- `/update-roadmap` — Sync roadmap with recent git activity
+- `/init-project` — Bootstrap a new project with Makefile, OpenSpec, and Obsidian note
 - `/new-diff` — Create a short-form changelog entry for the Hugo site
-- `/retrospective` — End-of-session learnings capture
 - `/morning-brief` — Chief-of-Staff daily briefing (Gmail, Calendar, Todoist, Obsidian)
 - `/evening-recap` — Chief-of-Staff end-of-day review and carry-over planning
 
-## Spec-Driven Development
-Two SDD toolkits are available. Use spec-kit for thorough planning, OpenSpec for fast iteration.
-
-### spec-kit (thorough)
-Initialize with `specify init . --ai claude`, then use:
-- `/speckit.constitution` — Establish project principles and guidelines
-- `/speckit.specify` — Define requirements and user stories (focus on what/why, not tech stack)
-- `/speckit.clarify` — Structured clarification of underspecified areas (run before planning)
-- `/speckit.plan` — Create technical implementation plan with architecture and tech stack choices
-- `/speckit.tasks` — Break the plan into ordered, actionable tasks with dependencies
-- `/speckit.implement` — Execute all tasks to build the feature
-- `/speckit.analyze` — Cross-artifact consistency & coverage analysis
-- `/speckit.checklist` — Generate quality checklists for requirements validation
-
-### OpenSpec (lightweight)
+## Spec-Driven Development (OpenSpec)
 Initialize with `openspec init`, then use:
-- `/opsx:new <name>` — Start a new change (creates proposal/specs/design/tasks folder)
+- `/opsx:new <name>` — Start a new change
 - `/opsx:ff` — Fast-forward: generate all planning artifacts at once
 - `/opsx:apply` — Implement all tasks from the plan
 - `/opsx:archive` — Archive completed change
 - `/opsx:onboard` — Onboard to an existing project
-
-See `claude-code/WORKFLOW.md` for the full workflow guide.

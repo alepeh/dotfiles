@@ -1,6 +1,6 @@
-# Initialize Project with Roadmap & Task Management
+# Initialize Project
 
-Bootstrap this project with a roadmap-driven workflow. Follow these steps in order.
+Bootstrap this project with a Makefile, OpenSpec, and an Obsidian project note. Follow these steps in order.
 
 ## Step 1: Analyze the Project
 
@@ -40,56 +40,13 @@ Based on what you learned in Step 1, create or update a Makefile as the project'
 | Java/Gradle | `./gradlew bootRun` | `./gradlew build` | `./gradlew test` | `./gradlew check` |
 | Hugo | `hugo server -D` | `hugo --gc --minify` | — | — |
 
-## Step 3: Create ROADMAP.md
+## Step 3: Initialize OpenSpec
 
-Create `ROADMAP.md` in the project root with this structure:
+Run `openspec init` to create the `openspec/` directory for spec-driven development.
 
-```markdown
-# [Project Name] Roadmap
+## Step 4: Update CLAUDE.md with Project Context
 
-## Progress Convention
-- `[ ]` = Todo | `[-]` = In Progress 🏗️ | `[x]` = Completed ✅
-- Add date when starting (🏗️ YYYY-MM-DD) and completing (✅ YYYY-MM-DD)
-
-## Current Sprint
-<!-- Move items here that are actively being worked on -->
-
-## High Priority
-<!-- Features and fixes that should be tackled next -->
-
-## Backlog
-<!-- Lower priority items, ideas, tech debt -->
-
-## Recently Completed
-<!-- Move finished items here with completion date -->
-```
-
-Interview me briefly using AskUserQuestion — ask about:
-1. What are the top 3-5 features or tasks to work on next?
-2. Any known tech debt or refactors needed?
-3. Any blockers or dependencies I should know about?
-
-Then populate the roadmap with my answers.
-
-## Step 4: Create AD_HOC_TASKS.md
-
-Create `reference/AD_HOC_TASKS.md` (create the `reference/` directory if needed):
-
-```markdown
-# Ad Hoc Tasks & Small Fixes
-
-Quick tasks too small for the roadmap but worth tracking.
-
-## Pending
-<!-- Small fixes, one-off improvements -->
-
-## Done
-<!-- Completed ad hoc items -->
-```
-
-## Step 5: Update CLAUDE.md with Project Context
-
-Add a **project-specific context section** to CLAUDE.md (the generic roadmap workflow rules are already in the global CLAUDE.md — don't duplicate them). Focus on:
+Add a **project-specific context section** to CLAUDE.md (the generic workflow rules are already in the global CLAUDE.md — don't duplicate them). Focus on:
 
 ```markdown
 ## Project Context
@@ -103,11 +60,11 @@ Run `make help` for all available commands.
 
 Only add commands that actually exist in the project. If a Justfile is used instead, reference `just` commands.
 
-## Step 6: Create Obsidian Project Note
+## Step 5: Create Obsidian Project Note
 
 Create a project overview note in Obsidian via MCP (`obsidian_append_content`). This note tracks the project's current state at a glance — it does **not** replace detailed technical documentation in the repository.
 
-**Note path:** `notes/{Project Name}.md` (use the same name as the ROADMAP.md title)
+**Note path:** `notes/{Project Name}.md` (use the same name as the project directory or README title)
 
 **Content:** Use the `Code Project Template` structure with frontmatter:
 
@@ -134,13 +91,13 @@ updated: {today YYYY-MM-DD}
 {Bullet list of key technologies discovered in Step 1 — language, framework, database, hosting}
 
 ## Aktueller Stand
-Projekt initialisiert. Roadmap erstellt.
+Projekt initialisiert. OpenSpec eingerichtet.
 
 ## Nächste Prioritäten
-{Top 3-5 items from the roadmap, as a bullet list}
+{Top 3-5 items to work on, based on project analysis or user input}
 
 ## Letzte Änderungen
-- {today} — Projekt-Setup: ROADMAP.md, CLAUDE.md, Obsidian-Notiz erstellt
+- {today} — Projekt-Setup: Makefile, OpenSpec, Obsidian-Notiz erstellt
 
 ## Links
 - Repository: {repo URL or local path}
@@ -149,11 +106,9 @@ Projekt initialisiert. Roadmap erstellt.
 
 Write in German. Keep it concise — this is a status overview, not technical documentation.
 
-## Step 7: Summary
+## Step 6: Summary
 
-After completing all steps, show me:
+After completing all steps, show:
 - A summary of files created/modified
 - Whether a Makefile was generated, augmented, or skipped (and why)
-- The current state of ROADMAP.md
 - The name of the Obsidian project note created
-- Remind me to set `CLAUDE_CODE_TASK_LIST_ID=<project-name>` in my shell if I want multi-session task sync
