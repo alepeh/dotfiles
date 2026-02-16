@@ -66,10 +66,60 @@ A daily cadence using MCP integrations (Gmail, Calendar, Todoist, Obsidian) to s
 - **Feedback**: Add a `## CoS Feedback` section to any journal entry — the agent reads and applies it on the next run.
 - **Labels**: All agent-created Todoist tasks use the `chief-of-staff` label for tracking and dedup.
 
+## Spec-Driven Development
+
+Two SDD toolkits are available for structured feature work. Use spec-kit for thorough multi-phase planning, OpenSpec for lightweight fluid iteration.
+
+### spec-kit (thorough, phase-gated)
+
+Best for greenfield projects, complex multi-component features, and enterprise-grade specifications.
+
+**Setup:** `specify init . --ai claude` (creates `.specify/` directory)
+
+**Workflow:**
+1. `/speckit.constitution` — Define project principles (quality, testing, UX standards)
+2. `/speckit.specify` — Describe what to build and why (no tech stack yet)
+3. `/speckit.clarify` — Structured Q&A to reduce ambiguity before planning
+4. `/speckit.plan` — Specify tech stack and architecture, generate implementation plan
+5. `/speckit.tasks` — Break plan into ordered, dependency-aware tasks
+6. `/speckit.implement` — Execute all tasks in order
+
+### OpenSpec (lightweight, fluid)
+
+Best for brownfield features, iterative enhancements, and quick structured changes with a proposal trail.
+
+**Setup:** `openspec init` (creates `openspec/` directory)
+
+**Workflow:**
+1. `/opsx:new <name>` — Start a new change (creates change folder with artifacts)
+2. `/opsx:ff` — Fast-forward: generate proposal, specs, design, and tasks in one shot
+3. `/opsx:apply` — Implement all tasks from the plan
+4. `/opsx:archive` — Archive completed change and update specs
+
+**Key difference:** OpenSpec has no rigid phase gates — update any artifact anytime, iterate freely.
+
+### When to Use Which
+
+| Scenario | Tool |
+|----------|------|
+| Greenfield project, complex multi-component feature | spec-kit |
+| Brownfield feature, iterative enhancement | OpenSpec |
+| Quick structured change with proposal trail | OpenSpec |
+| Enterprise-grade spec with research & validation | spec-kit |
+| Quick fix, small refactor, single-file change | Neither — use `/next-task` directly |
+
+### Integration with Roadmap
+
+Both tools complement the roadmap workflow:
+1. `/next-task` picks the feature from ROADMAP.md
+2. Initialize: `specify init . --ai claude` or `openspec init`
+3. Plan and implement via spec-kit or OpenSpec commands
+4. `/update-roadmap` marks the feature complete
+
 ## Day-to-Day Cadence
 
 - **Start**: `claude --continue` → CLAUDE.md loads roadmap instructions → Claude checks ROADMAP.md
 - **Morning brief**: `/morning-brief` → review priorities → approve actions
-- **Work**: `/next-task` → implement → commit → test
+- **Work**: `/next-task` → implement → commit → test (use spec-kit for complex features)
 - **Wrap up**: `/evening-recap` → `/update-roadmap` → `/retrospective`
 - The system is designed to be low-friction — skip steps when they don't add value

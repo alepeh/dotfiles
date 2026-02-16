@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -85,6 +85,8 @@ doctor: ## Quick sanity checks
 	@command -v yazi >/dev/null || (echo "yazi not found - run: brew install yazi" && exit 1)
 	@command -v delta >/dev/null || (echo "delta not found - run: brew install git-delta" && exit 1)
 	@command -v amp >/dev/null || (echo "amp not found - run: npm install -g @sourcegraph/amp" && exit 1)
+	@command -v specify >/dev/null || (echo "specify (spec-kit) not found - run: make spec-kit" && exit 1)
+	@command -v openspec >/dev/null || (echo "openspec not found - run: make openspec" && exit 1)
 	@[ -d "$(REPO_DIR)/omz/ohmyzsh" ] || (echo "oh-my-zsh submodule missing" && exit 1)
 	@[ -f "$(REPO_DIR)/zsh/.zshrc" ] || (echo ".zshrc missing" && exit 1)
 	@[ -d "$(REPO_DIR)/helix" ] || (echo "helix config missing" && exit 1)
@@ -246,6 +248,20 @@ amp: ## Link Amp Code configuration (Sourcegraph AI coding agent)
 	@ln -sfn "$(REPO_DIR)/amp/settings.json" "$(HOME)/.config/amp/settings.json"
 	@echo "✓ ~/.config/amp/settings.json → $(REPO_DIR)/amp/settings.json"
 	@echo "  Note: Run 'amp' to authenticate via browser, or set AMP_API_KEY in ~/.env.mcp"
+
+##@ Spec-Driven Development
+
+spec-kit: ## Install/upgrade spec-kit (Spec-Driven Development toolkit)
+	@echo "→ Installing spec-kit via uv"
+	@command -v uv >/dev/null || (echo "Error: uv not found - run: brew install uv" && exit 1)
+	@uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
+	@echo "✓ spec-kit installed. Run 'specify check' to verify."
+
+openspec: ## Install/upgrade OpenSpec (lightweight Spec-Driven Development)
+	@echo "→ Installing OpenSpec via npm"
+	@command -v npm >/dev/null || (echo "Error: npm not found - run: brew install node" && exit 1)
+	@npm install -g @fission-ai/openspec@latest
+	@echo "✓ OpenSpec installed. Run 'openspec init' in a project to get started."
 
 ##@ Claude Code
 
