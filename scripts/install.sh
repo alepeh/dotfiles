@@ -197,17 +197,9 @@ echo "→ Installing AI coding agents..."
 npm install -g @openai/codex
 npm install -g @sourcegraph/amp
 
-echo "→ Installing spec-driven development tools..."
-if have uv; then
-  uv tool install specify-cli --from git+https://github.com/github/spec-kit.git 2>/dev/null \
-    || uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
-  echo "✓ Installed specify CLI (spec-kit)"
-else
-  echo "   uv not found, spec-kit installation skipped (install uv first)"
-fi
-
+echo "→ Installing OpenSpec CLI..."
 npm install -g @fission-ai/openspec@latest
-echo "✓ Installed OpenSpec CLI (lightweight SDD)"
+echo "✓ Installed OpenSpec CLI"
 
 echo "→ Configuring jenv (Java version management)..."
 if have jenv; then
