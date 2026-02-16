@@ -28,6 +28,7 @@ Minimal, reproducible terminal setup for macOS optimized for AI-assisted develop
 * **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, GitHub, and Google Sheets - shared between Claude Desktop and Claude Code.
 * **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
 * **Cursor IDE**: AI-powered code editor with CLI (`cursor` command) for GUI-based development.
+* **Spec-Driven Development**: [spec-kit](https://github.com/github/spec-kit) (thorough) and [OpenSpec](https://github.com/Fission-AI/OpenSpec) (lightweight) for structured spec→plan→tasks→implement workflows with AI agents.
 
 ---
 
@@ -224,6 +225,63 @@ Then run the jenv configuration:
 ```bash
 ./scripts/install.sh  # Re-run to configure jenv with new JDKs
 ```
+
+### Spec-Driven Development
+
+Two SDD toolkits are installed automatically. Use whichever fits the task -- spec-kit for thorough planning, OpenSpec for fast iteration.
+
+#### spec-kit (thorough, phase-gated)
+
+[spec-kit](https://github.com/github/spec-kit) provides a structured, multi-phase workflow ideal for greenfield projects and complex features.
+
+```bash
+cd ~/code/my-project
+specify init . --ai claude
+```
+
+| Command | Purpose |
+|---------|---------|
+| `/speckit.constitution` | Establish project principles and guidelines |
+| `/speckit.specify` | Define what to build (requirements, user stories) |
+| `/speckit.clarify` | Clarify underspecified areas before planning |
+| `/speckit.plan` | Create technical implementation plan with tech stack |
+| `/speckit.tasks` | Break plan into actionable, ordered tasks |
+| `/speckit.implement` | Execute all tasks to build the feature |
+
+```bash
+specify check       # Verify installed tools
+make spec-kit       # Install or upgrade spec-kit
+```
+
+#### OpenSpec (lightweight, fluid)
+
+[OpenSpec](https://github.com/Fission-AI/OpenSpec) is a lighter alternative -- no rigid phase gates, artifact-guided workflow, great for brownfield and iterative work.
+
+```bash
+cd ~/code/my-project
+openspec init
+```
+
+| Command | Purpose |
+|---------|---------|
+| `/opsx:new <name>` | Start a new change (creates change folder) |
+| `/opsx:ff` | Fast-forward: generate proposal, specs, design, and tasks |
+| `/opsx:apply` | Implement all tasks from the plan |
+| `/opsx:archive` | Archive completed change and update specs |
+| `/opsx:onboard` | Onboard to an existing project |
+
+```bash
+make openspec       # Install or upgrade OpenSpec
+```
+
+#### When to use which
+
+| Scenario | Recommended |
+|----------|-------------|
+| Greenfield project, complex multi-component feature | spec-kit |
+| Brownfield feature, iterative enhancement | OpenSpec |
+| Quick structured change with proposal trail | OpenSpec |
+| Enterprise-grade spec with research & validation | spec-kit |
 
 ---
 

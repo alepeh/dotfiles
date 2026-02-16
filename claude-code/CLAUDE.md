@@ -89,4 +89,26 @@ Every project should have a Makefile (or Justfile) providing a standard command 
 - `/morning-brief` — Chief-of-Staff daily briefing (Gmail, Calendar, Todoist, Obsidian)
 - `/evening-recap` — Chief-of-Staff end-of-day review and carry-over planning
 
+## Spec-Driven Development
+Two SDD toolkits are available. Use spec-kit for thorough planning, OpenSpec for fast iteration.
+
+### spec-kit (thorough)
+Initialize with `specify init . --ai claude`, then use:
+- `/speckit.constitution` — Establish project principles and guidelines
+- `/speckit.specify` — Define requirements and user stories (focus on what/why, not tech stack)
+- `/speckit.clarify` — Structured clarification of underspecified areas (run before planning)
+- `/speckit.plan` — Create technical implementation plan with architecture and tech stack choices
+- `/speckit.tasks` — Break the plan into ordered, actionable tasks with dependencies
+- `/speckit.implement` — Execute all tasks to build the feature
+- `/speckit.analyze` — Cross-artifact consistency & coverage analysis
+- `/speckit.checklist` — Generate quality checklists for requirements validation
+
+### OpenSpec (lightweight)
+Initialize with `openspec init`, then use:
+- `/opsx:new <name>` — Start a new change (creates proposal/specs/design/tasks folder)
+- `/opsx:ff` — Fast-forward: generate all planning artifacts at once
+- `/opsx:apply` — Implement all tasks from the plan
+- `/opsx:archive` — Archive completed change
+- `/opsx:onboard` — Onboard to an existing project
+
 See `claude-code/WORKFLOW.md` for the full workflow guide.
