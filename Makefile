@@ -270,12 +270,15 @@ openspec: ## Install/upgrade OpenSpec (lightweight Spec-Driven Development)
 
 ##@ Claude Code
 
-claude-code: ## Link Claude Code global instructions (CLAUDE.md)
+claude-code: ## Link Claude Code global instructions (CLAUDE.md) and skills
 	@echo "→ Linking Claude Code global instructions"
 	@mkdir -p "$(HOME)/.claude"
 	@ln -sfn "$(REPO_DIR)/claude-code/CLAUDE.md" "$(HOME)/.claude/CLAUDE.md"
 	@echo "✓ ~/.claude/CLAUDE.md → $(REPO_DIR)/claude-code/CLAUDE.md"
-	@echo "  Note: This provides git workflow best practices for Claude Code"
+	@echo "→ Linking Claude Code global skills"
+	@mkdir -p "$(HOME)/.claude/skills/obsidian-cli"
+	@ln -sfn "$(REPO_DIR)/.claude/skills/obsidian-cli/SKILL.md" "$(HOME)/.claude/skills/obsidian-cli/SKILL.md"
+	@echo "✓ ~/.claude/skills/obsidian-cli/ → $(REPO_DIR)/.claude/skills/obsidian-cli/"
 
 claude-code-commands: ## Link Claude Code slash commands
 	@mkdir -p "$(HOME)/.claude/commands"
