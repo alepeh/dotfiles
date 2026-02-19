@@ -131,7 +131,7 @@ if command -v zellij >/dev/null 2>&1; then
     local name="$base"
     local suffix=2
     local existing
-    existing=$(zellij list-sessions -n 2>/dev/null)
+    existing=$(zellij list-sessions -n 2>/dev/null | awk '{print $1}')
     while echo "$existing" | grep -qx "$name"; do
       name="${base}-${suffix}"
       ((suffix++))
@@ -140,10 +140,10 @@ if command -v zellij >/dev/null 2>&1; then
   }
 
   # Start dev sessions named after current directory
-  dev()     { zellij --session "$(_zj_session_name)" --layout claude-dev; }
-  devmin()  { zellij --session "$(_zj_session_name)" --layout minimal; }
-  cdev()    { zellij --session "$(_zj_session_name)" --layout cursor-dev; }
-  cdevmin() { zellij --session "$(_zj_session_name)" --layout cursor-minimal; }
+  dev()     { zellij -s "$(_zj_session_name)" -n claude-dev; }
+  devmin()  { zellij -s "$(_zj_session_name)" -n minimal; }
+  cdev()    { zellij -s "$(_zj_session_name)" -n cursor-dev; }
+  cdevmin() { zellij -s "$(_zj_session_name)" -n cursor-minimal; }
 fi
 
 # Lazygit alias
