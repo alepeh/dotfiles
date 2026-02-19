@@ -21,7 +21,7 @@ Include links in both the conversation output and the Obsidian journal. In Obsid
    - Set `TODAY` to the current date (YYYY-MM-DD)
    - Set `TOMORROW` to the next date (YYYY-MM-DD)
 
-2. **Read today's journal** — `obsidian_get_file_contents`
+2. **Read today's journal** — `obsidian vault=brain read`
    - Read `journals/TODAY.md`
    - If it contains a `# Morning Brief` section, parse out the priorities (URGENT/OPERATIVE/STRATEGIC), schedule, and action items
    - If it contains a `## Decisions` section, note what was already acted on
@@ -102,8 +102,8 @@ Include links in both the conversation output and the Obsidian journal. In Obsid
 
 7. **Write to Obsidian**
    - Check if `journals/TODAY.md` already contains a `# Evening Recap` heading:
-     - If yes: use `obsidian_patch_content` with `target_type: heading`, `target: Evening Recap`, `operation: replace` to overwrite (idempotency)
-     - If no: use `obsidian_patch_content` to append to the file, or `obsidian_append_content` if simpler
+     - If yes: use the Obsidian CLI heading-edit eval pattern to replace content under the `Evening Recap` heading (see obsidian-cli skill)
+     - If no: append to the file: `obsidian vault=brain append path=journals/TODAY.md content="..."`
    - Format as Markdown under a `# Evening Recap` heading
    - Include a timestamp: `*Generated at HH:MM on YYYY-MM-DD*`
    - All links (Todoist, Gmail, Calendar) should be included as standard Markdown links
@@ -132,7 +132,7 @@ Include links in both the conversation output and the Obsidian journal. In Obsid
     - Update today's journal with two sections (or create them if they don't exist):
     - `## Decisions` — append evening decisions to existing morning decisions, with links (e.g., "Carried over [task](https://app.todoist.com/showTask?id=12345) to tomorrow", "Dropped [task](link) — no longer relevant")
     - `## Follow-up Next Session` — replace with updated list of items for tomorrow's morning brief, with source links (e.g., "Check if reply from [email](https://mail.google.com/mail/u/0/#all/{id}) arrived")
-    - Use `obsidian_patch_content` with heading-based replace for Follow-up; use append for Decisions (to preserve morning entries)
+    - Use the Obsidian CLI heading-edit eval pattern for Follow-up (replace); use `obsidian vault=brain append` for Decisions (to preserve morning entries)
 
 ## Guardrails
 
