@@ -124,11 +124,26 @@ if command -v zellij >/dev/null 2>&1; then
   alias zj='zellij'
   alias zja='zellij attach'
   alias zjl='zellij list-sessions'
-  # Start Claude Code dev session
-  alias dev='zellij --layout claude-dev'
-  alias devmin='zellij --layout minimal'
-  alias cdev='zellij --layout cursor-dev'
-  alias cdevmin='zellij --layout cursor-minimal'
+
+  # Generate a unique session name from current directory basename
+  _zj_session_name() {
+    local base="${PWD##*/}"
+    local name="$base"
+    local suffix=2
+    local existing
+    existing=$(zellij list-sessions -n 2>/dev/null)
+    while echo "$existing" | grep -qx "$name"; do
+      name="${base}-${suffix}"
+      ((suffix++))
+    done
+    echo "$name"
+  }
+
+  # Start dev sessions named after current directory
+  dev()     { zellij --session "$(_zj_session_name)" --layout claude-dev; }
+  devmin()  { zellij --session "$(_zj_session_name)" --layout minimal; }
+  cdev()    { zellij --session "$(_zj_session_name)" --layout cursor-dev; }
+  cdevmin() { zellij --session "$(_zj_session_name)" --layout cursor-minimal; }
 fi
 
 # Lazygit alias
