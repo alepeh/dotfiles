@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch obsidian-mcp helix-lsp site-serve site-preview site-build site-new clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -110,14 +110,19 @@ doctor-mcp: ## Check MCP server credentials and configuration
 	fi
 	@echo "└─────────────────────────────────────────────────────────────────┘"
 	@echo ""
-	@# Check Obsidian credentials
-	@echo "┌─ mcp-obsidian ──────────────────────────────────────────────────┐"
-	@if [ -f "$(HOME)/.env.mcp" ] && grep -q "OBSIDIAN_API_KEY=" "$(HOME)/.env.mcp" 2>/dev/null; then \
-	  echo "│ ✓ OBSIDIAN_API_KEY is set"; \
+	@# Check Obsidian CLI (replaces REST API + API key)
+	@echo "┌─ obsidian-cli-mcp ──────────────────────────────────────────────┐"
+	@if command -v obsidian >/dev/null 2>&1; then \
+	  echo "│ ✓ obsidian CLI found"; \
 	else \
-	  echo "│ ✗ OBSIDIAN_API_KEY missing in ~/.env.mcp"; \
-	  echo "│   Get it from: Obsidian → Settings → Community Plugins →"; \
-	  echo "│                Local REST API → Copy API Key"; \
+	  echo "│ ✗ obsidian CLI not found"; \
+	  echo "│   Requires Obsidian v1.12+ with Catalyst license"; \
+	  echo "│   Enable: Settings → General → Command line interface"; \
+	fi
+	@if [ -d "$(REPO_DIR)/mcp-servers/obsidian-cli-mcp/.venv" ]; then \
+	  echo "│ ✓ obsidian-cli-mcp dependencies synced"; \
+	else \
+	  echo "│ ✗ obsidian-cli-mcp not set up — run: make obsidian-mcp"; \
 	fi
 	@echo "└─────────────────────────────────────────────────────────────────┘"
 	@echo ""
@@ -299,6 +304,18 @@ claude-code-mcp-wrappers: ## Link MCP wrapper scripts to ~/.mcp-wrappers/
 	done
 	@echo "✓ MCP wrappers linked to ~/.mcp-wrappers/"
 	@ls -1 "$(HOME)/.mcp-wrappers/"
+
+obsidian-mcp: ## Install obsidian-cli-mcp server (requires Obsidian v1.12+ CLI)
+	@echo "→ Checking Obsidian CLI availability"
+	@command -v obsidian >/dev/null 2>&1 || \
+		(echo "✗ obsidian CLI not found" && \
+		 echo "  Requires Obsidian v1.12+ with Catalyst license" && \
+		 echo "  Enable: Settings → General → Command line interface" && \
+		 exit 1)
+	@echo "✓ obsidian CLI found"
+	@echo "→ Syncing obsidian-cli-mcp dependencies"
+	@cd "$(REPO_DIR)/mcp-servers/obsidian-cli-mcp" && uv sync --group dev
+	@echo "✓ obsidian-cli-mcp ready (wrapper at ~/.mcp-wrappers/obsidian-wrapper.sh)"
 
 mcp-gsuite-patch: ## Clone and patch mcp-gsuite to fix JSON schema bug (Issue #47)
 	@echo "→ Creating patched mcp-gsuite (fixes JSON schema validation error)"

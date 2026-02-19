@@ -1,5 +1,2 @@
 #!/bin/bash
-if [ -f ~/.env.mcp ]; then
-    source ~/.env.mcp
-fi
-exec /opt/homebrew/bin/uvx mcp-obsidian
+exec /opt/homebrew/bin/uv run --project ~/code/dotfiles/mcp-servers/obsidian-cli-mcp obsidian-cli-mcp --default-vault brain

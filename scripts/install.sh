@@ -110,8 +110,9 @@ fi
 
 echo "→ Installing MCP servers..."
 if have uv; then
-  uv tool install mcp-obsidian
-  echo "✓ Installed mcp-obsidian"
+  echo "→ Syncing obsidian-cli-mcp dependencies..."
+  (cd "$DOTFILES/mcp-servers/obsidian-cli-mcp" && uv sync --group dev)
+  echo "✓ obsidian-cli-mcp ready"
 else
   echo "   uv not found, will be installed via Homebrew"
 fi
@@ -134,13 +135,10 @@ if [ -f ~/.mcp-wrappers/todoist-wrapper.sh ]; then
   echo "✓ Removed obsolete todoist-wrapper.sh (now using official hosted MCP)"
 fi
 
-# Obsidian wrapper
+# Obsidian wrapper (uses official CLI via obsidian-cli-mcp)
 cat > ~/.mcp-wrappers/obsidian-wrapper.sh << 'EOF'
 #!/bin/bash
-if [ -f ~/.env.mcp ]; then
-    source ~/.env.mcp
-fi
-exec /opt/homebrew/bin/uvx mcp-obsidian
+exec /opt/homebrew/bin/uv run --project ~/code/dotfiles/mcp-servers/obsidian-cli-mcp obsidian-cli-mcp --default-vault brain
 EOF
 
 # GitHub wrapper
