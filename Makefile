@@ -110,14 +110,19 @@ doctor-mcp: ## Check MCP server credentials and configuration
 	fi
 	@echo "└─────────────────────────────────────────────────────────────────┘"
 	@echo ""
-	@# Check Obsidian credentials
-	@echo "┌─ mcp-obsidian ──────────────────────────────────────────────────┐"
-	@if [ -f "$(HOME)/.env.mcp" ] && grep -q "OBSIDIAN_API_KEY=" "$(HOME)/.env.mcp" 2>/dev/null; then \
-	  echo "│ ✓ OBSIDIAN_API_KEY is set"; \
+	@# Check Obsidian CLI (used directly via Agent Skill, no MCP server)
+	@echo "┌─ obsidian-cli (Agent Skill) ────────────────────────────────────┐"
+	@if command -v obsidian >/dev/null 2>&1; then \
+	  echo "│ ✓ obsidian CLI found"; \
 	else \
-	  echo "│ ✗ OBSIDIAN_API_KEY missing in ~/.env.mcp"; \
-	  echo "│   Get it from: Obsidian → Settings → Community Plugins →"; \
-	  echo "│                Local REST API → Copy API Key"; \
+	  echo "│ ✗ obsidian CLI not found"; \
+	  echo "│   Requires Obsidian v1.12+ with Catalyst license"; \
+	  echo "│   Enable: Settings → General → Command line interface"; \
+	fi
+	@if [ -f "$(REPO_DIR)/.claude/skills/obsidian-cli/SKILL.md" ]; then \
+	  echo "│ ✓ Claude Code skill installed"; \
+	else \
+	  echo "│ ✗ Claude Code skill missing at .claude/skills/obsidian-cli/SKILL.md"; \
 	fi
 	@echo "└─────────────────────────────────────────────────────────────────┘"
 	@echo ""
@@ -193,7 +198,7 @@ doctor-mcp: ## Check MCP server credentials and configuration
 	@# Check MCP wrapper scripts
 	@echo "┌─ MCP Wrapper Scripts ───────────────────────────────────────────┐"
 	@MISSING=0; \
-	for wrapper in obsidian github google-sheets mcp-gsuite; do \
+	for wrapper in github google-sheets mcp-gsuite; do \
 	  if [ -f "$(HOME)/.mcp-wrappers/$${wrapper}-wrapper.sh" ]; then \
 	    echo "│ ✓ $${wrapper}-wrapper.sh"; \
 	  else \

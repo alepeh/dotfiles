@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "mcp-obsidian": {
-      "type": "stdio",
-      "command": "/Users/alexanderpehm/.mcp-wrappers/obsidian-wrapper.sh",
-      "args": [],
-      "env": {}
-    },
     "todoist": {
       "type": "http",
       "url": "https://ai.todoist.net/mcp"
