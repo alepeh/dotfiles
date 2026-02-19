@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new test-obsidian clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -346,6 +346,11 @@ site-new: ## Create a new writing post (usage: make site-new TITLE=my-post-title
 	@test -n "$(TITLE)" || (echo "Usage: make site-new TITLE=my-post-title" && exit 1)
 	@cd "$(REPO_DIR)/site" && hugo new "writing/$(TITLE).md"
 	@echo "✓ Created site/content/writing/$(TITLE).md"
+
+##@ Testing
+
+test-obsidian: ## Run Obsidian CLI integration tests (requires running Obsidian)
+	@$(REPO_DIR)/tests/obsidian-cli/run-tests.sh
 
 ##@ Cleanup
 
