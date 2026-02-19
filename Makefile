@@ -291,7 +291,7 @@ claude-code-mcp: ## Sync Claude Code MCP servers from settings.json to ~/.claude
 	  echo "Error: ~/.claude.json not found. Run 'claude' first to initialize."; \
 	  exit 1; \
 	fi
-	@jq -s '.[0] * {mcpServers: .[1].mcpServers}' "$(HOME)/.claude.json" "$(REPO_DIR)/claude-code/settings.json" > "$(HOME)/.claude.json.tmp" \
+	@jq -s '.[0] + {mcpServers: .[1].mcpServers}' "$(HOME)/.claude.json" "$(REPO_DIR)/claude-code/settings.json" > "$(HOME)/.claude.json.tmp" \
 	  && mv "$(HOME)/.claude.json.tmp" "$(HOME)/.claude.json"
 	@echo "✓ MCP servers synced to ~/.claude.json"
 	@echo "  Servers: $$(jq -r '.mcpServers | keys | join(", ")' "$(REPO_DIR)/claude-code/settings.json")"
