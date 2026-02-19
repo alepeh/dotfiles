@@ -62,7 +62,7 @@ Only add commands that actually exist in the project. If a Justfile is used inst
 
 ## Step 5: Create Obsidian Project Note
 
-Create a project overview note in Obsidian via MCP (`obsidian_append_content`). This note tracks the project's current state at a glance — it does **not** replace detailed technical documentation in the repository.
+Create a project overview note in Obsidian via the Obsidian CLI (`obsidian vault=brain create name="..." content="..." silent`). This note tracks the project's current state at a glance — it does **not** replace detailed technical documentation in the repository.
 
 **Note path:** `notes/{Project Name}.md` (use the same name as the project directory or README title)
 

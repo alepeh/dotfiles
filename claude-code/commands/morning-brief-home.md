@@ -41,12 +41,12 @@ Include links in both the conversation output and the Obsidian journal. In Obsid
    - For each task, capture the `id` field for linking
    - Note: content (linked), project, priority, due date, and whether overdue
 
-   **Obsidian** — `obsidian_get_file_contents`
-   - Read `journals/YESTERDAY.md` (replace YESTERDAY with the actual date)
+   **Obsidian** — `obsidian vault=brain read`
+   - Read yesterday's journal: `obsidian vault=brain read path=journals/YESTERDAY.md`
    - If file doesn't exist, skip this step — note "no journal entry yesterday"
    - Look for any open items, Evening Recap carry-overs, or CoS Feedback section
 
-3. **Scan recent journals for patterns** — `obsidian_get_file_contents`
+3. **Scan recent journals for patterns** — `obsidian vault=brain read`
    - Read the last 3-5 journal entries (headings and Follow-up sections only, not full content)
    - Look for recurring topics, themes, or items that keep appearing
    - If a topic appeared in 3+ recent journals, flag it: "Recurring theme: [topic] — appeared [N] times recently. Consider creating a dedicated project or systematic approach."
@@ -102,13 +102,13 @@ Include links in both the conversation output and the Obsidian journal. In Obsid
    - Never auto-send emails. Never auto-modify calendar events. Never auto-delete anything.
 
 7. **Write to Obsidian**
-   - Check if `journals/TODAY.md` exists using `obsidian_get_file_contents`
+   - Check if `journals/TODAY.md` exists: `obsidian vault=brain read path=journals/TODAY.md`
    - If the file exists AND already contains a `# Morning Brief` heading:
-     - Use `obsidian_patch_content` with `target_type: heading`, `target: Morning Brief`, `operation: replace` to overwrite (idempotency on re-run)
+     - Use the Obsidian CLI heading-edit eval pattern to replace content under the `Morning Brief` heading (see obsidian-cli skill)
    - If the file exists but has no Morning Brief heading:
-     - Use `obsidian_patch_content` to append after existing content
+     - Append: `obsidian vault=brain append path=journals/TODAY.md content="..."`
    - If the file does not exist:
-     - Use `obsidian_append_content` to create it
+     - Create: `obsidian vault=brain create name="journals/TODAY" content="..." silent`
    - Format the brief as Markdown under a `# Morning Brief` heading
    - Include a timestamp: `*Generated at HH:MM on YYYY-MM-DD*`
    - All links (Todoist, Gmail, Calendar) should be included in the Obsidian output as standard Markdown links
@@ -130,7 +130,7 @@ Include links in both the conversation output and the Obsidian journal. In Obsid
     - After executing approved actions, append two sections to today's journal:
     - `## Decisions` — what was approved/rejected and why, with links to the relevant items (e.g., "Created [task](https://app.todoist.com/showTask?id=12345) based on [email from Mijajlovic](https://mail.google.com/mail/u/0/#all/19c3e37951ba05c2)")
     - `## Follow-up Next Session` — items that need attention but aren't actionable right now, with source links
-    - Use `obsidian_patch_content` with heading-based replace for idempotency
+    - Use the Obsidian CLI heading-edit eval pattern for idempotent heading-based replace (see obsidian-cli skill)
 
 ## Guardrails
 
