@@ -60,6 +60,14 @@ keybinds {
         bind "d" { Detach; }
         bind "q" { Quit; }
         bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        // Session browser (floating fzf picker for past Claude conversations)
+        bind "s" {
+            Run "claude-sessions" {
+                close_on_exit true
+                floating true
+            }
+            SwitchToMode "normal"
+        }
         // Enter resize mode
         bind "r" { SwitchToMode "resize"; }
         // Tab navigation
@@ -68,6 +76,14 @@ keybinds {
         bind "2" { GoToTab 2; SwitchToMode "normal"; }
         bind "3" { GoToTab 3; SwitchToMode "normal"; }
         bind "Tab" { GoToNextTab; SwitchToMode "normal"; }
+        // Help card (floating)
+        bind "?" {
+            Run "zellij-help" {
+                close_on_exit true
+                floating true
+            }
+            SwitchToMode "normal"
+        }
         // Escape back to normal
         bind "Esc" { SwitchToMode "normal"; }
         bind "Ctrl Space" { SwitchToMode "normal"; }

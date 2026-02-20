@@ -87,6 +87,12 @@ if [ ! -f "$HOME/.gitconfig.local" ]; then
   echo "   Note: Add machine-specific git settings (name, email) to ~/.gitconfig.local"
 fi
 
+echo "→ Linking utility scripts..."
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$DOTFILES/scripts/claude-sessions" "$HOME/.local/bin/claude-sessions"
+ln -sfn "$DOTFILES/scripts/zellij-help" "$HOME/.local/bin/zellij-help"
+echo "✓ Utility scripts → ~/.local/bin/"
+
 echo "→ Installing fzf keybindings/completions..."
 "$(brew --prefix)/opt/fzf/install" --key-bindings --completion --no-update-rc
 
