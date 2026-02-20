@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Claude Code Session Browser
+# Reads per-project conversation history and presents an fzf picker.
+# On selection, execs into a forked Claude session (the floating pane becomes the session).
+# Use Ctrl+Space e to embed into the tiled layout, then close the old Claude pane.
+
+CLAUDE_DIR="$HOME/.claude"
+
+# Resolve current project's session directory
+# Claude Code encodes project paths: /Users/foo/code/bar → -Users-foo-code-bar
+resolve_project_dir() {
+    local project_dir
+    project_dir="$(pwd)"
+    local encoded
+    encoded=$(echo "$project_dir" | sed 's|/|-|g')
+    echo "$CLAUDE_DIR/projects/${encoded}"
+}
+
+PROJECT_DIR=$(resolve_project_dir)
+
+if [[ ! -d "$PROJECT_DIR" ]]; then
+    echo "No sessions found for this project ($(pwd))"
+    exit 0
+fi
+
+# Parse sessions by scanning .jsonl transcript files directly
+# (sessions-index.json is often stale and missing recent sessions)
+# Output format: session_id<TAB>date  msgs  summary
+format_sessions() {
+    python3 -c "
+import json, sys, os
+from datetime import datetime
+
+project_dir = '$PROJECT_DIR'
+index_path = os.path.join(project_dir, 'sessions-index.json')
+
+# Load index as supplementary metadata (may be stale)
+index_data = {}
+if os.path.exists(index_path):
+    try:
+        with open(index_path) as f:
+            idx = json.load(f)
+        for e in idx.get('entries', []):
+            index_data[e['sessionId']] = e
+    except (json.JSONDecodeError, KeyError):
+        pass
+
+# Scan all .jsonl transcript files
+sessions = []
+for fname in os.listdir(project_dir):
+    if not fname.endswith('.jsonl'):
+        continue
+    full = os.path.join(project_dir, fname)
+    sid = fname.replace('.jsonl', '')
+    mtime = os.stat(full).st_mtime
+
+    # Try index first for metadata
+    if sid in index_data:
+        meta = index_data[sid]
+        summary = meta.get('summary') or meta.get('firstPrompt', '')
+        msg_count = meta.get('messageCount', 0)
+        branch = meta.get('gitBranch', '')
+    else:
+        # Extract metadata from transcript
+        summary = ''
+        msg_count = 0
+        branch = ''
+        try:
+            with open(full) as fh:
+                for line in fh:
+                    try:
+                        obj = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    t = obj.get('type', '')
+                    if t == 'summary':
+                        summary = obj.get('summary', '')
+                    if t in ('user', 'assistant'):
+                        msg_count += 1
+                        if not summary and t == 'user':
+                            msg = obj.get('message', {})
+                            content = msg.get('content', '')
+                            if isinstance(content, list):
+                                for c in content:
+                                    if isinstance(c, dict) and c.get('type') == 'text':
+                                        text = c['text']
+                                        if not text.startswith('<'):
+                                            summary = text[:80]
+                                            break
+                            elif isinstance(content, str) and not content.startswith('<'):
+                                summary = content[:80]
+        except Exception:
+            continue
+
+    if not summary:
+        summary = '(no summary)'
+
+    sessions.append((mtime, sid, summary, msg_count, branch))
+
+if not sessions:
+    print('No sessions found for this project.', file=sys.stderr)
+    sys.exit(1)
+
+sessions.sort(key=lambda s: s[0], reverse=True)
+
+for mtime, sid, summary, msg_count, branch in sessions:
+    date = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d')
+    summary = summary[:50] + '..' if len(summary) > 52 else summary
+    if branch:
+        branch = branch[:30] + '..' if len(branch) > 32 else branch
+        display = f'{date}  {msg_count:3d} msgs  {branch:32s}  {summary}'
+    else:
+        display = f'{date}  {msg_count:3d} msgs  {summary}'
+    print(f'{sid}\t{display}')
+"
+}
+
+# Preview: extract user/assistant messages from a session transcript
+preview_session() {
+    local session_id="$1"
+    local transcript="$PROJECT_DIR/${session_id}.jsonl"
+
+    if [[ ! -f "$transcript" ]]; then
+        echo "No transcript found for session $session_id"
+        return
+    fi
+
+    python3 -c "
+import json, sys
+
+with open('$transcript') as f:
+    for line in f:
+        try:
+            obj = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        t = obj.get('type', '')
+        if t not in ('user', 'assistant'):
+            continue
+        msg = obj.get('message', {})
+        role = msg.get('role', t)
+        content = msg.get('content', '')
+        texts = []
+        if isinstance(content, str) and content.strip():
+            texts.append(content)
+        elif isinstance(content, list):
+            for c in content:
+                if isinstance(c, dict) and c.get('type') == 'text':
+                    texts.append(c['text'])
+        for text in texts:
+            # Skip system/command messages
+            if text.startswith('<command-') or text.startswith('<local-command') or text.startswith('<system-'):
+                continue
+            label = 'you' if role == 'user' else 'claude'
+            # Truncate long messages for preview
+            preview = text[:300].replace('\n', '\n  ')
+            print(f'[{label}] {preview}')
+            print()
+"
+}
+
+# If called with --preview, show the preview for a session
+if [[ "${1:-}" == "--preview" ]]; then
+    preview_session "${2:-}"
+    exit 0
+fi
+
+# Main: run fzf picker
+SELECTION=$(format_sessions | fzf \
+    --with-nth=2.. \
+    --delimiter=$'\t' \
+    --header="Claude Code Sessions — Enter: fork  Esc: cancel" \
+    --preview="$0 --preview {1}" \
+    --preview-window=down:50%:wrap \
+    --no-sort \
+    --ansi \
+) || exit 0  # User pressed Esc
+
+# Extract session ID (first tab-separated field)
+SESSION_ID=$(echo "$SELECTION" | cut -f1)
+
+if [[ -z "$SESSION_ID" ]]; then
+    exit 0
+fi
+
+# Replace this script process with the forked Claude session.
+# The floating pane stays open (exec replaces the process, doesn't exit).
+# The fzf picker becomes a floating Claude session with the forked conversation.
+# Close it when done → --close-on-exit cleans up the pane.
+exec env -u CLAUDECODE claude -r "$SESSION_ID" --fork-session

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Quick-reference help card for the Zellij terminal IDE
+# Triggered via Ctrl+Space ? — press q or Esc to close
+
+cat <<'EOF'
+╔══════════════════════════════════════════════════════════════╗
+║                    Zellij Terminal IDE                       ║
+║                  Leader: Ctrl+Space                         ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  PANES (Ctrl+Space then...)                                  ║
+║  ─────────────────────────                                   ║
+║  h/j/k/l   Move focus              n   New pane              ║
+║  x         Close pane              z   Fullscreen toggle     ║
+║  f/w       Toggle floating          e   Float ↔ Embed        ║
+║  r         Enter resize mode       s   Session browser       ║
+║                                                              ║
+║  TABS                                                        ║
+║  ────                                                        ║
+║  t         Tab mode                Tab  Next tab             ║
+║  1/2/3     Go to tab 1/2/3                                   ║
+║                                                              ║
+║  SESSION                                                     ║
+║  ───────                                                     ║
+║  d         Detach                  q   Quit                  ║
+║                                                              ║
+║  QUICK NAV (no leader)                                       ║
+║  ─────────────────────                                       ║
+║  Alt+h/l   Focus left/right       Alt+j/k  Focus down/up    ║
+║  Alt+n     New pane               Alt+,/.  Swap layout       ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  LAZYGIT (in git tab)                                        ║
+║  ────────────────────                                        ║
+║  space     Stage/unstage           c   Commit                ║
+║  p         Push                    P   Pull                  ║
+║  s         Stash                   b   Branches              ║
+║  enter     View diff/expand        ?   Help                  ║
+║  [/]       Prev/next tab           q   Quit                  ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  CLAUDE CODE                                                 ║
+║  ──────────                                                  ║
+║  Ctrl+Space s    Browse & fork past sessions                 ║
+║  Ctrl+Space e    Embed floating → tiled (after fork)         ║
+║  claude -r       Resume session picker                       ║
+║  claude -c       Continue most recent session                ║
+║  /help           Claude Code help                            ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+EOF
+
+read -rsn1 -p "Press any key to close..."
