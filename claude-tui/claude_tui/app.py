@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 
 from rich.text import Text
@@ -22,7 +23,83 @@ from textual.widgets import (
     Static,
 )
 
+from claude_tui.config import CONFIG_FILE, Preset, load_presets
 from claude_tui.session import Session, SessionManager, Status
+
+
+# -----------------------------------------------------------------------
+# Help screen
+# -----------------------------------------------------------------------
+
+HELP_TEXT = """\
+[bold]Claude TUI — Keybindings[/bold]
+
+[bold cyan]Session management[/bold cyan]
+  [bold]n[/bold]  Spawn a new session (manual prompt)
+  [bold]p[/bold]  Spawn from a saved preset
+  [bold]b[/bold]  Batch-spawn all presets at once
+  [bold]d[/bold]  Kill the selected session
+  [bold]x[/bold]  Remove a finished session from the list
+
+[bold cyan]Navigation[/bold cyan]
+  [bold]j / k[/bold]      Move down / up in session list
+  [bold]up / down[/bold]  Move down / up in session list
+
+[bold cyan]Interaction[/bold cyan]
+  [bold]a[/bold]  Attach — suspend TUI, open interactive Claude
+      in the selected session's project directory.
+      If the session is done, forks from its conversation.
+
+[bold cyan]Other[/bold cyan]
+  [bold]?[/bold]  Show this help
+  [bold]q[/bold]  Quit
+
+[bold cyan]Presets[/bold cyan]
+  Save presets in [dim]~/.config/claude-tui/config.toml[/dim]:
+
+  [dim]\\[\\[presets]]
+  name = "My task"
+  project_dir = "~/code/project"
+  prompt = "Run tests and fix failures"
+  model = "sonnet"  # optional[/dim]
+"""
+
+
+class HelpScreen(ModalScreen):
+    """Overlay showing all keybindings."""
+
+    BINDINGS = [
+        Binding("escape", "dismiss", "Close"),
+        Binding("question_mark", "dismiss", "Close"),
+    ]
+
+    DEFAULT_CSS = """
+    HelpScreen {
+        align: center middle;
+    }
+    #help-dialog {
+        width: 64;
+        height: auto;
+        max-height: 80%;
+        border: thick $accent;
+        background: $surface;
+        padding: 1 2;
+        overflow-y: auto;
+    }
+    #help-dialog .buttons {
+        margin-top: 1;
+        align: center middle;
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="help-dialog"):
+            yield Static(HELP_TEXT, markup=True)
+            with Horizontal(classes="buttons"):
+                yield Button("Close", id="close")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.dismiss()
 
 
 # -----------------------------------------------------------------------
@@ -98,6 +175,98 @@ class SpawnScreen(ModalScreen[dict | None]):
 
 
 # -----------------------------------------------------------------------
+# Preset picker
+# -----------------------------------------------------------------------
+
+
+class PresetItem(ListItem):
+    """A preset entry in the picker."""
+
+    def __init__(self, preset: Preset) -> None:
+        super().__init__()
+        self.preset = preset
+
+    def compose(self) -> ComposeResult:
+        t = Text()
+        t.append(self.preset.name, style="bold")
+        if self.preset.model:
+            t.append(f"  ({self.preset.model})", style="dim")
+        t.append(f"\n{self.preset.resolved_dir}", style="dim")
+        t.append(f"\n{self.preset.prompt[:60]}", style="italic")
+        yield Static(t)
+
+
+class PresetScreen(ModalScreen[Preset | None]):
+    """Pick a preset to spawn."""
+
+    BINDINGS = [Binding("escape", "dismiss_modal", "Cancel")]
+
+    DEFAULT_CSS = """
+    PresetScreen {
+        align: center middle;
+    }
+    #preset-dialog {
+        width: 72;
+        height: auto;
+        max-height: 70%;
+        border: thick $accent;
+        background: $surface;
+        padding: 1 2;
+    }
+    #preset-dialog Label {
+        margin-bottom: 1;
+    }
+    #preset-list {
+        height: auto;
+        max-height: 20;
+    }
+    #preset-dialog .buttons {
+        margin-top: 1;
+        align: right middle;
+    }
+    #preset-dialog .buttons Button {
+        margin-left: 1;
+    }
+    PresetItem {
+        padding: 0 1;
+        height: auto;
+        min-height: 3;
+    }
+    PresetItem:hover {
+        background: $boost;
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        presets = load_presets()
+        with Vertical(id="preset-dialog"):
+            if not presets:
+                yield Label(
+                    f"[bold]No presets found.[/bold]\n\n"
+                    f"Create [dim]{CONFIG_FILE}[/dim] with preset entries.\n"
+                    f"See config.example.toml in the claude-tui directory."
+                )
+            else:
+                yield Label("[bold]Select a preset:[/bold]")
+                lv = ListView(id="preset-list")
+                for p in presets:
+                    lv.append(PresetItem(p))  # type: ignore[arg-type]
+                yield lv
+            with Horizontal(classes="buttons"):
+                yield Button("Cancel", id="cancel")
+
+    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        if isinstance(event.item, PresetItem):
+            self.dismiss(event.item.preset)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.dismiss(None)
+
+    def action_dismiss_modal(self) -> None:
+        self.dismiss(None)
+
+
+# -----------------------------------------------------------------------
 # Session list item
 # -----------------------------------------------------------------------
 
@@ -146,8 +315,12 @@ class ClaudeTUI(App):
 
     BINDINGS = [
         Binding("n", "spawn", "New"),
+        Binding("p", "preset_spawn", "Preset"),
+        Binding("b", "batch_spawn", "Batch"),
+        Binding("a", "attach", "Attach"),
         Binding("d", "kill_session", "Kill"),
         Binding("x", "remove_session", "Remove"),
+        Binding("question_mark", "help", "Help"),
         Binding("q", "quit", "Quit"),
     ]
 
@@ -166,7 +339,8 @@ class ClaudeTUI(App):
                 yield ListView(id="session-list")
             with Vertical(id="content"):
                 yield Static(
-                    "No sessions.  Press [bold]n[/bold] to spawn one.",
+                    "No sessions.  Press [bold]n[/bold] to spawn, "
+                    "[bold]p[/bold] for presets, or [bold]?[/bold] for help.",
                     id="content-header",
                 )
                 yield RichLog(
@@ -249,7 +423,10 @@ class ClaudeTUI(App):
             self._append_new_log_lines()
         else:
             header = self.query_one("#content-header", Static)
-            header.update("No sessions.  Press [bold]n[/bold] to spawn one.")
+            header.update(
+                "No sessions.  Press [bold]n[/bold] to spawn, "
+                "[bold]p[/bold] for presets, or [bold]?[/bold] for help."
+            )
 
     # ------------------------------------------------------------------
     # Event handlers
@@ -263,6 +440,9 @@ class ClaudeTUI(App):
     # Actions (key bindings)
     # ------------------------------------------------------------------
 
+    def action_help(self) -> None:
+        self.push_screen(HelpScreen())
+
     async def action_spawn(self) -> None:
         result = await self.push_screen_wait(SpawnScreen())
         if not result:
@@ -274,6 +454,60 @@ class ClaudeTUI(App):
         )
         self.selected_id = session.id
         self._sync_session_list()
+
+    async def action_preset_spawn(self) -> None:
+        """Pick a single preset and spawn it."""
+        preset = await self.push_screen_wait(PresetScreen())
+        if not preset:
+            return
+        session = await self.manager.spawn(
+            project_dir=preset.resolved_dir,
+            prompt=preset.prompt,
+            model=preset.model,
+        )
+        self.selected_id = session.id
+        self._sync_session_list()
+        self.notify(f"Spawned: {preset.name}")
+
+    async def action_batch_spawn(self) -> None:
+        """Spawn all presets at once."""
+        presets = load_presets()
+        if not presets:
+            self.notify(
+                f"No presets. Create {CONFIG_FILE}",
+                severity="warning",
+            )
+            return
+        for preset in presets:
+            session = await self.manager.spawn(
+                project_dir=preset.resolved_dir,
+                prompt=preset.prompt,
+                model=preset.model,
+            )
+        self._sync_session_list()
+        # Select the last spawned session
+        if session:
+            self.selected_id = session.id
+        self.notify(f"Batch-spawned {len(presets)} sessions")
+
+    def action_attach(self) -> None:
+        """Suspend TUI and drop into interactive Claude in the session's project dir."""
+        if not self.selected_id:
+            self.notify("No session selected", severity="warning")
+            return
+        session = self.manager.sessions.get(self.selected_id)
+        if not session:
+            return
+
+        cmd = ["claude"]
+        if session.claude_session_id and not session.alive:
+            # Fork from the completed session's conversation
+            cmd.extend(["-r", session.claude_session_id, "--fork-session"])
+
+        cwd = session.project_dir
+
+        with self.suspend():
+            subprocess.run(cmd, cwd=cwd)
 
     async def action_kill_session(self) -> None:
         if self.selected_id:

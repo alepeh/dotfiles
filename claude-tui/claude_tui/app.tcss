@@ -50,3 +50,9 @@ SessionItem:hover {
     height: 1fr;
     padding: 0 1;
 }
+
+/* ---- Notifications ---- */
+
+Toast {
+    margin: 1 2;
+}

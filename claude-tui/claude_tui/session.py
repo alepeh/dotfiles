@@ -62,6 +62,7 @@ class Session:
     started_at: float = field(default_factory=time.time)
     cost_usd: float = 0.0
     duration_ms: int = 0
+    claude_session_id: str = ""
 
     @property
     def name(self) -> str:
@@ -177,6 +178,9 @@ class SessionManager:
             sub = event.get("subtype", "")
             if sub == "init":
                 session.status = Status.STREAMING
+                sid = event.get("sessionId", "")
+                if sid:
+                    session.claude_session_id = sid
                 session._append("system", "Initialized")
             else:
                 session._append("system", sub or "system event")
