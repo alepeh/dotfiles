@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp site-serve site-preview site-build site-new test-obsidian clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui site-serve site-preview site-build site-new test-obsidian clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -322,6 +322,12 @@ mcp-gsuite-patch: ## Clone and patch mcp-gsuite to fix JSON schema bug (Issue #4
 	  "$(HOME)/.local/share/mcp-gsuite-patched/src/mcp_gsuite/tools_gmail.py"
 	@echo "✓ Patched mcp-gsuite installed to ~/.local/share/mcp-gsuite-patched"
 	@echo "  Note: Wrapper script already configured to use this location"
+
+##@ Claude TUI
+
+claude-tui: ## Run Claude TUI process manager (spawns/monitors Claude Code sessions)
+	@command -v uv >/dev/null || (echo "Error: uv not found - run: brew install uv" && exit 1)
+	@uv run --project "$(REPO_DIR)/claude-tui" claude-tui
 
 ##@ Language Servers
 

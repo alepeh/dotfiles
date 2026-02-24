@@ -1,0 +1,24 @@
+# Claude TUI presets — copy to ~/.config/claude-tui/config.toml
+#
+# Each [[presets]] entry defines a quick-launch session.
+# Use `p` in the TUI to pick one, or `b` to batch-spawn all.
+#
+# backend = "claude" (default) or "cursor"
+
+[[presets]]
+name = "Dotfiles doctor"
+project_dir = "~/dotfiles"
+prompt = "Run make doctor and fix any issues found"
+
+[[presets]]
+name = "API test suite"
+project_dir = "~/code/api"
+prompt = "Run the test suite and fix any failing tests"
+model = "sonnet"
+
+[[presets]]
+name = "Frontend lint (Cursor)"
+project_dir = "~/code/frontend"
+prompt = "Run the linter and fix all warnings"
+backend = "cursor"
+model = "sonnet-4"
