@@ -18,6 +18,7 @@ class Preset:
     project_dir: str
     prompt: str
     model: str = ""
+    backend: str = "claude"  # "claude" or "cursor"
 
     @property
     def resolved_dir(self) -> str:
@@ -37,6 +38,7 @@ def load_presets() -> list[Preset]:
             project_dir=p["project_dir"],
             prompt=p["prompt"],
             model=p.get("model", ""),
+            backend=p.get("backend", "claude"),
         )
         for p in data.get("presets", [])
     ]

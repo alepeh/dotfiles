@@ -1,4 +1,4 @@
-"""Claude Code session management — spawn, track, and control sessions."""
+"""Session management — spawn, track, and control Claude/Cursor sessions."""
 
 from __future__ import annotations
 
@@ -9,6 +9,11 @@ import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
+
+
+class Backend(Enum):
+    CLAUDE = "claude"
+    CURSOR = "cursor"
 
 
 class Status(Enum):
@@ -49,11 +54,12 @@ class LogLine:
 
 @dataclass
 class Session:
-    """A managed Claude Code session."""
+    """A managed agent session (Claude Code or Cursor)."""
 
     id: str
     project_dir: str
     prompt: str
+    backend: Backend = Backend.CLAUDE
     status: Status = Status.STARTING
     current_tool: str = ""
     last_text: str = ""
@@ -62,11 +68,12 @@ class Session:
     started_at: float = field(default_factory=time.time)
     cost_usd: float = 0.0
     duration_ms: int = 0
-    claude_session_id: str = ""
+    remote_session_id: str = ""
 
     @property
     def name(self) -> str:
-        return Path(self.project_dir).name
+        tag = "C" if self.backend == Backend.CLAUDE else "R"
+        return f"[{tag}] {Path(self.project_dir).name}"
 
     @property
     def display_status(self) -> str:
@@ -91,7 +98,7 @@ class Session:
 
 
 class SessionManager:
-    """Manages multiple concurrent Claude Code sessions."""
+    """Manages multiple concurrent agent sessions."""
 
     def __init__(self) -> None:
         self.sessions: dict[str, Session] = {}
@@ -101,15 +108,16 @@ class SessionManager:
         project_dir: str,
         prompt: str,
         model: str = "",
+        backend: Backend = Backend.CLAUDE,
     ) -> Session:
         sid = uuid.uuid4().hex[:8]
-        session = Session(id=sid, project_dir=project_dir, prompt=prompt)
+        session = Session(
+            id=sid, project_dir=project_dir, prompt=prompt, backend=backend,
+        )
         self.sessions[sid] = session
 
-        cmd = ["claude", "--print", "--output-format", "stream-json"]
-        if model:
-            cmd.extend(["--model", model])
-        cmd.extend(["-p", prompt])
+        cmd = self._build_cmd(backend, prompt, model)
+        bin_name = cmd[0]
 
         try:
             proc = await asyncio.create_subprocess_exec(
@@ -120,16 +128,33 @@ class SessionManager:
             )
             session._process = proc
             short = prompt[:60] + ("..." if len(prompt) > 60 else "")
-            session._append("system", f"Spawned: {short}")
+            session._append("system", f"[{backend.value}] Spawned: {short}")
             asyncio.create_task(self._read_stream(session))
         except FileNotFoundError:
             session.status = Status.ERROR
-            session._append("error", "'claude' command not found in PATH")
+            session._append("error", f"'{bin_name}' command not found in PATH")
         except Exception as exc:
             session.status = Status.ERROR
             session._append("error", str(exc))
 
         return session
+
+    @staticmethod
+    def _build_cmd(backend: Backend, prompt: str, model: str) -> list[str]:
+        if backend == Backend.CURSOR:
+            cmd = [
+                "cursor-agent", "--print", "--force",
+                "--output-format", "stream-json",
+            ]
+            if model:
+                cmd.extend(["--model", model])
+            cmd.append(prompt)
+        else:
+            cmd = ["claude", "--print", "--output-format", "stream-json"]
+            if model:
+                cmd.extend(["--model", model])
+            cmd.extend(["-p", prompt])
+        return cmd
 
     # ------------------------------------------------------------------
     # Stream reader
@@ -178,9 +203,13 @@ class SessionManager:
             sub = event.get("subtype", "")
             if sub == "init":
                 session.status = Status.STREAMING
-                sid = event.get("sessionId", "")
+                # Claude uses "sessionId", Cursor uses "session_id"
+                sid = (
+                    event.get("sessionId", "")
+                    or event.get("session_id", "")
+                )
                 if sid:
-                    session.claude_session_id = sid
+                    session.remote_session_id = sid
                 session._append("system", "Initialized")
             else:
                 session._append("system", sub or "system event")
@@ -215,12 +244,34 @@ class SessionManager:
                     summary = self._tool_summary(name, inp)
                     session._append("tool", f"{name}: {summary}")
 
+        # Cursor emits tool_call events (started/completed) separately
+        elif etype == "tool_call":
+            sub = event.get("subtype", "")
+            if sub == "started":
+                session.status = Status.TOOL_USE
+                tc = event.get("tool_call", {})
+                name = tc.get("name", "")
+                if name:
+                    inp = tc.get("input", {})
+                    summary = self._tool_summary(name, inp)
+                else:
+                    name, summary = self._parse_cursor_tool(tc)
+                session.current_tool = name
+                session._append("tool", f"{name}: {summary}")
+
         elif etype == "result":
             sub = event.get("subtype", "")
             if sub == "success":
                 session.status = Status.DONE
                 session.cost_usd = event.get("cost_usd", 0)
                 session.duration_ms = event.get("duration_ms", 0)
+                # Capture session_id from result too (Cursor puts it here)
+                sid = (
+                    event.get("sessionId", "")
+                    or event.get("session_id", "")
+                )
+                if sid and not session.remote_session_id:
+                    session.remote_session_id = sid
                 result = event.get("result", "")
                 if result:
                     for rline in str(result)[:500].split("\n"):
@@ -248,6 +299,26 @@ class SessionManager:
         if name == "WebFetch":
             return inp.get("url", "")[:80]
         return str(inp)[:80]
+
+    @staticmethod
+    def _parse_cursor_tool(tc: dict) -> tuple[str, str]:
+        """Extract tool name and summary from Cursor's tool_call dict.
+
+        Cursor uses keys like readToolCall, shellToolCall, writeToolCall,
+        deleteToolCall rather than a generic name + input structure.
+        """
+        for key, val in tc.items():
+            if key.endswith("ToolCall"):
+                name = key.replace("ToolCall", "")
+                if isinstance(val, dict):
+                    summary = (
+                        val.get("command", "")
+                        or val.get("path", "")
+                        or val.get("pattern", "")
+                        or str(val)[:80]
+                    )
+                    return name, summary
+        return "unknown", str(tc)[:80]
 
     # ------------------------------------------------------------------
     # Lifecycle

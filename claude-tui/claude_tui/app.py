@@ -1,4 +1,4 @@
-"""Textual TUI application for Claude Code process management."""
+"""Textual TUI application for Claude Code / Cursor agent process management."""
 
 from __future__ import annotations
 
@@ -19,12 +19,14 @@ from textual.widgets import (
     Label,
     ListItem,
     ListView,
+    RadioButton,
+    RadioSet,
     RichLog,
     Static,
 )
 
 from claude_tui.config import CONFIG_FILE, Preset, load_presets
-from claude_tui.session import Session, SessionManager, Status
+from claude_tui.session import Backend, Session, SessionManager, Status
 
 
 # -----------------------------------------------------------------------
@@ -46,13 +48,18 @@ HELP_TEXT = """\
   [bold]up / down[/bold]  Move down / up in session list
 
 [bold cyan]Interaction[/bold cyan]
-  [bold]a[/bold]  Attach — suspend TUI, open interactive Claude
+  [bold]a[/bold]  Attach — suspend TUI, open interactive session
       in the selected session's project directory.
-      If the session is done, forks from its conversation.
+      If the session is done, forks/resumes its conversation.
 
 [bold cyan]Other[/bold cyan]
   [bold]?[/bold]  Show this help
   [bold]q[/bold]  Quit
+
+[bold cyan]Backends[/bold cyan]
+  Both [bold]Claude Code[/bold] (\\[C]) and [bold]Cursor Agent[/bold] (\\[R])
+  are supported. Choose the backend when spawning.
+  Sessions show \\[C] or \\[R] prefix in the sidebar.
 
 [bold cyan]Presets[/bold cyan]
   Save presets in [dim]~/.config/claude-tui/config.toml[/dim]:
@@ -61,7 +68,8 @@ HELP_TEXT = """\
   name = "My task"
   project_dir = "~/code/project"
   prompt = "Run tests and fix failures"
-  model = "sonnet"  # optional[/dim]
+  model = "sonnet"     # optional
+  backend = "cursor"   # optional, default "claude"[/dim]
 """
 
 
@@ -78,7 +86,7 @@ class HelpScreen(ModalScreen):
         align: center middle;
     }
     #help-dialog {
-        width: 64;
+        width: 68;
         height: auto;
         max-height: 80%;
         border: thick $accent;
@@ -108,7 +116,7 @@ class HelpScreen(ModalScreen):
 
 
 class SpawnScreen(ModalScreen[dict | None]):
-    """Modal dialog to configure and spawn a new Claude Code session."""
+    """Modal dialog to configure and spawn a new session."""
 
     BINDINGS = [Binding("escape", "dismiss_modal", "Cancel")]
 
@@ -129,6 +137,10 @@ class SpawnScreen(ModalScreen[dict | None]):
     #dialog Input {
         margin-bottom: 0;
     }
+    #dialog RadioSet {
+        height: auto;
+        margin-top: 0;
+    }
     .buttons {
         margin-top: 1;
         align: right middle;
@@ -140,7 +152,11 @@ class SpawnScreen(ModalScreen[dict | None]):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="dialog"):
-            yield Label("[bold]New Claude Code Session[/bold]")
+            yield Label("[bold]New Session[/bold]")
+            yield Label("Backend:")
+            with RadioSet(id="backend-set"):
+                yield RadioButton("Claude Code", value=True, id="rb-claude")
+                yield RadioButton("Cursor Agent", id="rb-cursor")
             yield Label("Project directory:")
             yield Input(
                 placeholder="/path/to/project",
@@ -148,20 +164,32 @@ class SpawnScreen(ModalScreen[dict | None]):
                 value=str(Path.cwd()),
             )
             yield Label("Prompt:")
-            yield Input(placeholder="What should Claude do?", id="prompt-input")
+            yield Input(placeholder="What should the agent do?", id="prompt-input")
             yield Label("Model (optional):")
-            yield Input(placeholder="e.g. sonnet, opus", id="model-input")
+            yield Input(placeholder="e.g. sonnet, opus, gpt-5", id="model-input")
             with Horizontal(classes="buttons"):
                 yield Button("Cancel", id="cancel")
                 yield Button("Spawn", variant="primary", id="spawn")
 
+    def _get_result(self) -> dict | None:
+        d = self.query_one("#dir-input", Input).value.strip()
+        p = self.query_one("#prompt-input", Input).value.strip()
+        m = self.query_one("#model-input", Input).value.strip()
+        if not (d and p):
+            return None
+        is_claude = self.query_one("#rb-claude", RadioButton).value
+        return {
+            "project_dir": d,
+            "prompt": p,
+            "model": m,
+            "backend": "claude" if is_claude else "cursor",
+        }
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "spawn":
-            d = self.query_one("#dir-input", Input).value.strip()
-            p = self.query_one("#prompt-input", Input).value.strip()
-            m = self.query_one("#model-input", Input).value.strip()
-            if d and p:
-                self.dismiss({"project_dir": d, "prompt": p, "model": m})
+            result = self._get_result()
+            if result:
+                self.dismiss(result)
                 return
         self.dismiss(None)
 
@@ -188,11 +216,13 @@ class PresetItem(ListItem):
 
     def compose(self) -> ComposeResult:
         t = Text()
+        tag = "C" if self.preset.backend == "claude" else "R"
+        t.append(f"[{tag}] ", style="dim bold")
         t.append(self.preset.name, style="bold")
         if self.preset.model:
             t.append(f"  ({self.preset.model})", style="dim")
-        t.append(f"\n{self.preset.resolved_dir}", style="dim")
-        t.append(f"\n{self.preset.prompt[:60]}", style="italic")
+        t.append(f"\n    {self.preset.resolved_dir}", style="dim")
+        t.append(f"\n    {self.preset.prompt[:55]}", style="italic")
         yield Static(t)
 
 
@@ -230,7 +260,7 @@ class PresetScreen(ModalScreen[Preset | None]):
     PresetItem {
         padding: 0 1;
         height: auto;
-        min-height: 3;
+        min-height: 4;
     }
     PresetItem:hover {
         background: $boost;
@@ -272,7 +302,7 @@ class PresetScreen(ModalScreen[Preset | None]):
 
 
 class SessionItem(ListItem):
-    """Sidebar entry representing one Claude Code session."""
+    """Sidebar entry representing one agent session."""
 
     def __init__(self, session: Session) -> None:
         super().__init__()
@@ -303,12 +333,21 @@ class SessionItem(ListItem):
 
 
 # -----------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------
+
+
+def _backend_from_str(val: str) -> Backend:
+    return Backend.CURSOR if val == "cursor" else Backend.CLAUDE
+
+
+# -----------------------------------------------------------------------
 # Main application
 # -----------------------------------------------------------------------
 
 
 class ClaudeTUI(App):
-    """TUI process manager for Claude Code sessions."""
+    """TUI process manager for Claude Code / Cursor Agent sessions."""
 
     CSS_PATH = "app.tcss"
     TITLE = "Claude TUI"
@@ -447,10 +486,12 @@ class ClaudeTUI(App):
         result = await self.push_screen_wait(SpawnScreen())
         if not result:
             return
+        backend = _backend_from_str(result.get("backend", "claude"))
         session = await self.manager.spawn(
             project_dir=result["project_dir"],
             prompt=result["prompt"],
             model=result.get("model", ""),
+            backend=backend,
         )
         self.selected_id = session.id
         self._sync_session_list()
@@ -460,10 +501,12 @@ class ClaudeTUI(App):
         preset = await self.push_screen_wait(PresetScreen())
         if not preset:
             return
+        backend = _backend_from_str(preset.backend)
         session = await self.manager.spawn(
             project_dir=preset.resolved_dir,
             prompt=preset.prompt,
             model=preset.model,
+            backend=backend,
         )
         self.selected_id = session.id
         self._sync_session_list()
@@ -478,20 +521,22 @@ class ClaudeTUI(App):
                 severity="warning",
             )
             return
+        session = None
         for preset in presets:
+            backend = _backend_from_str(preset.backend)
             session = await self.manager.spawn(
                 project_dir=preset.resolved_dir,
                 prompt=preset.prompt,
                 model=preset.model,
+                backend=backend,
             )
         self._sync_session_list()
-        # Select the last spawned session
         if session:
             self.selected_id = session.id
         self.notify(f"Batch-spawned {len(presets)} sessions")
 
     def action_attach(self) -> None:
-        """Suspend TUI and drop into interactive Claude in the session's project dir."""
+        """Suspend TUI and drop into interactive session in the project dir."""
         if not self.selected_id:
             self.notify("No session selected", severity="warning")
             return
@@ -499,15 +544,17 @@ class ClaudeTUI(App):
         if not session:
             return
 
-        cmd = ["claude"]
-        if session.claude_session_id and not session.alive:
-            # Fork from the completed session's conversation
-            cmd.extend(["-r", session.claude_session_id, "--fork-session"])
-
-        cwd = session.project_dir
+        if session.backend == Backend.CURSOR:
+            cmd = ["cursor-agent"]
+            if session.remote_session_id and not session.alive:
+                cmd.extend(["--resume", session.remote_session_id])
+        else:
+            cmd = ["claude"]
+            if session.remote_session_id and not session.alive:
+                cmd.extend(["-r", session.remote_session_id, "--fork-session"])
 
         with self.suspend():
-            subprocess.run(cmd, cwd=cwd)
+            subprocess.run(cmd, cwd=session.project_dir)
 
     async def action_kill_session(self) -> None:
         if self.selected_id:
