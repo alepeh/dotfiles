@@ -115,13 +115,6 @@ if [ "$SHELL" != "$(command -v zsh)" ]; then
 fi
 
 echo "→ Installing MCP servers..."
-if have uv; then
-  echo "→ Syncing obsidian-cli-mcp dependencies..."
-  (cd "$DOTFILES/mcp-servers/obsidian-cli-mcp" && uv sync --group dev)
-  echo "✓ obsidian-cli-mcp ready"
-else
-  echo "   uv not found, will be installed via Homebrew"
-fi
 
 echo "→ Installing GitHub MCP server..."
 if have go; then
