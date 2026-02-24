@@ -1,0 +1,52 @@
+/* Claude TUI — main layout */
+
+#main {
+    height: 1fr;
+}
+
+/* ---- Sidebar ---- */
+
+#sidebar {
+    width: 36;
+    border-right: thick $primary;
+}
+
+#sidebar-header {
+    text-style: bold;
+    padding: 1;
+    background: $primary;
+    color: $text;
+    text-align: center;
+}
+
+#session-list {
+    height: 1fr;
+}
+
+SessionItem {
+    padding: 0 1;
+    height: auto;
+    min-height: 3;
+}
+
+SessionItem:hover {
+    background: $boost;
+}
+
+/* ---- Content area ---- */
+
+#content {
+    width: 1fr;
+}
+
+#content-header {
+    padding: 1;
+    background: $surface;
+    border-bottom: solid $primary;
+    height: 3;
+}
+
+#log {
+    height: 1fr;
+    padding: 0 1;
+}
