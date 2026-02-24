@@ -198,6 +198,22 @@ echo "→ Installing OpenSpec CLI..."
 npm install -g @fission-ai/openspec@latest
 echo "✓ Installed OpenSpec CLI"
 
+echo "→ Installing spec-kit..."
+if have uv; then
+  uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
+  echo "✓ Installed spec-kit"
+else
+  echo "   uv not found, skipping spec-kit (run: make spec-kit after installing uv)"
+fi
+
+echo "→ Installing claude-tui..."
+if have uv; then
+  uv tool install --force --from "$DOTFILES/claude-tui" claude-tui
+  echo "✓ Installed claude-tui"
+else
+  echo "   uv not found, skipping claude-tui (run: make claude-tui-install after installing uv)"
+fi
+
 echo "→ Configuring jenv (Java version management)..."
 if have jenv; then
   # Initialize jenv first

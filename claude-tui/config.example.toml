@@ -1,8 +1,18 @@
-# Claude TUI presets — copy to ~/.config/claude-tui/config.toml
+# Claude TUI config — copy to ~/.config/claude-tui/config.toml
 #
-# Each [[presets]] entry defines a quick-launch session.
+# Projects: saved folders for quick "new session" access.
+# Use `a` in the TUI to add projects interactively.
+
+[[projects]]
+name = "dotfiles"
+path = "~/code/dotfiles"
+
+[[projects]]
+name = "api"
+path = "~/code/api"
+
+# Presets: quick-launch sessions with a predefined prompt.
 # Use `p` in the TUI to pick one, or `b` to batch-spawn all.
-#
 # backend = "claude" (default) or "cursor"
 
 [[presets]]

@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui site-serve site-preview site-build site-new test-obsidian clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -87,6 +87,7 @@ doctor: ## Quick sanity checks
 	@command -v amp >/dev/null || (echo "amp not found - run: npm install -g @sourcegraph/amp" && exit 1)
 	@command -v specify >/dev/null || (echo "specify (spec-kit) not found - run: make spec-kit" && exit 1)
 	@command -v openspec >/dev/null || (echo "openspec not found - run: make openspec" && exit 1)
+	@command -v claude-tui >/dev/null || (echo "claude-tui not found - run: make claude-tui-install" && exit 1)
 	@[ -d "$(REPO_DIR)/omz/ohmyzsh" ] || (echo "oh-my-zsh submodule missing" && exit 1)
 	@[ -f "$(REPO_DIR)/zsh/.zshrc" ] || (echo ".zshrc missing" && exit 1)
 	@[ -d "$(REPO_DIR)/helix" ] || (echo "helix config missing" && exit 1)
@@ -325,9 +326,15 @@ mcp-gsuite-patch: ## Clone and patch mcp-gsuite to fix JSON schema bug (Issue #4
 
 ##@ Claude TUI
 
-claude-tui: ## Run Claude TUI process manager (spawns/monitors Claude Code sessions)
+claude-tui: ## Run Claude TUI (install globally first with make claude-tui-install)
+	@command -v claude-tui >/dev/null || (echo "claude-tui not found - run: make claude-tui-install" && exit 1)
+	@claude-tui
+
+claude-tui-install: ## Install/upgrade claude-tui globally via uv tool
+	@echo "→ Installing claude-tui via uv"
 	@command -v uv >/dev/null || (echo "Error: uv not found - run: brew install uv" && exit 1)
-	@uv run --project "$(REPO_DIR)/claude-tui" claude-tui
+	@uv tool install --force --from "$(REPO_DIR)/claude-tui" claude-tui
+	@echo "✓ claude-tui installed globally. Run 'claude-tui' from anywhere."
 
 ##@ Language Servers
 

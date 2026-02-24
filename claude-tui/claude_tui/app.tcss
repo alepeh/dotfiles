@@ -7,7 +7,8 @@
 /* ---- Sidebar ---- */
 
 #sidebar {
-    width: 36;
+    width: 42;
+    min-width: 30;
     border-right: thick $primary;
 }
 
@@ -17,19 +18,34 @@
     background: $primary;
     color: $text;
     text-align: center;
+    height: 3;
+}
+
+#filter-input {
+    margin: 0;
+    border: none;
+    background: $surface;
+    padding: 0 1;
+    height: 3;
+    border-bottom: solid $primary-darken-2;
+}
+
+#filter-input:focus {
+    border: none;
+    border-bottom: solid $accent;
 }
 
 #session-list {
     height: 1fr;
 }
 
-SessionItem {
+HistoricSessionItem {
     padding: 0 1;
     height: auto;
     min-height: 3;
 }
 
-SessionItem:hover {
+HistoricSessionItem:hover {
     background: $boost;
 }
 
@@ -43,7 +59,9 @@ SessionItem:hover {
     padding: 1;
     background: $surface;
     border-bottom: solid $primary;
-    height: 3;
+    height: auto;
+    min-height: 3;
+    max-height: 5;
 }
 
 #log {
