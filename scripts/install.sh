@@ -51,6 +51,13 @@ ZELLIJ_REPO="$DOTFILES/zellij"
 mkdir -p "$(dirname "$ZELLIJ_HOME")"
 backup_and_link "$ZELLIJ_REPO" "$ZELLIJ_HOME"
 
+# --- Ghostty config (used by cmux) ---
+GHOSTTY_HOME="$HOME/.config/ghostty"
+GHOSTTY_REPO="$DOTFILES/ghostty"
+
+mkdir -p "$(dirname "$GHOSTTY_HOME")"
+backup_and_link "$GHOSTTY_REPO" "$GHOSTTY_HOME"
+
 # --- Git config (delta, aliases) ---
 # Migrate existing user settings to .gitconfig.local before replacing
 if [ -f "$HOME/.gitconfig" ] && [ ! -L "$HOME/.gitconfig" ] && [ ! -f "$HOME/.gitconfig.local" ]; then
@@ -173,6 +180,13 @@ fi
 echo "→ Linking Claude Code global instructions..."
 mkdir -p "$HOME/.claude"
 backup_and_link "$DOTFILES/claude-code/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
+echo "→ Linking Claude Code hooks..."
+mkdir -p "$HOME/.claude/hooks"
+for f in "$DOTFILES/claude-code/hooks/"*.sh; do
+  [ -f "$f" ] && ln -sfn "$f" "$HOME/.claude/hooks/$(basename "$f")"
+done
+echo "✓ Claude Code hooks linked"
 
 echo "→ Linking Claude Code slash commands..."
 mkdir -p "$HOME/.claude/commands"

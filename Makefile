@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -80,6 +80,7 @@ doctor: ## Quick sanity checks
 	@command -v zsh >/dev/null || (echo "zsh not found" && exit 1)
 	@command -v brew >/dev/null || (echo "Homebrew not found" && exit 1)
 	@command -v hx >/dev/null || (echo "helix not found - run: brew install helix" && exit 1)
+	@command -v cmux >/dev/null || (echo "cmux not found - run: brew install --cask cmux" && exit 1)
 	@command -v zellij >/dev/null || (echo "zellij not found - run: brew install zellij" && exit 1)
 	@command -v lazygit >/dev/null || (echo "lazygit not found - run: brew install lazygit" && exit 1)
 	@command -v yazi >/dev/null || (echo "yazi not found - run: brew install yazi" && exit 1)
@@ -229,6 +230,16 @@ zellij: ## Link Zellij configuration
 	@mkdir -p "$(HOME)/.config"
 	@ln -sfn "$(REPO_DIR)/zellij" "$(HOME)/.config/zellij"
 	@echo "✓ ~/.config/zellij → $(REPO_DIR)/zellij"
+
+ghostty: ## Link Ghostty configuration (used by cmux)
+	@echo "→ Linking Ghostty configuration"
+	@mkdir -p "$(HOME)/.config"
+	@if [ -d "$(HOME)/.config/ghostty" ] && [ ! -L "$(HOME)/.config/ghostty" ]; then \
+	  echo "⚠ ~/.config/ghostty already exists as a directory (not a symlink) — skipping"; \
+	else \
+	  ln -sfn "$(REPO_DIR)/ghostty" "$(HOME)/.config/ghostty"; \
+	  echo "✓ ~/.config/ghostty → $(REPO_DIR)/ghostty"; \
+	fi
 
 yazi: ## Link Yazi configuration (file manager)
 	@echo "→ Linking Yazi configuration"

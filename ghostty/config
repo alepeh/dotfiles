@@ -1,0 +1,19 @@
+# Ghostty configuration
+# Used by cmux (built on libghostty) and standalone Ghostty
+
+# Font — MesloLGS Nerd Font (installed via Brewfile cask font-meslo-lg-nerd-font)
+font-family = "MesloLGS Nerd Font"
+font-size = 14
+
+# Theme — Catppuccin Mocha (matches Zellij/Helix theme)
+theme = "Catppuccin Mocha"
+
+# Window appearance
+window-padding-x = 4
+window-padding-y = 4
+window-decoration = true
+
+# Clipboard
+clipboard-read = allow
+clipboard-write = allow
+copy-on-select = clipboard

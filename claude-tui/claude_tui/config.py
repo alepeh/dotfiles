@@ -101,6 +101,20 @@ def remove_project(project_path: str) -> None:
     _write_config(data)
 
 
+def update_project(old_resolved_path: str, new_project: Project) -> None:
+    """Update a project in config.toml by its resolved path."""
+    ensure_config_dir()
+    data = load_config()
+    projects = data.get("projects", [])
+    for p in projects:
+        if str(Path(p["path"]).expanduser().resolve()) == old_resolved_path:
+            p["name"] = new_project.name
+            p["path"] = new_project.path
+            break
+    data["projects"] = projects
+    _write_config(data)
+
+
 def _append_toml_block(table_name: str, entry: dict) -> None:
     """Append a [[table_name]] entry to the config file."""
     ensure_config_dir()

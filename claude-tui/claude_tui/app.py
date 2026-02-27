@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 from rich.text import Text
@@ -31,7 +33,9 @@ from claude_tui.config import (
     CONFIG_FILE,
     Project,
     load_projects,
+    remove_project,
     save_project,
+    update_project,
 )
 from claude_tui.sessions import (
     Backend,
@@ -47,9 +51,15 @@ from claude_tui.sessions import (
 HELP_TEXT = """\
 [bold]Claude TUI — Keybindings[/bold]
 
-[bold cyan]Navigation[/bold cyan]
+[bold cyan]Session navigation[/bold cyan]
   [bold]j / k[/bold]      Move down / up in session list
   [bold]up / down[/bold]   Move down / up in session list
+
+[bold cyan]Panel navigation[/bold cyan]
+  [bold]h[/bold]          Focus session list (sidebar)
+  [bold]l[/bold]          Focus conversation log (scroll with arrows)
+  [bold]Tab[/bold]        Cycle focus between panels
+  [bold]escape[/bold]     Return to session list / clear filter
 
 [bold cyan]Session actions[/bold cyan]
   [bold]r[/bold]  Resume selected session in a zellij dev layout
@@ -59,10 +69,10 @@ HELP_TEXT = """\
 
 [bold cyan]Project management[/bold cyan]
   [bold]a[/bold]  Add a project (save a folder for quick access)
+  [bold]p[/bold]  Manage projects (edit / remove)
 
 [bold cyan]Filtering[/bold cyan]
   [bold]/[/bold]  Focus the search/filter bar
-  [bold]escape[/bold]  Clear filter (when filter bar is focused)
 
 [bold cyan]Other[/bold cyan]
   [bold]?[/bold]  Show this help
@@ -181,6 +191,199 @@ class AddProjectScreen(ModalScreen[Project | None]):
 
     def action_dismiss_modal(self) -> None:
         self.dismiss(None)
+
+
+# -----------------------------------------------------------------------
+# Edit Project screen
+# -----------------------------------------------------------------------
+
+
+class EditProjectScreen(ModalScreen[Project | None]):
+    """Edit a project's name and path."""
+
+    BINDINGS = [Binding("escape", "dismiss_modal", "Cancel")]
+
+    DEFAULT_CSS = """
+    EditProjectScreen {
+        align: center middle;
+    }
+    #edit-project-dialog {
+        width: 64;
+        height: auto;
+        border: thick $accent;
+        background: $surface;
+        padding: 1 2;
+    }
+    #edit-project-dialog Label {
+        margin-top: 1;
+    }
+    #edit-project-dialog Input {
+        margin-bottom: 0;
+    }
+    #edit-project-dialog .buttons {
+        margin-top: 1;
+        align: right middle;
+    }
+    #edit-project-dialog .buttons Button {
+        margin-left: 1;
+    }
+    """
+
+    def __init__(self, project: Project) -> None:
+        super().__init__()
+        self._original = project
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="edit-project-dialog"):
+            yield Label("[bold]Edit Project[/bold]")
+            yield Label("Project name:")
+            yield Input(value=self._original.name, id="name-input")
+            yield Label("Folder path:")
+            yield Input(value=self._original.path, id="path-input")
+            with Horizontal(classes="buttons"):
+                yield Button("Cancel", id="cancel")
+                yield Button("Save", variant="primary", id="save")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "save":
+            name = self.query_one("#name-input", Input).value.strip()
+            path = self.query_one("#path-input", Input).value.strip()
+            if name and path:
+                self.dismiss(Project(name=name, path=path))
+                return
+        self.dismiss(None)
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if event.input.id == "path-input":
+            self.query_one("#save", Button).press()
+
+    def action_dismiss_modal(self) -> None:
+        self.dismiss(None)
+
+
+# -----------------------------------------------------------------------
+# Manage Projects screen
+# -----------------------------------------------------------------------
+
+
+class ManageProjectItem(ListItem):
+    """A project item in the manage-projects list."""
+
+    def __init__(self, project: Project) -> None:
+        super().__init__()
+        self.project = project
+
+    def compose(self) -> ComposeResult:
+        t = Text()
+        t.append(self.project.name, style="bold")
+        t.append(f"  {self.project.path}", style="dim")
+        yield Static(t)
+
+
+class ManageProjectsScreen(ModalScreen):
+    """Edit or remove saved projects."""
+
+    BINDINGS = [
+        Binding("escape", "dismiss_modal", "Close"),
+        Binding("d", "delete_project", "Delete"),
+        Binding("e", "edit_project", "Edit"),
+    ]
+
+    DEFAULT_CSS = """
+    ManageProjectsScreen {
+        align: center middle;
+    }
+    #manage-dialog {
+        width: 72;
+        height: auto;
+        max-height: 80%;
+        border: thick $accent;
+        background: $surface;
+        padding: 1 2;
+    }
+    #manage-dialog Label {
+        margin-top: 1;
+    }
+    #manage-project-list {
+        height: auto;
+        max-height: 16;
+    }
+    ManageProjectItem {
+        padding: 0 1;
+        height: auto;
+        min-height: 2;
+    }
+    ManageProjectItem:hover {
+        background: $boost;
+    }
+    #manage-dialog .buttons {
+        margin-top: 1;
+        align: right middle;
+    }
+    #manage-dialog .buttons Button {
+        margin-left: 1;
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        projects = load_projects()
+        with Vertical(id="manage-dialog"):
+            yield Label("[bold]Manage Projects[/bold]")
+            yield Label(
+                "[dim]d[/dim] delete  [dim]e[/dim] edit  "
+                "[dim]escape[/dim] close"
+            )
+            if projects:
+                yield ListView(
+                    *[ManageProjectItem(p) for p in projects],
+                    id="manage-project-list",
+                )
+            else:
+                yield Label("No projects saved yet.")
+            with Horizontal(classes="buttons"):
+                yield Button("Close", id="close")
+
+    def action_delete_project(self) -> None:
+        try:
+            lv = self.query_one("#manage-project-list", ListView)
+        except Exception:
+            return
+        item = lv.highlighted_child
+        if item and isinstance(item, ManageProjectItem):
+            remove_project(item.project.resolved_path)
+            item.remove()
+            self.app.notify(f"Removed: {item.project.name}")
+
+    @work
+    async def action_edit_project(self) -> None:
+        try:
+            lv = self.query_one("#manage-project-list", ListView)
+        except Exception:
+            return
+        item = lv.highlighted_child
+        if not (item and isinstance(item, ManageProjectItem)):
+            return
+        old_path = item.project.resolved_path
+        result = await self.app.push_screen_wait(EditProjectScreen(item.project))
+        if result:
+            update_project(old_path, result)
+            self._refresh_list()
+            self.app.notify(f"Updated: {result.name}")
+
+    def _refresh_list(self) -> None:
+        try:
+            lv = self.query_one("#manage-project-list", ListView)
+        except Exception:
+            return
+        lv.clear()
+        for p in load_projects():
+            lv.append(ManageProjectItem(p))
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        self.dismiss()
+
+    def action_dismiss_modal(self) -> None:
+        self.dismiss()
 
 
 # -----------------------------------------------------------------------
@@ -393,10 +596,16 @@ class ClaudeTUI(App):
     TITLE = "Claude TUI"
 
     BINDINGS = [
+        Binding("j", "cursor_down", "Down", show=False),
+        Binding("k", "cursor_up", "Up", show=False),
+        Binding("h", "focus_sidebar", "Sidebar", show=False),
+        Binding("l", "focus_content", "Content", show=False),
+        Binding("escape", "handle_escape", "Back", show=False),
         Binding("n", "new_session", "New"),
         Binding("N", "manual_session", "Manual"),
         Binding("r", "resume_session", "Resume"),
         Binding("a", "add_project", "Add Project"),
+        Binding("p", "manage_projects", "Projects"),
         Binding("slash", "focus_filter", "Filter"),
         Binding("question_mark", "help", "Help"),
         Binding("q", "quit", "Quit"),
@@ -538,11 +747,42 @@ class ClaudeTUI(App):
     def action_help(self) -> None:
         self.push_screen(HelpScreen())
 
+    def action_cursor_down(self) -> None:
+        lv = self.query_one("#session-list", ListView)
+        lv.focus()
+        lv.action_cursor_down()
+
+    def action_cursor_up(self) -> None:
+        lv = self.query_one("#session-list", ListView)
+        lv.focus()
+        lv.action_cursor_up()
+
+    def action_focus_sidebar(self) -> None:
+        self.query_one("#session-list", ListView).focus()
+
+    def action_focus_content(self) -> None:
+        self.query_one("#log", RichLog).focus()
+
+    def action_handle_escape(self) -> None:
+        focused = self.focused
+        filter_input = self.query_one("#filter-input", Input)
+        lv = self.query_one("#session-list", ListView)
+        if focused is filter_input:
+            if filter_input.value:
+                filter_input.value = ""
+            else:
+                lv.focus()
+        else:
+            lv.focus()
+
     def action_focus_filter(self) -> None:
         self.query_one("#filter-input", Input).focus()
 
+    def action_manage_projects(self) -> None:
+        self.push_screen(ManageProjectsScreen())
+
     def action_resume_session(self) -> None:
-        """Resume selected session in a zellij dev layout."""
+        """Resume selected session in a dev layout (cmux or zellij)."""
         session = self.selected_session
         if not session:
             self.notify("No session selected", severity="warning")
@@ -555,16 +795,23 @@ class ClaudeTUI(App):
             agent_cmd = "claude"
             agent_args = f'"-r" "{session.session_id}" "--fork-session"'
 
-        project_name = Path(session.project_path).name
-        zellij_session = f"{session.backend_tag.lower()}-{project_name}-resume"
-
-        _launch_zellij_dev(
-            agent_cmd=agent_cmd,
-            agent_args=agent_args,
-            cwd=session.project_path,
-            zellij_session=zellij_session,
-        )
-        self.notify(f"Resumed in zellij: {session.display_name}")
+        if _is_cmux_running():
+            _launch_cmux_dev(
+                agent_cmd=agent_cmd,
+                agent_args=agent_args,
+                cwd=session.project_path,
+            )
+            self.notify(f"Resumed in cmux: {session.display_name}")
+        else:
+            project_name = Path(session.project_path).name
+            zellij_session = f"{session.backend_tag.lower()}-{project_name}-resume"
+            _launch_zellij_dev(
+                agent_cmd=agent_cmd,
+                agent_args=agent_args,
+                cwd=session.project_path,
+                zellij_session=zellij_session,
+            )
+            self.notify(f"Resumed in zellij: {session.display_name}")
 
     @work
     async def action_new_session(self) -> None:
@@ -573,16 +820,23 @@ class ClaudeTUI(App):
             return
         project_name = Path(result["project_dir"]).name
         backend = result["backend"]
-        tag = "c" if backend == "claude" else "r"
         agent_cmd = "claude" if backend == "claude" else "cursor-agent"
-        zellij_session = f"{tag}-{project_name}"
 
-        _launch_zellij_dev(
-            agent_cmd=agent_cmd,
-            agent_args="",
-            cwd=result["project_dir"],
-            zellij_session=zellij_session,
-        )
+        if _is_cmux_running():
+            _launch_cmux_dev(
+                agent_cmd=agent_cmd,
+                agent_args="",
+                cwd=result["project_dir"],
+            )
+        else:
+            tag = "c" if backend == "claude" else "r"
+            zellij_session = f"{tag}-{project_name}"
+            _launch_zellij_dev(
+                agent_cmd=agent_cmd,
+                agent_args="",
+                cwd=result["project_dir"],
+                zellij_session=zellij_session,
+            )
         self.notify(f"New session in {project_name}")
 
     @work
@@ -592,16 +846,23 @@ class ClaudeTUI(App):
             return
         project_name = Path(result["project_dir"]).name
         backend = result["backend"]
-        tag = "c" if backend == "claude" else "r"
         agent_cmd = "claude" if backend == "claude" else "cursor-agent"
-        zellij_session = f"{tag}-{project_name}"
 
-        _launch_zellij_dev(
-            agent_cmd=agent_cmd,
-            agent_args="",
-            cwd=result["project_dir"],
-            zellij_session=zellij_session,
-        )
+        if _is_cmux_running():
+            _launch_cmux_dev(
+                agent_cmd=agent_cmd,
+                agent_args="",
+                cwd=result["project_dir"],
+            )
+        else:
+            tag = "c" if backend == "claude" else "r"
+            zellij_session = f"{tag}-{project_name}"
+            _launch_zellij_dev(
+                agent_cmd=agent_cmd,
+                agent_args="",
+                cwd=result["project_dir"],
+                zellij_session=zellij_session,
+            )
         self.notify(f"New session in {project_name}")
 
     @work
@@ -714,3 +975,158 @@ def _launch_zellij_dev(
             f'  do script "{zellij_cmd}"\n'
             "end tell",
         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+# -----------------------------------------------------------------------
+# cmux detection and launcher
+# -----------------------------------------------------------------------
+
+
+def _is_cmux_running() -> bool:
+    """Check if cmux is running by testing for its Unix socket."""
+    return os.path.exists("/tmp/cmux.sock")
+
+
+def _cmux_run(*args: str) -> str:
+    """Run a cmux CLI command and return stdout."""
+    result = subprocess.run(
+        ["cmux", *args],
+        capture_output=True, text=True, timeout=5,
+    )
+    return result.stdout.strip()
+
+
+def _cmux_send_command(workspace: str, surface: str, command: str) -> None:
+    """Send a shell command to a cmux surface (type text + press Enter)."""
+    _cmux_run("send", "--workspace", workspace, "--surface", surface, command)
+    _cmux_run("send-key", "--workspace", workspace, "--surface", surface, "Enter")
+
+
+def _launch_cmux_dev(
+    agent_cmd: str,
+    agent_args: str,
+    cwd: str,
+) -> None:
+    """Set up a dev environment in cmux using workspaces and splits."""
+    # Build the full agent command line
+    if agent_args:
+        # agent_args comes as '"arg1" "arg2"' — convert to space-separated
+        full_agent = f"{agent_cmd} {agent_args.replace(chr(34), '')}"
+    else:
+        full_agent = agent_cmd
+
+    # --- Workspace 1: dev (agent + editor) ---
+    ws1_out = _cmux_run("new-workspace")
+    # Output: "OK <uuid>" — extract workspace ref from list
+    _cmux_run("list-workspaces")  # refresh state
+    # Get the new workspace ref by identifying the last one
+    ws_list = _cmux_run("list-workspaces")
+    # Parse last workspace ref (newest = last line)
+    ws1_ref = None
+    for line in ws_list.strip().splitlines():
+        parts = line.split()
+        for p in parts:
+            if p.startswith("workspace:"):
+                ws1_ref = p
+    if not ws1_ref:
+        return
+
+    _cmux_run("rename-workspace", "--workspace", ws1_ref, "dev")
+    _cmux_run("select-workspace", "--workspace", ws1_ref)
+
+    # Identify the initial surface in this workspace
+    panes = _cmux_run("list-pane-surfaces", "--workspace", ws1_ref)
+    agent_surface = None
+    for line in panes.strip().splitlines():
+        for p in line.split():
+            if p.startswith("surface:"):
+                agent_surface = p
+                break
+        if agent_surface:
+            break
+
+    if not agent_surface:
+        return
+
+    # cd to project dir and launch agent
+    _cmux_send_command(ws1_ref, agent_surface, f"cd '{cwd}'")
+    time.sleep(0.2)
+    _cmux_send_command(ws1_ref, agent_surface, full_agent)
+
+    # Split right for Helix editor
+    split_out = _cmux_run("new-split", "right", "--workspace", ws1_ref)
+    # Output: "OK surface:<n> workspace:<n>"
+    editor_surface = None
+    for p in split_out.split():
+        if p.startswith("surface:"):
+            editor_surface = p
+            break
+    if editor_surface:
+        _cmux_send_command(ws1_ref, editor_surface, f"cd '{cwd}'")
+        time.sleep(0.1)
+        _cmux_send_command(ws1_ref, editor_surface, "hx .")
+
+    # --- Workspace 2: git (lazygit) ---
+    _cmux_run("new-workspace")
+    ws_list = _cmux_run("list-workspaces")
+    ws2_ref = None
+    for line in ws_list.strip().splitlines():
+        parts = line.split()
+        for p in parts:
+            if p.startswith("workspace:"):
+                ws2_ref = p
+    if ws2_ref:
+        _cmux_run("rename-workspace", "--workspace", ws2_ref, "git")
+        git_panes = _cmux_run("list-pane-surfaces", "--workspace", ws2_ref)
+        git_surface = None
+        for line in git_panes.strip().splitlines():
+            for p in line.split():
+                if p.startswith("surface:"):
+                    git_surface = p
+                    break
+            if git_surface:
+                break
+        if git_surface:
+            _cmux_send_command(ws2_ref, git_surface, f"cd '{cwd}'")
+            time.sleep(0.1)
+            _cmux_send_command(ws2_ref, git_surface, "lazygit")
+
+    # --- Workspace 3: files (yazi + helix) ---
+    _cmux_run("new-workspace")
+    ws_list = _cmux_run("list-workspaces")
+    ws3_ref = None
+    for line in ws_list.strip().splitlines():
+        parts = line.split()
+        for p in parts:
+            if p.startswith("workspace:"):
+                ws3_ref = p
+    if ws3_ref:
+        _cmux_run("rename-workspace", "--workspace", ws3_ref, "files")
+        files_panes = _cmux_run("list-pane-surfaces", "--workspace", ws3_ref)
+        yazi_surface = None
+        for line in files_panes.strip().splitlines():
+            for p in line.split():
+                if p.startswith("surface:"):
+                    yazi_surface = p
+                    break
+            if yazi_surface:
+                break
+        if yazi_surface:
+            _cmux_send_command(ws3_ref, yazi_surface, f"cd '{cwd}'")
+            time.sleep(0.1)
+            _cmux_send_command(ws3_ref, yazi_surface, "yazi")
+
+        # Split right for Helix
+        split_out = _cmux_run("new-split", "right", "--workspace", ws3_ref)
+        hx_surface = None
+        for p in split_out.split():
+            if p.startswith("surface:"):
+                hx_surface = p
+                break
+        if hx_surface:
+            _cmux_send_command(ws3_ref, hx_surface, f"cd '{cwd}'")
+            time.sleep(0.1)
+            _cmux_send_command(ws3_ref, hx_surface, "hx")
+
+    # Focus back on the dev workspace
+    _cmux_run("select-workspace", "--workspace", ws1_ref)
