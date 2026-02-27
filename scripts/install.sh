@@ -188,6 +188,9 @@ for f in "$DOTFILES/claude-code/hooks/"*.sh; do
 done
 echo "✓ Claude Code hooks linked"
 
+echo "→ Linking Claude Code settings..."
+backup_and_link "$DOTFILES/claude-code/settings.json" "$HOME/.claude/settings.json"
+
 echo "→ Linking Claude Code slash commands..."
 mkdir -p "$HOME/.claude/commands"
 for f in "$DOTFILES/claude-code/commands/"*.md; do

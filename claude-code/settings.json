@@ -1,20 +1,60 @@
 {
-  "mcpServers": {
-    "todoist": {
-      "type": "http",
-      "url": "https://ai.todoist.net/mcp"
-    },
-    "mcp-google-sheets": {
-      "type": "stdio",
-      "command": "/Users/alexanderpehm/.mcp-wrappers/google-sheets-wrapper.sh",
-      "args": [],
-      "env": {}
-    },
-    "mcp-gsuite": {
-      "type": "stdio",
-      "command": "/Users/alexanderpehm/.mcp-wrappers/mcp-gsuite-wrapper.sh",
-      "args": [],
-      "env": {}
-    }
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "model": "opus",
+  "enabledPlugins": {
+    "ralph-loop@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/cmux-notify.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/cmux-notify.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/cmux-notify.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/cmux-notify.sh",
+            "async": true
+          }
+        ]
+      }
+    ]
   }
 }

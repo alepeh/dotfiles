@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian cleanup cleanup-dry clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp spec-kit openspec claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian cleanup cleanup-dry clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -292,6 +292,17 @@ claude-code: ## Link Claude Code global instructions (CLAUDE.md) and skills
 	@ln -sfn "$(REPO_DIR)/.claude/skills/obsidian-cli/SKILL.md" "$(HOME)/.claude/skills/obsidian-cli/SKILL.md"
 	@echo "✓ ~/.claude/skills/obsidian-cli/ → $(REPO_DIR)/.claude/skills/obsidian-cli/"
 
+claude-code-settings: ## Symlink Claude Code settings.json
+	@echo "→ Linking Claude Code settings"
+	@mkdir -p "$(HOME)/.claude"
+	@if [ -e "$(HOME)/.claude/settings.json" ] && [ ! -L "$(HOME)/.claude/settings.json" ]; then \
+	  ts=$$(date +"%Y%m%d_%H%M%S"); \
+	  echo "→ Backing up ~/.claude/settings.json → ~/.claude/settings.json.bak.$$ts"; \
+	  mv "$(HOME)/.claude/settings.json" "$(HOME)/.claude/settings.json.bak.$$ts"; \
+	fi
+	@ln -sfn "$(REPO_DIR)/claude-code/settings.json" "$(HOME)/.claude/settings.json"
+	@echo "✓ ~/.claude/settings.json → $(REPO_DIR)/claude-code/settings.json"
+
 claude-code-commands: ## Link Claude Code slash commands
 	@mkdir -p "$(HOME)/.claude/commands"
 	@for f in $(REPO_DIR)/claude-code/commands/*.md; do \
@@ -299,17 +310,17 @@ claude-code-commands: ## Link Claude Code slash commands
 	done
 	@echo "✓ Claude Code commands linked to ~/.claude/commands/"
 
-claude-code-mcp: ## Sync Claude Code MCP servers from settings.json to ~/.claude.json
+claude-code-mcp: ## Sync Claude Code MCP servers from mcp-servers.json to ~/.claude.json
 	@echo "→ Syncing Claude Code MCP servers"
 	@command -v jq >/dev/null || (echo "Error: jq not found - run: brew install jq" && exit 1)
 	@if [ ! -f "$(HOME)/.claude.json" ]; then \
 	  echo "Error: ~/.claude.json not found. Run 'claude' first to initialize."; \
 	  exit 1; \
 	fi
-	@jq -s '.[0] + {mcpServers: .[1].mcpServers}' "$(HOME)/.claude.json" "$(REPO_DIR)/claude-code/settings.json" > "$(HOME)/.claude.json.tmp" \
+	@jq -s '.[0] + {mcpServers: .[1].mcpServers}' "$(HOME)/.claude.json" "$(REPO_DIR)/claude-code/mcp-servers.json" > "$(HOME)/.claude.json.tmp" \
 	  && mv "$(HOME)/.claude.json.tmp" "$(HOME)/.claude.json"
 	@echo "✓ MCP servers synced to ~/.claude.json"
-	@echo "  Servers: $$(jq -r '.mcpServers | keys | join(", ")' "$(REPO_DIR)/claude-code/settings.json")"
+	@echo "  Servers: $$(jq -r '.mcpServers | keys | join(", ")' "$(REPO_DIR)/claude-code/mcp-servers.json")"
 
 claude-code-mcp-wrappers: ## Link MCP wrapper scripts to ~/.mcp-wrappers/
 	@echo "→ Linking MCP wrapper scripts"
