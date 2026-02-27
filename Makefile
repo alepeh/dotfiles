@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp spec-kit openspec claude-code claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian cleanup cleanup-dry clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -377,6 +377,94 @@ test-obsidian: ## Run Obsidian CLI integration tests (requires running Obsidian)
 	@$(REPO_DIR)/tests/obsidian-cli/run-tests.sh
 
 ##@ Cleanup
+
+cleanup-dry: ## Show what cleanup would kill (safe preview)
+	@echo "═══════════════════════════════════════════════════════════════════"
+	@echo "Dev Environment Cleanup — DRY RUN"
+	@echo "═══════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "┌─ Orphaned wrangler dev servers ─────────────────────────────────┐"
+	@WRANGLER_COUNT=$$(ps aux | grep "wrangler.*dev\|wrangler-dist/cli.js dev" | grep -v grep | wc -l | tr -d ' '); \
+	WRANGLER_MB=$$(ps aux | grep "wrangler.*dev\|wrangler-dist/cli.js dev" | grep -v grep | awk '{sum+=$$6} END {printf "%.0f", sum/1024}'); \
+	echo "│ $$WRANGLER_COUNT processes using $${WRANGLER_MB:-0} MB"
+	@echo "└─────────────────────────────────────────────────────────────────┘"
+	@echo ""
+	@echo "┌─ Orphaned workerd runtimes ─────────────────────────────────────┐"
+	@WORKERD_COUNT=$$(ps aux | grep "workerd serve" | grep -v grep | wc -l | tr -d ' '); \
+	WORKERD_MB=$$(ps aux | grep "workerd serve" | grep -v grep | awk '{sum+=$$6} END {printf "%.0f", sum/1024}'); \
+	echo "│ $$WORKERD_COUNT processes using $${WORKERD_MB:-0} MB"
+	@echo "└─────────────────────────────────────────────────────────────────┘"
+	@echo ""
+	@echo "┌─ Orphaned esbuild service processes ───────────────────────────┐"
+	@ESBUILD_COUNT=$$(ps aux | grep "esbuild.*--service" | grep -v grep | wc -l | tr -d ' '); \
+	ESBUILD_MB=$$(ps aux | grep "esbuild.*--service" | grep -v grep | awk '{sum+=$$6} END {printf "%.0f", sum/1024}'); \
+	echo "│ $$ESBUILD_COUNT processes using $${ESBUILD_MB:-0} MB"
+	@echo "└─────────────────────────────────────────────────────────────────┘"
+	@echo ""
+	@echo "┌─ EXITED Zellij sessions ────────────────────────────────────────┐"
+	@if command -v zellij >/dev/null 2>&1; then \
+	  EXITED=$$(zellij list-sessions 2>/dev/null | grep "EXITED" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $$1}'); \
+	  if [ -n "$$EXITED" ]; then \
+	    echo "$$EXITED" | while read -r s; do echo "│ $$s"; done; \
+	  else \
+	    echo "│ (none)"; \
+	  fi; \
+	else \
+	  echo "│ zellij not found"; \
+	fi
+	@echo "└─────────────────────────────────────────────────────────────────┘"
+	@echo ""
+	@TOTAL=$$(( $$(ps aux | grep "wrangler.*dev\|wrangler-dist/cli.js dev" | grep -v grep | awk '{sum+=$$6} END {print int(sum/1024)}') \
+	         + $$(ps aux | grep "workerd serve" | grep -v grep | awk '{sum+=$$6} END {print int(sum/1024)}') \
+	         + $$(ps aux | grep "esbuild.*--service" | grep -v grep | awk '{sum+=$$6} END {print int(sum/1024)}') )); \
+	echo "Total reclaimable: ~$${TOTAL} MB"
+	@echo ""
+	@echo "Run 'make cleanup' to kill these processes."
+
+cleanup: ## Kill orphaned dev servers, workerd, esbuild and clean EXITED Zellij sessions
+	@echo "═══════════════════════════════════════════════════════════════════"
+	@echo "Dev Environment Cleanup"
+	@echo "═══════════════════════════════════════════════════════════════════"
+	@echo ""
+	@# Kill wrangler dev servers
+	@WRANGLER_COUNT=$$(pkill -f "wrangler-dist/cli.js dev" 2>/dev/null; echo $$?); \
+	if [ "$$WRANGLER_COUNT" = "0" ]; then \
+	  echo "✓ Killed orphaned wrangler dev servers"; \
+	else \
+	  echo "· No wrangler dev servers running"; \
+	fi
+	@# Kill workerd runtimes
+	@WORKERD_COUNT=$$(pkill -f "workerd serve" 2>/dev/null; echo $$?); \
+	if [ "$$WORKERD_COUNT" = "0" ]; then \
+	  echo "✓ Killed orphaned workerd runtimes"; \
+	else \
+	  echo "· No workerd runtimes running"; \
+	fi
+	@# Kill esbuild service processes
+	@ESBUILD_COUNT=$$(pkill -f "esbuild.*--service" 2>/dev/null; echo $$?); \
+	if [ "$$ESBUILD_COUNT" = "0" ]; then \
+	  echo "✓ Killed orphaned esbuild service processes"; \
+	else \
+	  echo "· No esbuild service processes running"; \
+	fi
+	@# Kill orphaned pywrangler/uv processes
+	@pkill -f "pywrangler dev" 2>/dev/null && echo "✓ Killed orphaned pywrangler processes" || echo "· No pywrangler processes running"
+	@echo ""
+	@# Clean EXITED Zellij sessions
+	@if command -v zellij >/dev/null 2>&1; then \
+	  EXITED=$$(zellij list-sessions 2>/dev/null | grep "EXITED" | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $$1}'); \
+	  if [ -n "$$EXITED" ]; then \
+	    echo "$$EXITED" | while read -r session; do \
+	      zellij delete-session "$$session" 2>/dev/null && echo "✓ Deleted Zellij session: $$session"; \
+	    done; \
+	  else \
+	    echo "· No EXITED Zellij sessions"; \
+	  fi; \
+	fi
+	@echo ""
+	@echo "═══════════════════════════════════════════════════════════════════"
+	@echo "✓ Cleanup complete. Run 'make cleanup-dry' to verify."
+	@echo "═══════════════════════════════════════════════════════════════════"
 
 clean: ## Remove symlinked iTerm2 profile (non-destructive)
 	@rm -f "$(ITERM_PROFILE_LINK)"
