@@ -169,6 +169,9 @@ function y() {
 # Tree view alias using eza
 alias tree='eza --tree --level=3 --icons'
 
+# Claude Code: skip permission prompts
+alias claude='claude --dangerously-skip-permissions'
+
 # Ensure brew env (useful in login shells)
 if command -v brew >/dev/null 2>&1; then
   eval "$(brew shellenv)"
