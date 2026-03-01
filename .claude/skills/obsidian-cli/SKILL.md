@@ -11,6 +11,18 @@ Run `obsidian help` to see all available commands. Run `obsidian help <command>`
 
 Full docs: https://help.obsidian.md/cli
 
+## Vault conventions
+
+Before interacting with the vault, read the conventions file:
+
+```bash
+obsidian vault=brain read path="Agent Instructions.md"
+```
+
+This file contains the directory structure, note types with frontmatter schemas, naming conventions, tag taxonomy, linking rules, and special syntax. Use it to:
+- **Write ops**: Follow schemas exactly when creating or editing notes
+- **Read/search ops**: Know where to look (e.g., people are in `notes/` tagged `people`, journals are in `journals/` as `YYYY-MM-DD.md`, recipes are in `meals/`) and how to filter by `collections`, `tags`, or type-specific properties
+
 ## Vault targeting
 
 Always target the vault as the first parameter:
