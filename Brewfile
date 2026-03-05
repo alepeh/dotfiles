@@ -17,6 +17,7 @@ brew "git-delta"      # Better git diffs
 brew "uv"        # Python package installer (for MCP servers)
 brew "go"        # For GitHub MCP server
 brew "hugo"      # Static site generator for blog
+brew "sox"       # Audio recording for Claude Code voice mode
 brew "jenv"       # Java version manager
 brew "mvn"
 
