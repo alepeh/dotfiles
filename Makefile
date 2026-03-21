@@ -331,6 +331,17 @@ claude-code-mcp-wrappers: ## Link MCP wrapper scripts to ~/.mcp-wrappers/
 	@echo "✓ MCP wrappers linked to ~/.mcp-wrappers/"
 	@ls -1 "$(HOME)/.mcp-wrappers/"
 
+launchpad: ## Create ~/.launchpad directories (hooks managed via claude-code-settings)
+	@echo "→ Creating ~/.launchpad directories..."
+	@mkdir -p "$(HOME)/.launchpad/sessions/active"
+	@mkdir -p "$(HOME)/.launchpad/tasks/backlog"
+	@mkdir -p "$(HOME)/.launchpad/tasks/active"
+	@mkdir -p "$(HOME)/.launchpad/tasks/done"
+	@mkdir -p "$(HOME)/.launchpad/inbox"
+	@echo "✓ ~/.launchpad/ directories created"
+	@echo "  Hooks: managed via settings.json (run make claude-code-settings)"
+	@echo "  Server: cd ~/code/launchpad && make dev"
+
 mcp-gsuite-patch: ## Clone and patch mcp-gsuite to fix JSON schema bug (Issue #47)
 	@echo "→ Creating patched mcp-gsuite (fixes JSON schema validation error)"
 	@echo "  See: https://github.com/MarkusPfundstein/mcp-gsuite/issues/47"
