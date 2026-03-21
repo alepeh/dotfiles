@@ -231,6 +231,13 @@ else
   echo "   uv not found, skipping claude-tui (run: make claude-tui-install after installing uv)"
 fi
 
+echo "→ Linking scripts to ~/.local/bin..."
+mkdir -p "$HOME/.local/bin"
+for f in "$DOTFILES/scripts/claude-sessions" "$DOTFILES/scripts/launchpad"; do
+  [ -f "$f" ] && ln -sfn "$f" "$HOME/.local/bin/$(basename "$f")"
+done
+echo "✓ Scripts linked (claude-sessions, launchpad)"
+
 echo "→ Configuring jenv (Java version management)..."
 if have jenv; then
   # Initialize jenv first

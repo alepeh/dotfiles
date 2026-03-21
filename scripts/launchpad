@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Launchpad — start server + open dashboard in cmux browser pane
+# Usage: launchpad [stop]
+
+PORT=3141
+URL="http://localhost:$PORT"
+SERVER_DIR="$HOME/code/launchpad"
+LOG_DIR="$HOME/.launchpad"
+
+stop_server() {
+  local pid
+  pid=$(lsof -ti:"$PORT" 2>/dev/null || true)
+  if [ -n "$pid" ]; then
+    kill "$pid" 2>/dev/null || true
+    echo "Launchpad stopped (pid $pid)"
+  else
+    echo "Launchpad is not running"
+  fi
+}
+
+start_server() {
+  # Already running?
+  if curl -sf "$URL/api/health" >/dev/null 2>&1; then
+    echo "Launchpad already running at $URL"
+    return 0
+  fi
+
+  if [ ! -d "$SERVER_DIR" ]; then
+    echo "Error: $SERVER_DIR not found"
+    echo "  git clone https://github.com/alepeh/launchpad.git ~/code/launchpad"
+    exit 1
+  fi
+
+  # Ensure directories exist
+  mkdir -p "$LOG_DIR/sessions/active" "$LOG_DIR/tasks/backlog" "$LOG_DIR/tasks/active" "$LOG_DIR/tasks/done" "$LOG_DIR/inbox"
+
+  # Start in background
+  cd "$SERVER_DIR"
+  nohup bun src/server.ts > "$LOG_DIR/server.log" 2>&1 &
+  local server_pid=$!
+
+  # Wait for it to be ready
+  for i in {1..20}; do
+    if curl -sf "$URL/api/health" >/dev/null 2>&1; then
+      echo "Launchpad started (pid $server_pid) at $URL"
+      return 0
+    fi
+    sleep 0.25
+  done
+
+  echo "Error: Launchpad failed to start — check $LOG_DIR/server.log"
+  exit 1
+}
+
+open_browser_pane() {
+  # Only if running inside cmux
+  if [ ! -S /tmp/cmux.sock ]; then
+    echo "Not inside cmux — open $URL in a browser manually"
+    return 0
+  fi
+
+  # Check if there's already a browser pane with Launchpad open
+  local existing
+  existing=$(cmux --json list-workspaces 2>/dev/null | jq -r '.workspaces[].ref' 2>/dev/null || true)
+  for ws in $existing; do
+    local panes
+    panes=$(cmux --json list-panes --workspace "$ws" 2>/dev/null || true)
+    local surface_refs
+    surface_refs=$(echo "$panes" | jq -r '.panes[].surface_refs[]' 2>/dev/null || true)
+    for surf in $surface_refs; do
+      local surfaces
+      surfaces=$(cmux --json list-pane-surfaces --workspace "$ws" 2>/dev/null || true)
+      local browser_surf
+      browser_surf=$(echo "$surfaces" | jq -r ".surfaces[] | select(.type == \"browser\" and .title == \"Launchpad\") | .ref" 2>/dev/null || true)
+      if [ -n "$browser_surf" ]; then
+        echo "Launchpad browser pane already open — focusing"
+        cmux select-workspace --workspace "$ws" 2>/dev/null || true
+        return 0
+      fi
+    done
+  done
+
+  # Open a new browser pane to the right
+  cmux new-pane --type browser --direction right --url "$URL" 2>/dev/null || true
+  echo "Dashboard opened in cmux browser pane"
+}
+
+# Handle subcommands
+case "${1:-}" in
+  stop)
+    stop_server
+    ;;
+  status)
+    if curl -sf "$URL/api/health" >/dev/null 2>&1; then
+      local_sessions=$(curl -sf "$URL/api/sessions" | jq 'length' 2>/dev/null || echo "?")
+      echo "Launchpad running at $URL — $local_sessions session(s)"
+    else
+      echo "Launchpad is not running"
+    fi
+    ;;
+  *)
+    start_server
+    open_browser_pane
+    ;;
+esac
