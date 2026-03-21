@@ -13,11 +13,15 @@ stop_server() {
   local pid
   pid=$(lsof -ti:"$PORT" 2>/dev/null || true)
   if [ -n "$pid" ]; then
-    kill "$pid" 2>/dev/null || true
-    echo "Launchpad stopped (pid $pid)"
+    kill $pid 2>/dev/null || true
+    echo "Launchpad server stopped"
   else
-    echo "Launchpad is not running"
+    echo "Launchpad server is not running"
   fi
+  # Kill cmux worker
+  pkill -f "cmux-worker.sh" 2>/dev/null && echo "cmux worker stopped" || true
+  # Clean up command files
+  rm -rf /tmp/launchpad-cmux-cmds 2>/dev/null
 }
 
 start_server() {
@@ -36,9 +40,16 @@ start_server() {
   # Ensure directories exist
   mkdir -p "$LOG_DIR/sessions/active" "$LOG_DIR/tasks/backlog" "$LOG_DIR/tasks/active" "$LOG_DIR/tasks/done" "$LOG_DIR/inbox"
 
-  # Start in background
+  # Start cmux worker (sidecar that executes cmux commands via socket)
+  # Requires CMUX_SOCKET_PASSWORD in environment (set in ~/.zshrc.local)
+  mkdir -p /tmp/launchpad-cmux-cmds /tmp/launchpad-cmux-cache
+  nohup env CMUX_SOCKET_PASSWORD="$CMUX_SOCKET_PASSWORD" \
+    bash "$SERVER_DIR/src/cmux/cmux-worker.sh" > "$LOG_DIR/cmux-worker.log" 2>&1 &
+
+  # Start Bun server
   cd "$SERVER_DIR"
-  nohup bun src/server.ts > "$LOG_DIR/server.log" 2>&1 &
+  nohup env PATH="$PATH" CMUX_SOCKET_PASSWORD="$CMUX_SOCKET_PASSWORD" \
+    bun src/server.ts > "$LOG_DIR/server.log" 2>&1 &
   local server_pid=$!
 
   # Wait for it to be ready
