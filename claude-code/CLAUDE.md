@@ -79,10 +79,12 @@ Every project should have a Makefile (or Justfile) providing a standard command 
 - `/morning-brief` — Chief-of-Staff daily briefing (Gmail, Calendar, Todoist, Obsidian)
 - `/evening-recap` — Chief-of-Staff end-of-day review and carry-over planning
 
-## Spec-Driven Development (OpenSpec)
-Initialize with `openspec init`, then use:
-- `/opsx:new <name>` — Start a new change
-- `/opsx:ff` — Fast-forward: generate all planning artifacts at once
-- `/opsx:apply` — Implement all tasks from the plan
-- `/opsx:archive` — Archive completed change
-- `/opsx:onboard` — Onboard to an existing project
+## Change Protocol
+Architecture-driven change management (see `architecture/change-protocol.md`):
+- `/change:new <name>` — Classify and scaffold a new change
+- `/change:ff <name>` — Fast-forward: classify + all artifacts in one go
+- `/change:continue` — Create the next artifact for a change
+- `/change:apply` — Implement tasks from a change
+- `/change:verify` — Verify implementation matches artifacts
+- `/change:archive` — Distill rules, sync specs, archive
+- `/change:explore` — Thinking partner for ideas and investigation
