@@ -170,7 +170,7 @@ need formal AC tracking.
 | [skills/change-protocol/scripts/verify-ac.py](skills/change-protocol/scripts/verify-ac.py) | **fleshed** | AC gate with graceful degradation when `feature_groups: []` |
 | [skills/local-dev](skills/local-dev/SKILL.md) | **fleshed** | Full Makefile macros, `.dev/` layout, D1 snapshot/restore, port numbering |
 | [skills/cloudflare-baseline](skills/cloudflare-baseline/SKILL.md) | stub | Conventions done; full `wrangler.jsonc` templates TODO |
-| [skills/secrets-1password](skills/secrets-1password/SKILL.md) | stub | File-role table done; `op`-CLI `backup-env`/`restore-env` TODO |
+| [skills/secrets-1password](skills/secrets-1password/SKILL.md) | **fleshed** | Full `backup-env` / `restore-env` Makefile recipes, fresh-machine onboarding flow, `op` CLI prereqs, ENV_FILES convention, rotation order, pitfalls (title collisions, non-atomic restore, session expiry) |
 | [skills/ddd-layout](skills/ddd-layout/SKILL.md) | stub | Folder convention done; domain-model/guidelines/ADR templates TODO |
 | [skills/scaleway-email](skills/scaleway-email/SKILL.md) | stub | Wiring + TEST_MODE done; API call signature + migrations TODO |
 | [skills/python-worker](skills/python-worker/SKILL.md) | stub | Layout done; `pyproject.toml` + `app.py` + test harness TODO |
