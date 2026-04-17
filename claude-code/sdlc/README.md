@@ -1,5 +1,12 @@
 # Agentic SDLC
 
+> **Looking for the narrative overview?** See
+> [`site/content/writing/agentic-sdlc/index.md`](../../site/content/writing/agentic-sdlc/index.md)
+> — it explains *why* the system exists, walks through a bootstrap → change → archive
+> cycle end-to-end, and covers the rule-distillation loop and living-documentation
+> model. This README is the contributor reference (file layout, current state,
+> install, how to extend).
+
 Opinionated commands and skills that codify how personal projects get built
 and evolved:
 
