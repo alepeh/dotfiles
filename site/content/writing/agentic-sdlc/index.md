@@ -1,7 +1,7 @@
 ---
 title: "Agentic SDLC"
 date: 2026-04-17
-draft: false
+draft: true
 tags: ["Workflow", "Tooling", "Claude Code", "Cloudflare", "DDD", "OpenSpec"]
 summary: "An opt-in agent skill system that codifies how personal projects are bootstrapped and evolved — Cloudflare as infrastructure baseline, typed changes with a rule-distillation loop, architecture as living documentation."
 ---
