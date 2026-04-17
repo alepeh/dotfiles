@@ -417,7 +417,9 @@ install-sdlc: ## Install SDLC slash-commands and skills (NOT run by make install
 	  ln -sfn "$$d" "$$SKL_DST/$$name"; \
 	  echo "  ✓ skill: $$name"; \
 	done; \
-	echo "✓ SDLC installed. Available: /sdlc:new, /sdlc:change, /sdlc:resume, /sdlc:import"
+	echo "✓ SDLC installed."; \
+	echo "  Bootstrap: /sdlc:bootstrap, /sdlc:import"; \
+	echo "  Changes:   /sdlc:new, /sdlc:ff, /sdlc:continue, /sdlc:apply, /sdlc:verify, /sdlc:archive, /sdlc:explore"
 
 uninstall-sdlc: ## Remove SDLC slash-commands and skills
 	@SDLC_DIR="$(REPO_DIR)/claude-code/sdlc"; \
