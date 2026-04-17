@@ -158,7 +158,7 @@ need formal AC tracking.
 | Artifact | Status | Notes |
 |---|---|---|
 | [commands/bootstrap.md](commands/bootstrap.md) | **fleshed** | 10-step orchestrator; delegates to capability skills |
-| [commands/import.md](commands/import.md) | stub | 5-step checklist; depends on every capability skill being fleshed |
+| [commands/import.md](commands/import.md) | **fleshed** | 5-step retrofit flow (detect → classify → add missing → baseline ADR → summarize); per-stack skill routing; non-destructive |
 | [commands/new.md](commands/new.md) | **fleshed** | Classify + first-artifact template; reads `.sdlc.yaml` for AC flow |
 | [commands/ff.md](commands/ff.md) | **fleshed** | Classify + all artifacts + domain-impact checklist in one shot |
 | [commands/continue.md](commands/continue.md) | **fleshed** | Next-artifact-in-sequence with domain-impact on design.md |
@@ -171,11 +171,11 @@ need formal AC tracking.
 | [skills/local-dev](skills/local-dev/SKILL.md) | **fleshed** | Full Makefile macros, `.dev/` layout, D1 snapshot/restore, port numbering |
 | [skills/cloudflare-baseline](skills/cloudflare-baseline/SKILL.md) | **fleshed** | 4 full `wrangler.jsonc` templates (TS/Python Workers, Pages SPA, Container gateway); D1/R2/service-binding/DO conventions; custom-domain routing; `make deploy` with `GIT_COMMIT`; `pywrangler` vs `wrangler` |
 | [skills/secrets-1password](skills/secrets-1password/SKILL.md) | **fleshed** | Full `backup-env` / `restore-env` Makefile recipes, fresh-machine onboarding flow, `op` CLI prereqs, ENV_FILES convention, rotation order, pitfalls (title collisions, non-atomic restore, session expiry) |
-| [skills/ddd-layout](skills/ddd-layout/SKILL.md) | stub | Folder convention done; domain-model/guidelines/ADR templates TODO |
-| [skills/scaleway-email](skills/scaleway-email/SKILL.md) | stub | Wiring + TEST_MODE done; API call signature + migrations TODO |
-| [skills/python-worker](skills/python-worker/SKILL.md) | stub | Layout done; `pyproject.toml` + `app.py` + test harness TODO |
-| [skills/hono-worker](skills/hono-worker/SKILL.md) | stub | Layout done; `tsconfig.json` + vitest + Zod + JWT TODO |
-| [skills/cicd](skills/cicd/SKILL.md) | stub | Philosophy done; `ci.yml` template TODO |
+| [skills/ddd-layout](skills/ddd-layout/SKILL.md) | **fleshed** | 1:1 models/routes/schemas convention + full `domain-model.md` / `guidelines.md` / `rules.md` / ADR templates; ADR-worthiness checklist |
+| [skills/scaleway-email](skills/scaleway-email/SKILL.md) | **fleshed** | Full satellite wiring + 3 migrations (preference, template, settings); verbatim `scaleway.py` with dual send paths (CF fetch + httpx fallback); unsubscribe token flow; TEST_MODE as DB state |
+| [skills/python-worker](skills/python-worker/SKILL.md) | **fleshed** | Full `pyproject.toml`, `src/worker.py`, `src/app.py` (lazy lifespan), `src/db.py`; models/routes/schemas templates; migration runner; pyodide gotchas |
+| [skills/hono-worker](skills/hono-worker/SKILL.md) | **fleshed** | Full `package.json`, `tsconfig.json`, `vitest.config.ts`, `src/index.ts`, hand-maintained Env type, JWT middleware via Web Crypto, Zod Create/Update/Read/ListItem |
+| [skills/cicd](skills/cicd/SKILL.md) | **fleshed** | Full `ci.yml` (typecheck + test jobs); `make typecheck` / `make test` recipes for mixed Node/Python; optional Playwright job (build+list, not full run); graduation signals |
 
 Run `make doctor-sdlc` to verify symlinks on your current machine.
 
