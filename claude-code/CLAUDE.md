@@ -74,17 +74,27 @@ Every project should have a Makefile (or Justfile) providing a standard command 
   mark completed only after verification
 
 ## Workflow Commands
-- `/init-project` — Bootstrap a new project with Makefile, OpenSpec, and Obsidian note
+- `/init-project` — Bootstrap a Makefile + OpenSpec + Obsidian note on any project (generic)
 - `/new-diff` — Create a short-form changelog entry for the Hugo site
 - `/morning-brief` — Chief-of-Staff daily briefing (Gmail, Calendar, Todoist, Obsidian)
 - `/evening-recap` — Chief-of-Staff end-of-day review and carry-over planning
 
-## Change Protocol
-Architecture-driven change management (see `architecture/change-protocol.md`):
-- `/change:new <name>` — Classify and scaffold a new change
-- `/change:ff <name>` — Fast-forward: classify + all artifacts in one go
-- `/change:continue` — Create the next artifact for a change
-- `/change:apply` — Implement tasks from a change
-- `/change:verify` — Verify implementation matches artifacts
-- `/change:archive` — Distill rules, sync specs, archive
-- `/change:explore` — Thinking partner for ideas and investigation
+## Agentic SDLC (personal projects, opt-in)
+Installed via `make install-sdlc` in the dotfiles repo. One-time bootstrap,
+then every subsequent piece of work is a change.
+
+**Bootstrap** (rare, one-shot):
+- `/sdlc:bootstrap <name>` — Scaffold a new project on the Cloudflare baseline
+  (monorepo, Makefile, architecture/, .sdlc.yaml, OpenSpec, Obsidian note)
+- `/sdlc:import <path>` — Retrofit an existing project onto the baseline
+
+**Changes** (everyday, see `architecture/change-protocol.md` + the `change-protocol` skill):
+- `/sdlc:new <name>` — Classify and scaffold a new change (one artifact at a time)
+- `/sdlc:ff <name>` — Fast-forward: classify + all artifacts in one go
+- `/sdlc:continue` — Create the next artifact for an in-flight change
+- `/sdlc:apply` — Implement tasks from a change (prompts for rule-distillation at the end)
+- `/sdlc:verify` — Verify implementation against artifacts (completeness/correctness/AC gate/coherence)
+- `/sdlc:archive` — Distill rules, sync delta specs, move to archive/
+- `/sdlc:explore` — Thinking partner for ideas and investigation (no implementation)
+
+Not installed on Paysafe / work machines.

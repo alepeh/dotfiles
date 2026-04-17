@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp spec-kit openspec claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian cleanup cleanup-dry clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp spec-kit openspec claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian cleanup cleanup-dry clean install-sdlc uninstall-sdlc doctor-sdlc
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -397,6 +397,70 @@ site-new: ## Create a new writing post (usage: make site-new TITLE=my-post-title
 
 test-obsidian: ## Run Obsidian CLI integration tests (requires running Obsidian)
 	@$(REPO_DIR)/tests/obsidian-cli/run-tests.sh
+
+##@ Agentic SDLC (opt-in — personal machines only)
+
+install-sdlc: ## Install SDLC slash-commands and skills (NOT run by make install)
+	@SDLC_DIR="$(REPO_DIR)/claude-code/sdlc"; \
+	CMD_DST="$(HOME)/.claude/commands/sdlc"; \
+	SKL_DST="$(HOME)/.claude/skills"; \
+	if [ ! -d "$$SDLC_DIR" ]; then \
+	  echo "✗ $$SDLC_DIR not found"; exit 1; \
+	fi; \
+	mkdir -p "$$CMD_DST" "$$SKL_DST"; \
+	for f in "$$SDLC_DIR/commands/"*.md; do \
+	  [ -f "$$f" ] && ln -sfn "$$f" "$$CMD_DST/$$(basename $$f)"; \
+	done; \
+	echo "✓ SDLC commands → ~/.claude/commands/sdlc/"; \
+	for d in "$$SDLC_DIR/skills/"*/; do \
+	  name=$$(basename "$$d"); \
+	  ln -sfn "$$d" "$$SKL_DST/$$name"; \
+	  echo "  ✓ skill: $$name"; \
+	done; \
+	echo "✓ SDLC installed. Available: /sdlc:new, /sdlc:change, /sdlc:resume, /sdlc:import"
+
+uninstall-sdlc: ## Remove SDLC slash-commands and skills
+	@SDLC_DIR="$(REPO_DIR)/claude-code/sdlc"; \
+	CMD_DST="$(HOME)/.claude/commands/sdlc"; \
+	SKL_DST="$(HOME)/.claude/skills"; \
+	if [ -d "$$CMD_DST" ]; then \
+	  find "$$CMD_DST" -maxdepth 1 -type l -delete 2>/dev/null || true; \
+	  rmdir "$$CMD_DST" 2>/dev/null || true; \
+	  echo "✓ Removed ~/.claude/commands/sdlc/"; \
+	fi; \
+	if [ -d "$$SDLC_DIR/skills" ]; then \
+	  for d in "$$SDLC_DIR/skills/"*/; do \
+	    name=$$(basename "$$d"); \
+	    link="$$SKL_DST/$$name"; \
+	    if [ -L "$$link" ]; then \
+	      rm "$$link"; \
+	      echo "  ✓ removed skill: $$name"; \
+	    fi; \
+	  done; \
+	fi; \
+	echo "✓ SDLC uninstalled"
+
+doctor-sdlc: ## Check SDLC install status
+	@SDLC_DIR="$(REPO_DIR)/claude-code/sdlc"; \
+	CMD_DST="$(HOME)/.claude/commands/sdlc"; \
+	SKL_DST="$(HOME)/.claude/skills"; \
+	echo "═══════════════════════════════════════════════════════════════════"; \
+	echo "Agentic SDLC Install Check"; \
+	echo "═══════════════════════════════════════════════════════════════════"; \
+	if [ -d "$$CMD_DST" ]; then \
+	  echo "✓ commands dir: $$CMD_DST"; \
+	  for f in "$$SDLC_DIR/commands/"*.md; do \
+	    name=$$(basename "$$f"); \
+	    if [ -L "$$CMD_DST/$$name" ]; then echo "  ✓ $$name"; else echo "  ✗ $$name (missing symlink)"; fi; \
+	  done; \
+	else \
+	  echo "✗ commands not installed (run: make install-sdlc)"; \
+	fi; \
+	echo ""; \
+	for d in "$$SDLC_DIR/skills/"*/; do \
+	  name=$$(basename "$$d"); \
+	  if [ -L "$$SKL_DST/$$name" ]; then echo "  ✓ skill: $$name"; else echo "  ✗ skill: $$name (missing)"; fi; \
+	done
 
 ##@ Cleanup
 

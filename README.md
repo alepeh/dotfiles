@@ -29,6 +29,7 @@ Minimal, reproducible terminal setup for macOS optimized for AI-assisted develop
 * **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
 * **Cursor IDE**: AI-powered code editor with CLI (`cursor` command) for GUI-based development.
 * **Spec-Driven Development**: [spec-kit](https://github.com/github/spec-kit) (thorough) and [OpenSpec](https://github.com/Fission-AI/OpenSpec) (lightweight) for structured spec→plan→tasks→implement workflows with AI agents.
+* **Agentic SDLC** (opt-in, personal machines only): `/sdlc:bootstrap` + `/sdlc:new` / `/sdlc:ff` / `/sdlc:apply` / `/sdlc:verify` / `/sdlc:archive` commands that codify how personal projects get built on a Cloudflare baseline. See [`claude-code/sdlc/`](claude-code/sdlc/) and the overview at [site/content/writing/agentic-sdlc](site/content/writing/agentic-sdlc/index.md). Install with `make install-sdlc`.
 
 ---
 
