@@ -169,7 +169,7 @@ need formal AC tracking.
 | [skills/change-protocol](skills/change-protocol/SKILL.md) | **fleshed** | 8 types, artifact matrix, 9-item checklist, meta.yaml schema, delta-spec grammar, rule format, ADR template, `.sdlc.yaml` ref |
 | [skills/change-protocol/scripts/verify-ac.py](skills/change-protocol/scripts/verify-ac.py) | **fleshed** | AC gate with graceful degradation when `feature_groups: []` |
 | [skills/local-dev](skills/local-dev/SKILL.md) | **fleshed** | Full Makefile macros, `.dev/` layout, D1 snapshot/restore, port numbering |
-| [skills/cloudflare-baseline](skills/cloudflare-baseline/SKILL.md) | stub | Conventions done; full `wrangler.jsonc` templates TODO |
+| [skills/cloudflare-baseline](skills/cloudflare-baseline/SKILL.md) | **fleshed** | 4 full `wrangler.jsonc` templates (TS/Python Workers, Pages SPA, Container gateway); D1/R2/service-binding/DO conventions; custom-domain routing; `make deploy` with `GIT_COMMIT`; `pywrangler` vs `wrangler` |
 | [skills/secrets-1password](skills/secrets-1password/SKILL.md) | **fleshed** | Full `backup-env` / `restore-env` Makefile recipes, fresh-machine onboarding flow, `op` CLI prereqs, ENV_FILES convention, rotation order, pitfalls (title collisions, non-atomic restore, session expiry) |
 | [skills/ddd-layout](skills/ddd-layout/SKILL.md) | stub | Folder convention done; domain-model/guidelines/ADR templates TODO |
 | [skills/scaleway-email](skills/scaleway-email/SKILL.md) | stub | Wiring + TEST_MODE done; API call signature + migrations TODO |
