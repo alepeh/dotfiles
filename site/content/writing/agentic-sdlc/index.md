@@ -2,13 +2,13 @@
 title: "Agentic SDLC"
 date: 2026-04-17
 draft: true
-tags: ["Workflow", "Tooling", "Claude Code", "Cloudflare", "DDD", "OpenSpec"]
+tags: ["Workflow", "Tooling", "Claude Code", "Cloudflare", "DDD"]
 summary: "An opt-in agent skill system that codifies how personal projects are bootstrapped and evolved — Cloudflare as infrastructure baseline, typed changes with a rule-distillation loop, architecture as living documentation."
 ---
 
 Claude Code is great at individual changes. What it's *not* great at, by default, is keeping a consistent shape across many projects. Every personal side project I spin up accumulates its own conventions — its own folder layout, its own secret-management story, its own "how do I deploy this again." A year in, each one feels like a different codebase by a different person.
 
-The fix I've landed on is an **agentic SDLC** — a bundle of Claude Code skills and slash commands that codify one set of architectural decisions across every personal project I build. One bootstrap per project, and then every subsequent piece of work is a *typed change* that goes through the same artifact lifecycle. The reference implementation is [kaminkommander](https://github.com/alepeh) (my chimney-sweep platform); the skills that generalize it live in [this dotfiles repo](https://github.com/alepeh/dotfiles) under `claude-code/sdlc/`.
+The fix I've landed on is an **agentic SDLC** — a bundle of Claude Code skills and slash commands that codify one set of architectural decisions across every personal project I build. One bootstrap per project, and then every subsequent piece of work is a *typed change* that goes through the same artifact lifecycle. The patterns crystallized in a personal Cloudflare project I've been running for a few months; the skills that generalize them live in [this dotfiles repo](https://github.com/alepeh/dotfiles) under `claude-code/sdlc/`.
 
 This post is the overview: what it is, why it exists, how the pieces fit together, and what I get out of it.
 
@@ -58,7 +58,7 @@ The bootstrap encodes a pile of decisions that I don't want to re-litigate for e
 | Worker ↔ Worker    | Service bindings, never HTTP                                  |
 | Email              | Dedicated Scaleway Worker with a TEST_MODE flag               |
 | Secrets            | `.dev.vars` locally, `wrangler secret put` in prod, 1Password as SoT |
-| Docs               | `architecture/{domain-model,guidelines,rules,decisions/}.md` + OpenSpec |
+| Docs               | `architecture/{domain-model,guidelines,rules,decisions/}.md` + `specs/` |
 | CI/CD              | GitHub Actions: typecheck + test. Deploys are manual via `make deploy`. |
 | Local dev          | Makefile with `start_service` / `stop_service` macros, D1 snapshot/restore |
 
@@ -90,9 +90,9 @@ Ten steps later, I have a monorepo at `~/code/email-summarizer/` with:
 - `apps/core/` with a FastAPI Python Worker scaffolded from the `python-worker` skill
 - `architecture/` with domain-model / guidelines / rules / decisions / acceptance placeholders
 - `.sdlc.yaml` at the root
-- `openspec/` initialized
+- `specs/` initialized (main-spec target for delta merges)
 - An Obsidian note created in my vault at `notes/Email Summarizer.md` linking to the GitHub repo
-- An initial commit on `main`
+- A private GitHub repo + initial commit on `main`
 
 Total wall-clock time: maybe three minutes, most of it spent answering the questions.
 
@@ -134,7 +134,7 @@ Four-dimensional report: completeness (7/7 tasks, 2/2 spec requirements covered)
 /sdlc:archive
 ```
 
-Claude runs the distillation prompt one more time (anything I missed Tuesday?), merges the delta spec at `changes/summarize-endpoint/specs/summarize/spec.md` into the main spec at `openspec/specs/summarize/spec.md`, sets `completed: 2026-04-21` in `meta.yaml`, and moves the change to `changes/archive/2026-04-21-summarize-endpoint/`.
+Claude runs the distillation prompt one more time (anything I missed Tuesday?), merges the delta spec at `changes/summarize-endpoint/specs/summarize/spec.md` into the main spec at `specs/summarize/spec.md`, sets `completed: 2026-04-21` in `meta.yaml`, and moves the change to `changes/archive/2026-04-21-summarize-endpoint/`.
 
 The project is now one real feature richer, with:
 - Implementation merged on `main`
@@ -189,13 +189,13 @@ This is the part that I can't imagine doing manually. I'd forget. With Claude as
 
 If any of these answers "yes," the impact is `additive` (new concepts) or `breaking` (existing concepts changed). In both cases, the **first task** in `tasks.md` is always to update `domain-model.md`. So the doc is updated *before* the implementation, not after — which means the doc is never stale by more than one in-flight change.
 
-Kaminkommander has been run this way for a few months now, and `domain-model.md` has stayed honest. This is the first time in my life I've had living architecture documentation that actually lives.
+I've been running a personal project this way for a few months now, and `domain-model.md` has stayed honest. This is the first time in my life I've had living architecture documentation that actually lives.
 
 ## What this isn't
 
 - **Not for work projects.** The whole thing is scoped to personal use. The skills are opt-in, `make install-sdlc` is a separate target, and each skill's description says "personal projects only." On my Paysafe machine, none of this is installed and Claude behaves normally.
 - **Not a team-scale solution.** For one person or a pair, the manual deploy flow is fine. Past that, the CI skill has a "graduation signals" section — team > 1, multiple deploys per week, SLO anxiety — pointing to when it's time to add automated deploys.
-- **Not a replacement for OpenSpec.** It builds on OpenSpec. The `openspec init` call is part of bootstrap. Delta specs follow OpenSpec grammar. The change commands wrap OpenSpec's lifecycle with stronger typing and a rule-distillation loop on top.
+- **Not a wrapper around another spec tool.** Early versions leaned on OpenSpec for the spec format and init; I dropped that dependency. The change commands own the full lifecycle. Delta specs follow a similar grammar (ADDED/MODIFIED/REMOVED/RENAMED requirements) but no external tool is required — the format is documented in the `change-protocol` skill.
 - **Not magical.** If I tell Claude to do something that doesn't fit the baseline — "use Postgres via Hyperdrive" — it'll do that, just without the skill scaffolding behind it. The skills exist to make the *default* path fast, not to prevent deviation.
 
 ## Where this lives
@@ -224,7 +224,7 @@ cd ~/code/dotfiles
 make install-sdlc
 ```
 
-The [README in the skill bundle](https://github.com/alepeh/dotfiles/tree/main/claude-code/sdlc) has the install details, the extension guide (how to flesh a stub, how to add a new skill), and a current-state table. The [kaminkommander repo](https://github.com/alepeh) — where all of these patterns originated — is the reference implementation.
+The [README in the skill bundle](https://github.com/alepeh/dotfiles/tree/main/claude-code/sdlc) has the install details, the extension guide (how to flesh a stub, how to add a new skill), and a current-state table.
 
 ## What I'd do differently next time
 

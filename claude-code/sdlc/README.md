@@ -36,8 +36,8 @@ See [Install](#install). Don't install on a Paysafe / work machine.
 
 - **`/sdlc:bootstrap <name>`** — new project from scratch. Picks runtime,
   creates monorepo, wires Cloudflare bindings, generates Makefile +
-  `architecture/` + `.sdlc.yaml`, runs `openspec init`, creates Obsidian
-  project note, initial commit.
+  `architecture/` + `specs/` + `.sdlc.yaml`, creates Obsidian project note,
+  initializes git + private GitHub repo + first commit.
 - **`/sdlc:import <path>`** — retrofit an existing project. Adds Makefile,
   `architecture/`, `.dev/`, `.sdlc.yaml`, 1Password env sync; leaves stack
   as-is.
@@ -131,7 +131,7 @@ guidelines: architecture/guidelines.md
 acceptance_dir: architecture/acceptance
 decisions_dir: architecture/decisions
 changes_dir: changes
-specs_dir: openspec/specs
+specs_dir: specs
 ```
 
 When `feature_groups` is empty, the AC gate in `/sdlc:verify` skips cleanly —

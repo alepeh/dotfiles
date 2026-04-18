@@ -21,7 +21,8 @@ Check in parallel:
 
 - `Makefile` / `Justfile`
 - `architecture/` directory
-- `openspec/` directory
+- `specs/` directory (SDLC delta-merge target)
+- `openspec/` directory (legacy — from older bootstraps; offer to migrate if found)
 - `changes/` directory (could be ours, could be from another system)
 - `.dev/` directory
 - `.sdlc.yaml` (already imported?)
@@ -37,7 +38,7 @@ Report a concise table of what exists vs. missing:
 |----------------------|---------------|
 | Makefile             | ✅ exists      |
 | architecture/        | ❌ missing     |
-| openspec/            | ❌ missing     |
+| specs/               | ❌ missing     |
 | .sdlc.yaml           | ❌ missing     |
 | changes/             | ❌ missing     |
 | wrangler.jsonc (app) | ✅ exists (2)  |
@@ -113,16 +114,21 @@ guidelines: architecture/guidelines.md
 acceptance_dir: architecture/acceptance
 decisions_dir: architecture/decisions
 changes_dir: changes
-specs_dir: openspec/specs
+specs_dir: specs
 ```
 
 Override the default paths **only** if the project already has an
 `architecture/`-like directory elsewhere (e.g. `docs/architecture/`) —
 reuse, don't duplicate.
 
-### 3.4 — `openspec init`
+### 3.4 — `specs/`
 
-Run if `openspec/` is missing. Don't overwrite if it's present.
+Create `specs/` at the repo root if missing (`mkdir -p specs && touch
+specs/.gitkeep`). This is the delta-merge target for feature-type changes —
+no tooling required, the format is documented in the **change-protocol**
+skill. If a legacy `openspec/` directory exists from an earlier import,
+ask the user whether to migrate its contents into `specs/` or leave it as
+reference.
 
 ### 3.5 — `changes/` (pre-existing)
 
