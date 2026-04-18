@@ -371,7 +371,7 @@ guidelines: architecture/guidelines.md
 acceptance_dir: architecture/acceptance
 decisions_dir: architecture/decisions
 changes_dir: changes
-specs_dir: openspec/specs
+specs_dir: specs
 ```
 
 ### AC gate behavior

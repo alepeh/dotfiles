@@ -1,6 +1,6 @@
 ---
 name: sdlc:bootstrap
-description: Bootstrap a new personal project on the agentic-SDLC baseline — Cloudflare-first infra, monorepo with Makefile, OpenSpec change management, .sdlc.yaml config, Obsidian project note, initial commit. Use when starting a greenfield repo outside work. After this, all subsequent work flows through /sdlc:new, /sdlc:ff, /sdlc:continue, /sdlc:apply, /sdlc:verify, /sdlc:archive, /sdlc:explore.
+description: Bootstrap a new personal project on the agentic-SDLC baseline — Cloudflare-first infra, monorepo with Makefile, change-management via the SDLC protocol, .sdlc.yaml config, Obsidian project note, git repo + private GitHub repo + initial commit. Use when starting a greenfield repo outside work. After this, all subsequent work flows through /sdlc:new, /sdlc:ff, /sdlc:continue, /sdlc:apply, /sdlc:verify, /sdlc:archive, /sdlc:explore.
 ---
 
 # /sdlc:bootstrap — Bootstrap a new project
@@ -56,7 +56,7 @@ proved this scales from one app to several without restructuring):
 │   ├── rules.md                 # seeded empty — distilled rules accumulate here
 │   └── acceptance/              # per feature-group AC files (created as groups are defined)
 ├── changes/                     # active changes live here; archive/ sibling created on first archive
-├── openspec/                    # created by `openspec init`
+├── specs/                       # main specs (delta merge target for /sdlc:archive)
 ├── apps/
 │   └── <primary>/               # runtime-specific scaffold, see Step 3
 └── packages/
@@ -159,7 +159,7 @@ guidelines: architecture/guidelines.md
 acceptance_dir: architecture/acceptance
 decisions_dir: architecture/decisions
 changes_dir: changes
-specs_dir: openspec/specs
+specs_dir: specs
 ```
 
 When `feature_groups` is `[]`, the AC-gate in `/sdlc:verify` degrades
@@ -167,14 +167,17 @@ gracefully: changes don't need `feature_group` / `acceptance_criteria` in
 their `meta.yaml`. Add groups + populate the AC file when the project grows
 enough to need the rigor.
 
-## Step 6 — OpenSpec
+## Step 6 — Specs directory
 
 ```bash
-openspec init
+mkdir -p specs
+touch specs/.gitkeep
 ```
 
-Run in the repo root. Don't overwrite `architecture/` — OpenSpec lives in
-`openspec/` alongside it.
+The SDLC protocol stores main specs here. Feature-type changes write delta
+specs into `changes/<name>/specs/<cap>/spec.md` which `/sdlc:archive` merges
+into `specs/<cap>/spec.md`. No external tooling needed — the format is
+documented in the **change-protocol** skill (section 6/7).
 
 ## Step 7 — CI
 
@@ -182,23 +185,31 @@ Add a single `.github/workflows/ci.yml` that runs `make typecheck` and
 `make test` on pushes to main and all PRs. Use the **cicd** skill for the
 template. No deploy workflow — deploys are manual via `make deploy`.
 
-## Step 8 — GitHub repo + initial commit
+## Step 8 — Git repo + private GitHub repo + initial commit
 
-Delegate to `/init-repo` if available (it already handles `gh repo create --private`
-+ initial commit + push). Otherwise:
+Verify `gh auth status` first. If not authenticated, stop and ask the user
+to run `gh auth login`.
+
+Then, from the repo root:
 
 ```bash
 git init -b main
 git add .
 git commit -m "chore: bootstrap project via /sdlc:bootstrap"
-gh repo create <name> --private --source=. --push
+gh repo create <name> --private --source=. --remote=origin --push
 ```
+
+Capture the GitHub URL from `gh repo create`'s output — Step 9 uses it.
+
+If `origin` already exists (unlikely for a fresh bootstrap), stop and ask
+before overwriting.
 
 ## Step 9 — Obsidian project note
 
-Delegate to `/init-project` Step 5 (it already knows the Code Project Template
-and the `notes/<Project Name>.md` path). Pass the GitHub URL from Step 8 so the
-`repo:` frontmatter is populated.
+Create `notes/<Project Name>.md` in the Obsidian vault using the Code Project
+Template. Populate the `repo:` frontmatter with the GitHub URL from Step 8.
+The template lives at `~/code/obsidian/templates/code-project.md` (or the
+equivalent path in the user's vault — confirm if unfamiliar).
 
 ## Step 10 — Summarize
 

@@ -62,7 +62,7 @@ Every project should have a Makefile (or Justfile) providing a standard command 
 - Use `make <target>` instead of raw build/test/lint commands
 - Standard targets: `dev`, `build`, `test`, `lint`, `clean` (not all may be present)
 - When adding new tooling, add a corresponding Make target
-- `/init-project` auto-generates a Makefile if one doesn't exist
+- `/sdlc:bootstrap` scaffolds a Makefile (plus the rest of the SDLC baseline) for new personal projects
 
 # Project Management
 
@@ -74,7 +74,6 @@ Every project should have a Makefile (or Justfile) providing a standard command 
   mark completed only after verification
 
 ## Workflow Commands
-- `/init-project` — Bootstrap a Makefile + OpenSpec + Obsidian note on any project (generic)
 - `/new-diff` — Create a short-form changelog entry for the Hugo site
 - `/morning-brief` — Chief-of-Staff daily briefing (Gmail, Calendar, Todoist, Obsidian)
 - `/evening-recap` — Chief-of-Staff end-of-day review and carry-over planning

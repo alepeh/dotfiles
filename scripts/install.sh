@@ -211,18 +211,6 @@ echo "→ Installing AI coding agents..."
 npm install -g @openai/codex
 npm install -g @sourcegraph/amp
 
-echo "→ Installing OpenSpec CLI..."
-npm install -g @fission-ai/openspec@latest
-echo "✓ Installed OpenSpec CLI"
-
-echo "→ Installing spec-kit..."
-if have uv; then
-  uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
-  echo "✓ Installed spec-kit"
-else
-  echo "   uv not found, skipping spec-kit (run: make spec-kit after installing uv)"
-fi
-
 echo "→ Installing claude-tui..."
 if have uv; then
   uv tool install --force --from "$DOTFILES/claude-tui" claude-tui
