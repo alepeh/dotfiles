@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install site-serve site-preview site-build site-new test-obsidian cleanup cleanup-dry clean install-sdlc uninstall-sdlc doctor-sdlc
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install link-vault-skills site-serve site-preview site-build site-new test-obsidian cleanup cleanup-dry clean install-sdlc uninstall-sdlc doctor-sdlc
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -293,6 +293,10 @@ claude-code-commands: ## Link Claude Code slash commands
 	  ln -sfn "$$f" "$(HOME)/.claude/commands/$$(basename $$f)"; \
 	done
 	@echo "✓ Claude Code commands linked to ~/.claude/commands/"
+
+link-vault-skills: ## Mirror <vault>/agents/<name>/commands/*.md into ~/.claude/commands/
+	@$(REPO_DIR)/scripts/link-vault-skills.sh
+	@echo "✓ Vault skills linked. Override vault path with HUDSON_VAULT=..."
 
 claude-code-mcp: ## Sync Claude Code MCP servers from mcp-servers.json to ~/.claude.json
 	@echo "→ Syncing Claude Code MCP servers"
