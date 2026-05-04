@@ -7,10 +7,25 @@
 # Idempotent: re-running fixes broken/changed links and prunes its own
 # stale entries. Never touches commands that don't point into the vault
 # (so hand-written commands or other dotfile-managed links are safe).
+#
+# Vault path resolution (matches install-hudson.sh and the Hudson Obsidian
+# plugin's backend):
+#   1. $HUDSON_VAULT — the canonical env var.
+#   2. $ZK_VAULT     — legacy fallback, prints a one-shot deprecation hint.
+#   3. ~/code/zettelkasten — final default (was ~/obsidian/brain prior to
+#      the env-var standardisation; the new default matches every other
+#      Hudson tool in this repo).
 
 set -euo pipefail
 
-VAULT="${HUDSON_VAULT:-$HOME/obsidian/brain}"
+if [ -n "${HUDSON_VAULT:-}" ]; then
+    VAULT="$HUDSON_VAULT"
+elif [ -n "${ZK_VAULT:-}" ]; then
+    VAULT="$ZK_VAULT"
+    echo "⚠  link-vault-skills: using \$ZK_VAULT (deprecated) — set HUDSON_VAULT instead" >&2
+else
+    VAULT="$HOME/code/zettelkasten"
+fi
 TARGET="$HOME/.claude/commands"
 
 if [ ! -d "$VAULT/agents" ]; then

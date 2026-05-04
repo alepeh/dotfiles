@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install link-vault-skills site-serve site-preview site-build site-new test-obsidian cleanup cleanup-dry clean install-sdlc uninstall-sdlc doctor-sdlc
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install link-vault-skills site-serve site-preview site-build site-new test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean install-sdlc uninstall-sdlc doctor-sdlc
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -24,6 +24,7 @@ install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install
 	@echo "→ Running scripts/install.sh"
 	@$(REPO_DIR)/scripts/install.sh
 	@$(MAKE) iterm-profile
+	@$(MAKE) hudson-install
 	@echo "✓ Install complete. If iTerm2 was open, quit & relaunch to load the new profile."
 
 update: ## Update Homebrew packages & git submodules
@@ -344,6 +345,14 @@ mcp-gsuite-patch: ## Clone and patch mcp-gsuite to fix JSON schema bug (Issue #4
 	  "$(HOME)/.local/share/mcp-gsuite-patched/src/mcp_gsuite/tools_gmail.py"
 	@echo "✓ Patched mcp-gsuite installed to ~/.local/share/mcp-gsuite-patched"
 	@echo "  Note: Wrapper script already configured to use this location"
+
+##@ Hudson
+
+hudson-install: ## Wire Hudson skill into claude-code and cursor-agent (symlinks + HUDSON_VAULT export)
+	@$(REPO_DIR)/scripts/install-hudson.sh
+
+hudson-uninstall: ## Remove Hudson symlinks from claude-code and cursor-agent (leaves vault untouched)
+	@$(REPO_DIR)/scripts/uninstall-hudson.sh
 
 ##@ Claude TUI
 

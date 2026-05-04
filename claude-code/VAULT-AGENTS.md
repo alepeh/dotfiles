@@ -37,7 +37,7 @@ git clone git@github.com:<you>/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles && make install
 
 # 2. Sync your Obsidian vault (however you sync it — iCloud, Syncthing, git, etc.)
-#    By default the script looks at ~/obsidian/brain. Override per-machine:
+#    By default the script looks at ~/code/zettelkasten. Override per-machine:
 export HUDSON_VAULT=/path/to/your/vault   # add to ~/.zshrc.local
 
 # 3. Open Obsidian once with that vault so its registry knows about it.
@@ -62,7 +62,8 @@ Because state access goes through the Obsidian app's IPC, the agent reaches the 
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `HUDSON_VAULT` | `~/obsidian/brain` | Path to the vault whose `agents/` directory should be mirrored. Set in `~/.zshrc.local` for per-machine overrides. |
+| `HUDSON_VAULT` | `~/code/zettelkasten` | Path to the vault whose `agents/` directory should be mirrored. Set in `~/.zshrc.local` for per-machine overrides. The same env var is read by `scripts/install-hudson.sh` and the Hudson Obsidian plugin's Python backend, so a single export drives every consumer. |
+| `ZK_VAULT` | _(unset)_ | Legacy fallback. Read only when `HUDSON_VAULT` is unset; prints a one-shot deprecation warning recommending `export HUDSON_VAULT="$ZK_VAULT"`. |
 
 That's it for this pattern's own config. Everything else (MCP credentials, etc.) is independent.
 
@@ -112,7 +113,7 @@ The hard-coded conventions are minimal and most are easy to change:
 
 | Convention | Where it's set | If you want to change it |
 |---|---|---|
-| Vault path defaults to `~/obsidian/brain` | `scripts/link-vault-skills.sh` | Set `HUDSON_VAULT` instead of editing the script |
+| Vault path defaults to `~/code/zettelkasten` | `scripts/link-vault-skills.sh` | Set `HUDSON_VAULT` instead of editing the script |
 | Slash commands sourced from `agents/*/commands/*.md` | Same script | Edit the glob if your layout differs |
 | Symlinks land in `~/.claude/commands/` | Same script | Hard to change without confusing Claude CLI; don't |
 | Agent file set (`agent.md`, `playbook.md`, `memory.md`, etc.) | Convention only — Claude reads whatever the recipe references | Use any structure you like; the script doesn't care |
