@@ -18,6 +18,7 @@ brew "uv"        # Python package installer (for MCP servers)
 brew "go"        # For GitHub MCP server
 brew "hugo"      # Static site generator for blog
 brew "sox"       # Audio recording for Claude Code voice mode
+brew "glow"      # Terminal markdown renderer
 brew "jenv"       # Java version manager
 brew "mvn"
 
