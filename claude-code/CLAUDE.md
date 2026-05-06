@@ -62,7 +62,7 @@ Every project should have a Makefile (or Justfile) providing a standard command 
 - Use `make <target>` instead of raw build/test/lint commands
 - Standard targets: `dev`, `build`, `test`, `lint`, `clean` (not all may be present)
 - When adding new tooling, add a corresponding Make target
-- `/sdlc:bootstrap` scaffolds a Makefile (plus the rest of the SDLC baseline) for new personal projects
+- `/sdlc:bootstrap` (from the [incunabula](https://github.com/alepeh/incunabula) repo) scaffolds a Makefile (plus the rest of the SDLC baseline) for new personal projects
 
 # Project Management
 
@@ -79,7 +79,8 @@ Every project should have a Makefile (or Justfile) providing a standard command 
 - `/evening-recap` — Chief-of-Staff end-of-day review and carry-over planning
 
 ## Agentic SDLC (personal projects, opt-in)
-Installed via `make install-sdlc` in the dotfiles repo. One-time bootstrap,
+Installed from the [incunabula](https://github.com/alepeh/incunabula) repo:
+`cd ~/code/incunabula && make install`. One-time bootstrap per project,
 then every subsequent piece of work is a change.
 
 **Bootstrap** (rare, one-shot):
