@@ -11,6 +11,12 @@
     "mcp-google-sheets": {
       "command": "$HOME/.mcp-wrappers/google-sheets-wrapper.sh",
       "args": []
+    },
+    "oreilly": {
+      "url": "https://api.oreilly.com/api/content-discovery/v1/mcp/",
+      "headers": {
+        "Authorization": "Bearer YOUR_OREILLY_API_TOKEN"
+      }
     }
   }
 }
