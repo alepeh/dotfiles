@@ -25,3 +25,10 @@ export PATH="$HOME/.local/bin:$PATH"
 if [[ -f "$HOME/.cargo/env" ]]; then
   . "$HOME/.cargo/env"
 fi
+
+# Homebrew's rustup doesn't create ~/.cargo/env, so ~/.cargo/bin (where
+# `cargo install` puts binaries) never lands on PATH via the block above.
+# Add it directly when present.
+if [[ -d "$HOME/.cargo/bin" ]]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
