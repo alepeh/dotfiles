@@ -181,6 +181,9 @@ fi
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 export PATH="$HOME/.local/bin:$PATH"
 
+# Add the path for rust apps
+export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+
 # Machine-specific environment variables (not tracked in git)
 # Create ~/.zshrc.local to add variables that should only apply to this machine
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

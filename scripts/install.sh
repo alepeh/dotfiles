@@ -198,10 +198,52 @@ for f in "$DOTFILES/claude-code/commands/"*.md; do
 done
 echo "✓ Claude Code commands linked"
 
-echo "→ Linking Claude desktop config..."
+echo "→ Generating Claude desktop config..."
 CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
 mkdir -p "$CLAUDE_CONFIG_DIR"
-backup_and_link "$DOTFILES/claude/claude_desktop_config.json" "$CLAUDE_CONFIG_DIR/claude_desktop_config.json"
+CLAUDE_DESKTOP_CONFIG="$CLAUDE_CONFIG_DIR/claude_desktop_config.json"
+# Source secrets to substitute into generated config
+if [ -f ~/.env.mcp ]; then
+  source ~/.env.mcp
+fi
+# Remove old symlink if present (was previously symlinked from repo)
+[ -L "$CLAUDE_DESKTOP_CONFIG" ] && rm -f "$CLAUDE_DESKTOP_CONFIG"
+cat > "$CLAUDE_DESKTOP_CONFIG" << EOF
+{
+  "mcpServers": {
+    "mcp-obsidian": {
+      "command": "\$HOME/.mcp-wrappers/obsidian-wrapper.sh",
+      "args": []
+    },
+    "mcp-server-github": {
+      "command": "\$HOME/.mcp-wrappers/github-wrapper.sh",
+      "args": []
+    },
+    "mcp-google-sheets": {
+      "command": "\$HOME/.mcp-wrappers/google-sheets-wrapper.sh",
+      "args": []
+    },
+    "oreilly": {
+      "url": "https://api.oreilly.com/api/content-discovery/v1/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${OREILLY_API_TOKEN:-YOUR_OREILLY_API_TOKEN}"
+      }
+    }
+  }
+}
+EOF
+echo "✓ Generated Claude desktop config"
+
+echo "→ Configuring O'Reilly MCP for Claude Code..."
+if have claude && [ -n "${OREILLY_API_TOKEN:-}" ]; then
+  claude mcp remove oreilly -s user 2>/dev/null || true
+  claude mcp add --transport http -s user oreilly \
+    "https://api.oreilly.com/api/content-discovery/v1/mcp/" \
+    --header "Authorization: Bearer ${OREILLY_API_TOKEN}"
+  echo "✓ Added O'Reilly MCP to Claude Code (user scope)"
+else
+  echo "   Skipped: claude CLI not found or OREILLY_API_TOKEN not set in ~/.env.mcp"
+fi
 
 echo "→ Linking Amp Code configuration..."
 mkdir -p "$HOME/.config/amp"
