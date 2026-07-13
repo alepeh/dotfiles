@@ -1,5 +1,4 @@
 # Ghostty configuration
-# Used by cmux (built on libghostty) and standalone Ghostty
 
 # Font — MesloLGS Nerd Font (installed via Brewfile cask font-meslo-lg-nerd-font)
 font-family = "MesloLGS Nerd Font"
@@ -12,6 +11,14 @@ theme = "Catppuccin Mocha"
 window-padding-x = 4
 window-padding-y = 4
 window-decoration = true
+
+# Tabs & splits
+# NOTE: Ghostty has no vertical tabs (cmux's headline feature). macOS uses
+# native horizontal tabs in the titlebar. Splits fill the vertical-pane gap.
+#   New tab:   cmd+t        Next/prev tab:  cmd+shift+]/[
+#   Split:     cmd+d (right) / cmd+shift+d (down)   Nav: cmd+alt+arrows
+macos-titlebar-style = tabs
+window-new-tab-position = end
 
 # Clipboard
 clipboard-read = allow

@@ -51,7 +51,7 @@ ZELLIJ_REPO="$DOTFILES/zellij"
 mkdir -p "$(dirname "$ZELLIJ_HOME")"
 backup_and_link "$ZELLIJ_REPO" "$ZELLIJ_HOME"
 
-# --- Ghostty config (used by cmux) ---
+# --- Ghostty config ---
 GHOSTTY_HOME="$HOME/.config/ghostty"
 GHOSTTY_REPO="$DOTFILES/ghostty"
 

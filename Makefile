@@ -81,7 +81,7 @@ doctor: ## Quick sanity checks
 	@command -v zsh >/dev/null || (echo "zsh not found" && exit 1)
 	@command -v brew >/dev/null || (echo "Homebrew not found" && exit 1)
 	@command -v hx >/dev/null || (echo "helix not found - run: brew install helix" && exit 1)
-	@command -v cmux >/dev/null || (echo "cmux not found - run: brew install --cask cmux" && exit 1)
+	@[ -d "/Applications/Ghostty.app" ] || command -v ghostty >/dev/null 2>&1 || (echo "ghostty not found - run: brew install --cask ghostty" && exit 1)
 	@command -v zellij >/dev/null || (echo "zellij not found - run: brew install zellij" && exit 1)
 	@command -v lazygit >/dev/null || (echo "lazygit not found - run: brew install lazygit" && exit 1)
 	@command -v yazi >/dev/null || (echo "yazi not found - run: brew install yazi" && exit 1)
@@ -230,7 +230,7 @@ zellij: ## Link Zellij configuration
 	@ln -sfn "$(REPO_DIR)/zellij" "$(HOME)/.config/zellij"
 	@echo "✓ ~/.config/zellij → $(REPO_DIR)/zellij"
 
-ghostty: ## Link Ghostty configuration (used by cmux)
+ghostty: ## Link Ghostty configuration
 	@echo "→ Linking Ghostty configuration"
 	@mkdir -p "$(HOME)/.config"
 	@if [ -d "$(HOME)/.config/ghostty" ] && [ ! -L "$(HOME)/.config/ghostty" ]; then \
