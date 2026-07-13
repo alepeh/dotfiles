@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import os
 import subprocess
 import tempfile
-import time
 from pathlib import Path
 
 from rich.text import Text
@@ -782,7 +780,7 @@ class ClaudeTUI(App):
         self.push_screen(ManageProjectsScreen())
 
     def action_resume_session(self) -> None:
-        """Resume selected session in a dev layout (cmux or zellij)."""
+        """Resume selected session in a zellij dev layout."""
         session = self.selected_session
         if not session:
             self.notify("No session selected", severity="warning")
@@ -795,23 +793,15 @@ class ClaudeTUI(App):
             agent_cmd = "claude"
             agent_args = f'"-r" "{session.session_id}" "--fork-session"'
 
-        if _is_cmux_running():
-            _launch_cmux_dev(
-                agent_cmd=agent_cmd,
-                agent_args=agent_args,
-                cwd=session.project_path,
-            )
-            self.notify(f"Resumed in cmux: {session.display_name}")
-        else:
-            project_name = Path(session.project_path).name
-            zellij_session = f"{session.backend_tag.lower()}-{project_name}-resume"
-            _launch_zellij_dev(
-                agent_cmd=agent_cmd,
-                agent_args=agent_args,
-                cwd=session.project_path,
-                zellij_session=zellij_session,
-            )
-            self.notify(f"Resumed in zellij: {session.display_name}")
+        project_name = Path(session.project_path).name
+        zellij_session = f"{session.backend_tag.lower()}-{project_name}-resume"
+        _launch_zellij_dev(
+            agent_cmd=agent_cmd,
+            agent_args=agent_args,
+            cwd=session.project_path,
+            zellij_session=zellij_session,
+        )
+        self.notify(f"Resumed in zellij: {session.display_name}")
 
     @work
     async def action_new_session(self) -> None:
@@ -822,21 +812,14 @@ class ClaudeTUI(App):
         backend = result["backend"]
         agent_cmd = "claude" if backend == "claude" else "cursor-agent"
 
-        if _is_cmux_running():
-            _launch_cmux_dev(
-                agent_cmd=agent_cmd,
-                agent_args="",
-                cwd=result["project_dir"],
-            )
-        else:
-            tag = "c" if backend == "claude" else "r"
-            zellij_session = f"{tag}-{project_name}"
-            _launch_zellij_dev(
-                agent_cmd=agent_cmd,
-                agent_args="",
-                cwd=result["project_dir"],
-                zellij_session=zellij_session,
-            )
+        tag = "c" if backend == "claude" else "r"
+        zellij_session = f"{tag}-{project_name}"
+        _launch_zellij_dev(
+            agent_cmd=agent_cmd,
+            agent_args="",
+            cwd=result["project_dir"],
+            zellij_session=zellij_session,
+        )
         self.notify(f"New session in {project_name}")
 
     @work
@@ -848,21 +831,14 @@ class ClaudeTUI(App):
         backend = result["backend"]
         agent_cmd = "claude" if backend == "claude" else "cursor-agent"
 
-        if _is_cmux_running():
-            _launch_cmux_dev(
-                agent_cmd=agent_cmd,
-                agent_args="",
-                cwd=result["project_dir"],
-            )
-        else:
-            tag = "c" if backend == "claude" else "r"
-            zellij_session = f"{tag}-{project_name}"
-            _launch_zellij_dev(
-                agent_cmd=agent_cmd,
-                agent_args="",
-                cwd=result["project_dir"],
-                zellij_session=zellij_session,
-            )
+        tag = "c" if backend == "claude" else "r"
+        zellij_session = f"{tag}-{project_name}"
+        _launch_zellij_dev(
+            agent_cmd=agent_cmd,
+            agent_args="",
+            cwd=result["project_dir"],
+            zellij_session=zellij_session,
+        )
         self.notify(f"New session in {project_name}")
 
     @work
@@ -975,158 +951,3 @@ def _launch_zellij_dev(
             f'  do script "{zellij_cmd}"\n'
             "end tell",
         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
-# -----------------------------------------------------------------------
-# cmux detection and launcher
-# -----------------------------------------------------------------------
-
-
-def _is_cmux_running() -> bool:
-    """Check if cmux is running by testing for its Unix socket."""
-    return os.path.exists("/tmp/cmux.sock")
-
-
-def _cmux_run(*args: str) -> str:
-    """Run a cmux CLI command and return stdout."""
-    result = subprocess.run(
-        ["cmux", *args],
-        capture_output=True, text=True, timeout=5,
-    )
-    return result.stdout.strip()
-
-
-def _cmux_send_command(workspace: str, surface: str, command: str) -> None:
-    """Send a shell command to a cmux surface (type text + press Enter)."""
-    _cmux_run("send", "--workspace", workspace, "--surface", surface, command)
-    _cmux_run("send-key", "--workspace", workspace, "--surface", surface, "Enter")
-
-
-def _launch_cmux_dev(
-    agent_cmd: str,
-    agent_args: str,
-    cwd: str,
-) -> None:
-    """Set up a dev environment in cmux using workspaces and splits."""
-    # Build the full agent command line
-    if agent_args:
-        # agent_args comes as '"arg1" "arg2"' — convert to space-separated
-        full_agent = f"{agent_cmd} {agent_args.replace(chr(34), '')}"
-    else:
-        full_agent = agent_cmd
-
-    # --- Workspace 1: dev (agent + editor) ---
-    ws1_out = _cmux_run("new-workspace")
-    # Output: "OK <uuid>" — extract workspace ref from list
-    _cmux_run("list-workspaces")  # refresh state
-    # Get the new workspace ref by identifying the last one
-    ws_list = _cmux_run("list-workspaces")
-    # Parse last workspace ref (newest = last line)
-    ws1_ref = None
-    for line in ws_list.strip().splitlines():
-        parts = line.split()
-        for p in parts:
-            if p.startswith("workspace:"):
-                ws1_ref = p
-    if not ws1_ref:
-        return
-
-    _cmux_run("rename-workspace", "--workspace", ws1_ref, "dev")
-    _cmux_run("select-workspace", "--workspace", ws1_ref)
-
-    # Identify the initial surface in this workspace
-    panes = _cmux_run("list-pane-surfaces", "--workspace", ws1_ref)
-    agent_surface = None
-    for line in panes.strip().splitlines():
-        for p in line.split():
-            if p.startswith("surface:"):
-                agent_surface = p
-                break
-        if agent_surface:
-            break
-
-    if not agent_surface:
-        return
-
-    # cd to project dir and launch agent
-    _cmux_send_command(ws1_ref, agent_surface, f"cd '{cwd}'")
-    time.sleep(0.2)
-    _cmux_send_command(ws1_ref, agent_surface, full_agent)
-
-    # Split right for Helix editor
-    split_out = _cmux_run("new-split", "right", "--workspace", ws1_ref)
-    # Output: "OK surface:<n> workspace:<n>"
-    editor_surface = None
-    for p in split_out.split():
-        if p.startswith("surface:"):
-            editor_surface = p
-            break
-    if editor_surface:
-        _cmux_send_command(ws1_ref, editor_surface, f"cd '{cwd}'")
-        time.sleep(0.1)
-        _cmux_send_command(ws1_ref, editor_surface, "hx .")
-
-    # --- Workspace 2: git (lazygit) ---
-    _cmux_run("new-workspace")
-    ws_list = _cmux_run("list-workspaces")
-    ws2_ref = None
-    for line in ws_list.strip().splitlines():
-        parts = line.split()
-        for p in parts:
-            if p.startswith("workspace:"):
-                ws2_ref = p
-    if ws2_ref:
-        _cmux_run("rename-workspace", "--workspace", ws2_ref, "git")
-        git_panes = _cmux_run("list-pane-surfaces", "--workspace", ws2_ref)
-        git_surface = None
-        for line in git_panes.strip().splitlines():
-            for p in line.split():
-                if p.startswith("surface:"):
-                    git_surface = p
-                    break
-            if git_surface:
-                break
-        if git_surface:
-            _cmux_send_command(ws2_ref, git_surface, f"cd '{cwd}'")
-            time.sleep(0.1)
-            _cmux_send_command(ws2_ref, git_surface, "lazygit")
-
-    # --- Workspace 3: files (yazi + helix) ---
-    _cmux_run("new-workspace")
-    ws_list = _cmux_run("list-workspaces")
-    ws3_ref = None
-    for line in ws_list.strip().splitlines():
-        parts = line.split()
-        for p in parts:
-            if p.startswith("workspace:"):
-                ws3_ref = p
-    if ws3_ref:
-        _cmux_run("rename-workspace", "--workspace", ws3_ref, "files")
-        files_panes = _cmux_run("list-pane-surfaces", "--workspace", ws3_ref)
-        yazi_surface = None
-        for line in files_panes.strip().splitlines():
-            for p in line.split():
-                if p.startswith("surface:"):
-                    yazi_surface = p
-                    break
-            if yazi_surface:
-                break
-        if yazi_surface:
-            _cmux_send_command(ws3_ref, yazi_surface, f"cd '{cwd}'")
-            time.sleep(0.1)
-            _cmux_send_command(ws3_ref, yazi_surface, "yazi")
-
-        # Split right for Helix
-        split_out = _cmux_run("new-split", "right", "--workspace", ws3_ref)
-        hx_surface = None
-        for p in split_out.split():
-            if p.startswith("surface:"):
-                hx_surface = p
-                break
-        if hx_surface:
-            _cmux_send_command(ws3_ref, hx_surface, f"cd '{cwd}'")
-            time.sleep(0.1)
-            _cmux_send_command(ws3_ref, hx_surface, "hx")
-
-    # Focus back on the dev workspace
-    _cmux_run("select-workspace", "--workspace", ws1_ref)
