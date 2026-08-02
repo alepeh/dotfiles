@@ -249,6 +249,19 @@ echo "→ Linking Amp Code configuration..."
 mkdir -p "$HOME/.config/amp"
 backup_and_link "$DOTFILES/amp/settings.json" "$HOME/.config/amp/settings.json"
 
+# --- Mistral Vibe (vibe CLI coding agent) ---
+# The `vibe` binary is installed via the Brewfile (brew "mistral-vibe").
+# Vibe keeps its config and session logs under ~/.vibe (override with VIBE_HOME).
+echo "→ Setting up Mistral Vibe..."
+mkdir -p "$HOME/.vibe"
+if [ ! -f "$HOME/.vibe/.env" ]; then
+  cp "$DOTFILES/vibe/.env.template" "$HOME/.vibe/.env"
+  chmod 600 "$HOME/.vibe/.env"
+  echo "✓ Created ~/.vibe/.env from template — edit it to add MISTRAL_API_KEY, or run 'vibe --setup'"
+else
+  echo "✓ ~/.vibe/.env already exists (leaving it untouched)"
+fi
+
 echo "→ Installing AI coding agents..."
 npm install -g @openai/codex
 npm install -g @sourcegraph/amp
