@@ -35,4 +35,5 @@ cask "temurin"      # Eclipse Temurin JDK 24 (latest)
 cask "ghostty"     # GPU-accelerated native macOS terminal emulator
 cask "claude-code@latest"
 cask "cursor-cli"  # Cursor command-line agent (standalone, doesn't require Cursor IDE)
+brew "mistral-vibe" # Mistral Vibe — minimal CLI coding agent (provides the `vibe` command)
 cask "font-meslo-lg-nerd-font"  # still works as a normal cask

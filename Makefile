@@ -13,7 +13,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install link-vault-skills site-serve site-preview site-build site-new test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install vibe vibe-setup link-vault-skills site-serve site-preview site-build site-new test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -87,6 +87,7 @@ doctor: ## Quick sanity checks
 	@command -v yazi >/dev/null || (echo "yazi not found - run: brew install yazi" && exit 1)
 	@command -v delta >/dev/null || (echo "delta not found - run: brew install git-delta" && exit 1)
 	@command -v amp >/dev/null || (echo "amp not found - run: npm install -g @sourcegraph/amp" && exit 1)
+	@command -v vibe >/dev/null || (echo "vibe not found - run: brew install mistral-vibe" && exit 1)
 	@command -v claude-tui >/dev/null || (echo "claude-tui not found - run: make claude-tui-install" && exit 1)
 	@[ -d "$(REPO_DIR)/omz/ohmyzsh" ] || (echo "oh-my-zsh submodule missing" && exit 1)
 	@[ -f "$(REPO_DIR)/zsh/.zshrc" ] || (echo ".zshrc missing" && exit 1)
@@ -365,6 +366,22 @@ claude-tui-install: ## Install/upgrade claude-tui globally via uv tool
 	@command -v uv >/dev/null || (echo "Error: uv not found - run: brew install uv" && exit 1)
 	@uv tool install --force --from "$(REPO_DIR)/claude-tui" claude-tui
 	@echo "✓ claude-tui installed globally. Run 'claude-tui' from anywhere."
+
+##@ Mistral Vibe
+
+vibe: ## Run Mistral Vibe (install first with: brew install mistral-vibe)
+	@command -v vibe >/dev/null || (echo "vibe not found - run: brew install mistral-vibe" && exit 1)
+	@vibe
+
+vibe-setup: ## Create ~/.vibe/.env from template (add MISTRAL_API_KEY there, or run 'vibe --setup')
+	@mkdir -p "$(HOME)/.vibe"
+	@if [ -f "$(HOME)/.vibe/.env" ]; then \
+	  echo "✓ ~/.vibe/.env already exists (leaving it untouched)"; \
+	else \
+	  cp "$(REPO_DIR)/vibe/.env.template" "$(HOME)/.vibe/.env"; \
+	  chmod 600 "$(HOME)/.vibe/.env"; \
+	  echo "✓ Created ~/.vibe/.env from template — edit it to add MISTRAL_API_KEY, or run 'vibe --setup'"; \
+	fi
 
 ##@ Language Servers
 
