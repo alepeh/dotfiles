@@ -25,6 +25,19 @@ clipboard-read = allow
 clipboard-write = allow
 copy-on-select = clipboard
 
+# Shell integration
+# Ghostty exports TERM=xterm-ghostty, which ssh forwards to remote hosts. Hosts
+# that don't ship that terminfo entry (Synology DSM, Home Assistant OS, most
+# stock Linux) then break on anything terminfo-driven — clear, vim, htop, less,
+# arrow keys — even though the connection itself succeeded. iTerm2 doesn't hit
+# this because it sends the universally-known xterm-256color.
+#   ssh-env      → send TERM=xterm-256color to remotes as a safe fallback
+#   ssh-terminfo → install the real ghostty terminfo on the remote via `tic` on
+#                  first connect, so later sessions get full fidelity
+# The defaults (cursor, title, path) must be repeated: this key replaces the
+# default set rather than adding to it. sudo stays off, as before.
+shell-integration-features = cursor,path,title,ssh-env,ssh-terminfo
+
 # Attention / notifications
 # Goal: know when an agent (Claude Code, cursor-agent, etc.) needs input, and
 # WHICH tab/split it is in. These agents ring the terminal bell (OSC) when they
@@ -40,4 +53,5 @@ bell-features = attention,title,border,system
 # ends) is GTK/Linux-only in Ghostty 1.3.x and has no effect on macOS, so it is
 # intentionally omitted. On macOS the bell-features above are the mechanism.
 # Shell integration (needed for bell delivery) is injected automatically by
-# Ghostty for zsh — no sourcing required.
+# Ghostty for zsh — no sourcing required; see shell-integration-features above
+# for which features that injection enables.
