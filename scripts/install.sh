@@ -186,6 +186,14 @@ mkdir -p "$HOME/.claude/hooks"
 for f in "$DOTFILES/claude-code/hooks/"*.sh; do
   [ -f "$f" ] && ln -sfn "$f" "$HOME/.claude/hooks/$(basename "$f")"
 done
+# Prune links to hooks that no longer exist in the repo (e.g. cmux-notify.sh),
+# otherwise settings.json can keep pointing at a hook that silently never runs.
+for l in "$HOME/.claude/hooks/"*; do
+  if [ -L "$l" ] && [ ! -e "$l" ]; then
+    echo "  removing stale hook link: $(basename "$l")"
+    rm -f "$l"
+  fi
+done
 echo "✓ Claude Code hooks linked"
 
 echo "→ Linking Claude Code settings..."

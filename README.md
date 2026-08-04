@@ -24,7 +24,7 @@ Minimal, reproducible terminal setup for macOS optimized for AI-assisted develop
 * **Fast prompt**: Powerlevel10k with instant prompt enabled.
 * **Better completion**: OMZ completions + `zsh-completions`, with refined matching rules.
 * **Nice defaults**: `eza`, `ripgrep`, `bat`, `zoxide` and helpful aliases.
-* **iTerm2 profile**: Pre-configured font/colors; linked via Dynamic Profiles.
+* **iTerm2 profile**: Catppuccin Mocha + MesloLGS Nerd Font, matching the Ghostty config; linked via Dynamic Profiles. See [Terminals: Ghostty and iTerm2](#terminals-ghostty-and-iterm2).
 * **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, GitHub, and Google Sheets - shared between Claude Desktop and Claude Code.
 * **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
 * **Cursor IDE**: AI-powered code editor with CLI (`cursor` command) for GUI-based development.
@@ -337,6 +337,62 @@ make brew-lock
 
 ---
 
+## Terminals: Ghostty and iTerm2
+
+Both terminals are configured to look and behave the same, so either one can be
+the daily driver. Ghostty is configured in `ghostty/config`; iTerm2 is split
+across two places because iTerm2 separates per-profile from app-wide settings.
+
+| What | Ghostty | iTerm2 | Applied by |
+| --- | --- | --- | --- |
+| Theme | `theme = Catppuccin Mocha` | full 16-colour palette + bg/fg/cursor/selection | `make iterm-profile` |
+| Font | `MesloLGS Nerd Font` 14 | `MesloLGSNF-Regular 14` | `make iterm-profile` |
+| Window padding | `window-padding-x/y = 4` | `TerminalMargin` / `TerminalVMargin` = 4 | `make iterm-defaults` |
+| Dim unfocused split | `unfocused-split-opacity` | `DimInactiveSplitPanes` + 0.15 | `make iterm-defaults` |
+| Vertical tabs | not supported | `TabViewType = 2` (tabs on the left) | `make iterm-defaults` |
+| Tab chrome | native macOS tabs | `TabStyleWithAutomaticOption = 5` (Minimal) | `make iterm-defaults` |
+
+```bash
+make iterm-profile    # Dynamic Profile: colours, font, bell/notification behaviour
+make iterm-defaults   # app-wide prefs — quit iTerm2 first, it clobbers external writes
+```
+
+`make iterm-defaults` refuses to run while iTerm2 is open: iTerm2 holds its
+preferences in memory and rewrites the entire plist on quit, silently throwing
+away anything written from outside.
+
+### Agent notifications
+
+Goal, in both terminals: know when Claude Code needs input, and know *which*
+tab it is in.
+
+Ghostty does this with `bell-features = attention,title,border,system` — agents
+ring the terminal bell and Ghostty bounces the dock, marks the tab title, and
+outlines the split.
+
+iTerm2 reaches the same result from two directions:
+
+* **Profile keys** (`iterm2/Dotfiles-MinimalP10k.json`) — `Send Bell Alert` plus
+  `BM Growl` turn a bell into a Notification Center alert, and `Send Terminal
+  Generated Alerts` lets programs post their own. `Silence Bell` is off
+  (audible cue, Ghostty's `system`) while `Visual Bell` is off too — the bell
+  glyph in the tab is the marker, not a full-screen flash. The noisy triggers
+  (`Send Idle Alert`, `Send New Output Alert`, `Send Session Ended Alert`) are
+  deliberately off; flip them in the JSON if you want them.
+* **`claude-code/hooks/notify.sh`** — posts a macOS notification in any terminal,
+  and when it detects iTerm2 additionally requests dock attention and colours
+  the tab: **peach** when Claude needs input, **green** when it finishes,
+  cleared when you submit the next prompt. In the vertical tab bar that is a
+  direct replacement for cmux's per-session status.
+
+The hook is registered in `claude-code/settings.json` for `Notification`,
+`Stop`, `PostToolUse`(Task), `UserPromptSubmit` and `SessionEnd`, and is linked
+by `make claude-code-hooks` (also run as part of `make install`). That target
+prunes hook symlinks whose target no longer exists — a stale link means
+`settings.json` points at a hook that silently never runs.
+
+---
+
 ## Restore iTerm2 preferences (optional)
 
 If you used `make install`, your current iTerm2 prefs file was backed up:
@@ -443,7 +499,9 @@ exec zsh
 
 ## Troubleshooting
 
-* **Weird glyphs**: Set *MesloLGM Nerd Font* in iTerm2 → Profiles → Text.
+* **Weird glyphs**: Run `make fonts`, then check iTerm2 → Profiles → Text shows *MesloLGS Nerd Font* (the profile sets it as `MesloLGSNF-Regular`).
+* **iTerm2 looks unthemed**: the Dynamic Profile is only picked up on launch — quit and relaunch iTerm2. If it still looks wrong, confirm the profile is selected in Preferences → Profiles ("Dotfiles - Catppuccin Mocha").
+* **`make iterm-defaults` had no effect**: iTerm2 rewrites its plist on quit. Quit iTerm2 *before* running it, not after.
 * **"insecure completion-dependent directories"**: We set `ZSH_DISABLE_COMPFIX=true` and manage `fpath`/`compinit`; if warnings persist, check permissions on your repo path.
 * **fzf bindings not active**: Ensure `brew install fzf` ran and `$(brew --prefix)/opt/fzf/install` executed (installer does this). Restart the terminal.
 * **Helix LSP not working**: Run `hx --health` to check language server status. Install missing servers with your package manager.

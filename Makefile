@@ -5,7 +5,9 @@ BREWFILE := $(REPO_DIR)/Brewfile
 
 # iTerm2 bits
 ITERM_PROFILE := $(REPO_DIR)/iterm2/Dotfiles-MinimalP10k.json
-ITERM_DYNAMIC_DIR := $(HOME)/Library/Application\ Support/iTerm2/DynamicProfiles
+# Note: no backslash-escape on the space — every use is inside double quotes in
+# the recipes, so escaping here would create a literal "Application\ Support" dir.
+ITERM_DYNAMIC_DIR := $(HOME)/Library/Application Support/iTerm2/DynamicProfiles
 ITERM_PROFILE_LINK := $(ITERM_DYNAMIC_DIR)/Dotfiles-MinimalP10k.json
 
 ITERM_PREFS := $(HOME)/Library/Preferences/com.googlecode.iterm2.plist
@@ -13,7 +15,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install vibe vibe-setup link-vault-skills site-serve site-preview site-build site-new test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean
+.PHONY: help install update backup-iterm restore-iterm iterm-profile iterm-defaults claude-code-hooks brew-lock brew-update fonts doctor doctor-mcp helix zellij ghostty yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install vibe vibe-setup link-vault-skills site-serve site-preview site-build site-new test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -26,6 +28,7 @@ install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install
 	@$(MAKE) iterm-profile
 	@$(MAKE) hudson-install
 	@echo "✓ Install complete. If iTerm2 was open, quit & relaunch to load the new profile."
+	@echo "  Then run 'make iterm-defaults' with iTerm2 quit to apply the app-wide prefs."
 
 update: ## Update Homebrew packages & git submodules
 	@echo "→ Updating Homebrew bundle"
@@ -56,10 +59,13 @@ restore-iterm: ## Restore the most recent iTerm2 prefs backup
 	  echo "No backups found in $(BACKUP_DIR)"; \
 	fi
 
-iterm-profile: ## Link iTerm2 Dynamic Profile JSON
+iterm-profile: ## Link iTerm2 Dynamic Profile JSON (colors, font, bell/notifications)
 	@mkdir -p "$(ITERM_DYNAMIC_DIR)"
 	@ln -sfn "$(ITERM_PROFILE)" "$(ITERM_PROFILE_LINK)"
 	@echo "✓ Linked iTerm2 profile → $(ITERM_PROFILE_LINK)"
+
+iterm-defaults: ## Apply app-level iTerm2 prefs (padding, vertical tabs, split dimming) — quit iTerm2 first
+	@$(REPO_DIR)/scripts/iterm-defaults.sh
 
 ##@ Homebrew
 
@@ -288,6 +294,20 @@ claude-code-settings: ## Symlink Claude Code settings.json
 	fi
 	@ln -sfn "$(REPO_DIR)/claude-code/settings.json" "$(HOME)/.claude/settings.json"
 	@echo "✓ ~/.claude/settings.json → $(REPO_DIR)/claude-code/settings.json"
+
+claude-code-hooks: ## Link Claude Code hooks and prune stale ones
+	@echo "→ Linking Claude Code hooks"
+	@mkdir -p "$(HOME)/.claude/hooks"
+	@for f in $(REPO_DIR)/claude-code/hooks/*.sh; do \
+	  ln -sfn "$$f" "$(HOME)/.claude/hooks/$$(basename $$f)"; \
+	done
+	@for l in "$(HOME)/.claude/hooks/"*; do \
+	  if [ -L "$$l" ] && [ ! -e "$$l" ]; then \
+	    echo "  removing stale link: $$(basename $$l)"; rm -f "$$l"; \
+	  fi; \
+	done
+	@echo "✓ Claude Code hooks linked to ~/.claude/hooks/"
+	@ls -1 "$(HOME)/.claude/hooks/"
 
 claude-code-commands: ## Link Claude Code slash commands
 	@mkdir -p "$(HOME)/.claude/commands"
