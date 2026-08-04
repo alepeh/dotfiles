@@ -51,13 +51,6 @@ ZELLIJ_REPO="$DOTFILES/zellij"
 mkdir -p "$(dirname "$ZELLIJ_HOME")"
 backup_and_link "$ZELLIJ_REPO" "$ZELLIJ_HOME"
 
-# --- Ghostty config ---
-GHOSTTY_HOME="$HOME/.config/ghostty"
-GHOSTTY_REPO="$DOTFILES/ghostty"
-
-mkdir -p "$(dirname "$GHOSTTY_HOME")"
-backup_and_link "$GHOSTTY_REPO" "$GHOSTTY_HOME"
-
 # --- Git config (delta, aliases) ---
 # Migrate existing user settings to .gitconfig.local before replacing
 if [ -f "$HOME/.gitconfig" ] && [ ! -L "$HOME/.gitconfig" ] && [ ! -f "$HOME/.gitconfig.local" ]; then
@@ -186,8 +179,8 @@ mkdir -p "$HOME/.claude/hooks"
 for f in "$DOTFILES/claude-code/hooks/"*.sh; do
   [ -f "$f" ] && ln -sfn "$f" "$HOME/.claude/hooks/$(basename "$f")"
 done
-# Prune links to hooks that no longer exist in the repo (e.g. cmux-notify.sh),
-# otherwise settings.json can keep pointing at a hook that silently never runs.
+# Prune links to hooks that no longer exist in the repo, otherwise
+# settings.json can keep pointing at a hook that silently never runs.
 for l in "$HOME/.claude/hooks/"*; do
   if [ -L "$l" ] && [ ! -e "$l" ]; then
     echo "  removing stale hook link: $(basename "$l")"

@@ -1,15 +1,15 @@
 #!/bin/bash
 # Attention hook for Claude Code.
 #
+# Goal: know when Claude Code needs you, and know WHICH tab it is in.
+#
 # Two layers, both optional and both fail-safe:
 #
 #   1. macOS desktop notification (osascript) — works in any terminal.
-#   2. iTerm2-native attention, mirroring Ghostty's `bell-features`:
-#        RequestAttention=once  → bounce the dock icon      (ghostty: attention)
-#        tab colour             → mark WHICH tab needs you  (ghostty: title/border)
+#   2. iTerm2-native attention:
+#        RequestAttention=once  → bounce the dock icon while iTerm2 is unfocused
+#        tab colour             → mark which tab is waiting on you
 #      Tab colours use the Catppuccin Mocha palette so they match the profile.
-#
-# Replaces the former cmux-notify.sh — no terminal dependency, works anywhere.
 #
 # Hook events handled:
 #   PostToolUse      — agent (Task) finished

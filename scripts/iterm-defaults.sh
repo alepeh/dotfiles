@@ -5,16 +5,13 @@
 # per-profile: colors, font, cursor, bell/notification behaviour. The settings
 # below live in the app preferences instead, so they need `defaults write`.
 #
-# Each one mirrors a Ghostty config key (ghostty/config):
+# What gets set:
 #
-#   ghostty                          iTerm2
-#   ------------------------------   --------------------------------------
-#   window-padding-x = 4             TerminalMargin  = 4
-#   window-padding-y = 4             TerminalVMargin = 4
-#   (n/a — ghostty has no vtabs)     TabViewType = 2        → tabs on the LEFT
-#   minimal window chrome            TabStyleWithAutomaticOption = 5 (Minimal)
-#   unfocused-split-opacity = 0.85   DimInactiveSplitPanes + amount 0.15
-#   (no scrollbar)                   HideScrollbar = true
+#   TerminalMargin / TerminalVMargin = 4   window padding
+#   TabViewType = 2                        tabs on the LEFT (vertical tab bar)
+#   TabStyleWithAutomaticOption = 5        Minimal tab style
+#   DimInactiveSplitPanes + 0.15           dim the split you're not in
+#   HideScrollbar = true                   no scrollbar
 #
 # IMPORTANT: iTerm2 keeps preferences in memory and rewrites the whole plist
 # when it quits, silently discarding anything written from outside. So this
@@ -40,23 +37,23 @@ fi
 
 echo "→ Applying iTerm2 application preferences"
 
-# Window padding — Ghostty's window-padding-x / window-padding-y
+# Window padding
 defaults write "$DOMAIN" TerminalMargin -int 4
 defaults write "$DOMAIN" TerminalVMargin -int 4
 
-# Vertical tabs on the left (the one cmux feature iTerm2 already had)
+# Vertical tabs on the left
 defaults write "$DOMAIN" TabViewType -int 2
 
 # Minimal tab style: the tab bar takes the profile background colour, which is
-# what makes iTerm2 read as "one flat surface" the way Ghostty does.
+# what makes iTerm2 read as one flat surface instead of stacked chrome.
 # Other values: 0 light, 1 dark, 2/3 high contrast, 4 automatic, 6 compact.
 defaults write "$DOMAIN" TabStyleWithAutomaticOption -int 5
 
-# Dim inactive splits, like Ghostty's unfocused-split-opacity (0.85 → 0.15 dim)
+# Dim inactive splits so the focused one is obvious
 defaults write "$DOMAIN" DimInactiveSplitPanes -bool true
 defaults write "$DOMAIN" SplitPaneDimmingAmount -float 0.15
 
-# No scrollbar — Ghostty doesn't draw one
+# No scrollbar
 defaults write "$DOMAIN" HideScrollbar -bool true
 
 # Make the dotfiles profile the default one for new windows/tabs

@@ -24,7 +24,7 @@ Minimal, reproducible terminal setup for macOS optimized for AI-assisted develop
 * **Fast prompt**: Powerlevel10k with instant prompt enabled.
 * **Better completion**: OMZ completions + `zsh-completions`, with refined matching rules.
 * **Nice defaults**: `eza`, `ripgrep`, `bat`, `zoxide` and helpful aliases.
-* **iTerm2 profile**: Catppuccin Mocha + MesloLGS Nerd Font, matching the Ghostty config; linked via Dynamic Profiles. See [Terminals: Ghostty and iTerm2](#terminals-ghostty-and-iterm2).
+* **iTerm2**: Catppuccin Mocha + MesloLGS Nerd Font, vertical tabs, and agent notifications that mark *which* tab needs you. See [Terminal: iTerm2](#terminal-iterm2).
 * **Claude MCP Servers**: Secure configuration for Obsidian, Todoist, GitHub, and Google Sheets - shared between Claude Desktop and Claude Code.
 * **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
 * **Cursor IDE**: AI-powered code editor with CLI (`cursor` command) for GUI-based development.
@@ -337,20 +337,20 @@ make brew-lock
 
 ---
 
-## Terminals: Ghostty and iTerm2
+## Terminal: iTerm2
 
-Both terminals are configured to look and behave the same, so either one can be
-the daily driver. Ghostty is configured in `ghostty/config`; iTerm2 is split
-across two places because iTerm2 separates per-profile from app-wide settings.
+iTerm2 is the terminal. Its configuration is split across two places, because
+iTerm2 separates per-profile settings from app-wide ones:
 
-| What | Ghostty | iTerm2 | Applied by |
-| --- | --- | --- | --- |
-| Theme | `theme = Catppuccin Mocha` | full 16-colour palette + bg/fg/cursor/selection | `make iterm-profile` |
-| Font | `MesloLGS Nerd Font` 14 | `MesloLGSNF-Regular 14` | `make iterm-profile` |
-| Window padding | `window-padding-x/y = 4` | `TerminalMargin` / `TerminalVMargin` = 4 | `make iterm-defaults` |
-| Dim unfocused split | `unfocused-split-opacity` | `DimInactiveSplitPanes` + 0.15 | `make iterm-defaults` |
-| Vertical tabs | not supported | `TabViewType = 2` (tabs on the left) | `make iterm-defaults` |
-| Tab chrome | native macOS tabs | `TabStyleWithAutomaticOption = 5` (Minimal) | `make iterm-defaults` |
+| What | Setting | Applied by |
+| --- | --- | --- |
+| Theme | Catppuccin Mocha — full 16-colour palette + bg/fg/cursor/selection | `make iterm-profile` |
+| Font | `MesloLGSNF-Regular 14` (MesloLGS Nerd Font) | `make iterm-profile` |
+| Bell / notifications | see below | `make iterm-profile` |
+| Window padding | `TerminalMargin` / `TerminalVMargin` = 4 | `make iterm-defaults` |
+| Vertical tabs | `TabViewType = 2` (tabs on the left) | `make iterm-defaults` |
+| Tab chrome | `TabStyleWithAutomaticOption = 5` (Minimal) | `make iterm-defaults` |
+| Dim unfocused split | `DimInactiveSplitPanes` + 0.15 | `make iterm-defaults` |
 
 ```bash
 make iterm-profile    # Dynamic Profile: colours, font, bell/notification behaviour
@@ -363,27 +363,22 @@ away anything written from outside.
 
 ### Agent notifications
 
-Goal, in both terminals: know when Claude Code needs input, and know *which*
-tab it is in.
+Goal: know when Claude Code needs input, and know *which* tab it is in.
 
-Ghostty does this with `bell-features = attention,title,border,system` — agents
-ring the terminal bell and Ghostty bounces the dock, marks the tab title, and
-outlines the split.
-
-iTerm2 reaches the same result from two directions:
+Two mechanisms:
 
 * **Profile keys** (`iterm2/Dotfiles-MinimalP10k.json`) — `Send Bell Alert` plus
   `BM Growl` turn a bell into a Notification Center alert, and `Send Terminal
-  Generated Alerts` lets programs post their own. `Silence Bell` is off
-  (audible cue, Ghostty's `system`) while `Visual Bell` is off too — the bell
-  glyph in the tab is the marker, not a full-screen flash. The noisy triggers
-  (`Send Idle Alert`, `Send New Output Alert`, `Send Session Ended Alert`) are
-  deliberately off; flip them in the JSON if you want them.
+  Generated Alerts` lets programs post their own. `Silence Bell` is off, so the
+  bell stays audible, while `Visual Bell` is off too — the bell glyph in the tab
+  is the marker, not a full-screen flash. The noisy triggers (`Send Idle Alert`,
+  `Send New Output Alert`, `Send Session Ended Alert`) are deliberately off;
+  flip them in the JSON if you want them.
 * **`claude-code/hooks/notify.sh`** — posts a macOS notification in any terminal,
   and when it detects iTerm2 additionally requests dock attention and colours
   the tab: **peach** when Claude needs input, **green** when it finishes,
-  cleared when you submit the next prompt. In the vertical tab bar that is a
-  direct replacement for cmux's per-session status.
+  cleared when you submit the next prompt. In the vertical tab bar that gives
+  you per-session status at a glance.
 
 The hook is registered in `claude-code/settings.json` for `Notification`,
 `Stop`, `PostToolUse`(Task), `UserPromptSubmit` and `SessionEnd`, and is linked

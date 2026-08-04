@@ -3,7 +3,7 @@
     {
       "Guid": "D9C0B3A2-3C7B-4B6E-9C6B-33A7A7D8A0F1",
       "Name": "Dotfiles - Catppuccin Mocha",
-      "Description": "Ghostty parity profile: Catppuccin Mocha + MesloLGS Nerd Font + agent notifications",
+      "Description": "Catppuccin Mocha + MesloLGS Nerd Font + agent notifications",
 
       "Normal Font": "MesloLGSNF-Regular 14",
       "Non Ascii Font": "MesloLGSNF-Regular 14",
