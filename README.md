@@ -476,11 +476,30 @@ Two mechanisms:
   cleared when you submit the next prompt. In the vertical tab bar that gives
   you per-session status at a glance.
 
-The hook is registered in `claude-code/settings.json` for `Notification`,
+The hook is registered in `claude-code/settings.base.json` for `Notification`,
 `Stop`, `PostToolUse`(Task), `UserPromptSubmit` and `SessionEnd`, and is linked
 by `make claude-code-hooks` (also run as part of `make install`). That target
 prunes hook symlinks whose target no longer exists — a stale link means
-`settings.json` points at a hook that silently never runs.
+the settings point at a hook that silently never runs.
+
+### Why `settings.base.json` and not `settings.json`
+
+Claude Code owns `~/.claude/settings.json` and rewrites it on every session —
+`model`, `theme`, `tui`, `voice` and `enabledPlugins` all change under you.
+Symlinking that file into this repo therefore left the working tree
+permanently dirty and made a plain `git pull` refuse to run.
+
+So the machine's `~/.claude/settings.json` is a **real, untracked file**, and
+this repo tracks only the subset worth sharing across machines in
+`claude-code/settings.base.json`: `env`, `permissions` and `hooks`.
+`make claude-code-settings` (also part of `make install`) merges the base over
+whatever is already on the machine, leaving app-managed keys untouched.
+`hooks` is replaced wholesale, so deleting a hook event from the base file also
+removes it from the machine.
+
+To change shared config, edit `claude-code/settings.base.json` and re-run
+`make claude-code-settings`. Machine-specific preferences need no repo change —
+just set them in Claude Code as usual.
 
 ---
 

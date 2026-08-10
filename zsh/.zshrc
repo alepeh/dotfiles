@@ -18,6 +18,11 @@ export ZSH="$DOTFILES/omz/ohmyzsh"
 export ZSH_CUSTOM="$DOTFILES/omz/custom"
 export ZSH_DISABLE_COMPFIX=true    # avoid interactive compfix prompts on fresh clones
 
+# $ZSH is a git submodule of this repo, so OMZ's self-updater would silently
+# move the pinned commit and leave the dotfiles working tree dirty. The repo
+# owns the version; bump it deliberately with `make update`.
+zstyle ':omz:update' mode disabled
+
 ##### Put 3rd‑party completions on fpath BEFORE compinit #####
 fpath=("$ZSH_CUSTOM/plugins/zsh-completions/src" "$ZSH_CUSTOM/completions" $fpath)
 
