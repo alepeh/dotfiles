@@ -2,7 +2,9 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "model": "opus[1m]",
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -98,19 +100,5 @@
         ]
       }
     ]
-  },
-  "permissions": {
-    "defaultMode": "bypassPermissions"
-  },
-  "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
-  },
-  "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
-  "voiceEnabled": true,
-  "tui": "fullscreen",
-  "agentPushNotifEnabled": true
+  }
 }

@@ -15,6 +15,9 @@ backups
 # App-managed configs (machine-specific, track .example files instead)
 claude/claude_desktop_config.json
 amp/settings.json
+# Claude Code rewrites ~/.claude/settings.json on every session; only the
+# shared subset in claude-code/settings.base.json is tracked.
+claude-code/settings.json
 
 # Hugo build artifacts
 site/public/

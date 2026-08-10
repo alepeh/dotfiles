@@ -277,16 +277,8 @@ claude-code: ## Link Claude Code global instructions (CLAUDE.md) and skills
 	@ln -sfn "$(REPO_DIR)/.claude/skills/obsidian-cli/SKILL.md" "$(HOME)/.claude/skills/obsidian-cli/SKILL.md"
 	@echo "✓ ~/.claude/skills/obsidian-cli/ → $(REPO_DIR)/.claude/skills/obsidian-cli/"
 
-claude-code-settings: ## Symlink Claude Code settings.json
-	@echo "→ Linking Claude Code settings"
-	@mkdir -p "$(HOME)/.claude"
-	@if [ -e "$(HOME)/.claude/settings.json" ] && [ ! -L "$(HOME)/.claude/settings.json" ]; then \
-	  ts=$$(date +"%Y%m%d_%H%M%S"); \
-	  echo "→ Backing up ~/.claude/settings.json → ~/.claude/settings.json.bak.$$ts"; \
-	  mv "$(HOME)/.claude/settings.json" "$(HOME)/.claude/settings.json.bak.$$ts"; \
-	fi
-	@ln -sfn "$(REPO_DIR)/claude-code/settings.json" "$(HOME)/.claude/settings.json"
-	@echo "✓ ~/.claude/settings.json → $(REPO_DIR)/claude-code/settings.json"
+claude-code-settings: ## Merge shared Claude Code settings into ~/.claude/settings.json
+	@$(REPO_DIR)/scripts/claude-code-settings.sh
 
 claude-code-hooks: ## Link Claude Code hooks and prune stale ones
 	@echo "→ Linking Claude Code hooks"
