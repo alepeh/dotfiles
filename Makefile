@@ -15,20 +15,20 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm-profile iterm-defaults claude-code-hooks brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install vibe vibe-setup link-vault-skills site-serve site-preview site-build site-new test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean
+.PHONY: help install update backup-iterm restore-iterm iterm2-profile iterm2-link claude-code-hooks brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install vibe vibe-setup link-vault-skills site-serve site-preview site-build site-new test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean
 
 help: ## Show available targets
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z0-9_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 ##@ Setup
 
 install: backup-iterm ## Install everything (backs up iTerm2 prefs, runs install.sh, links profile)
 	@echo "→ Running scripts/install.sh"
 	@$(REPO_DIR)/scripts/install.sh
-	@$(MAKE) iterm-profile
+	@$(MAKE) iterm2-link
 	@$(MAKE) hudson-install
-	@echo "✓ Install complete. If iTerm2 was open, quit & relaunch to load the new profile."
-	@echo "  Then run 'make iterm-defaults' with iTerm2 quit to apply the app-wide prefs."
+	@echo "✓ Install complete."
+	@echo "  Run 'make iterm2-profile' to apply the iTerm2 settings (it restarts iTerm2)."
 
 update: ## Update Homebrew packages & git submodules
 	@echo "→ Updating Homebrew bundle"
@@ -59,13 +59,15 @@ restore-iterm: ## Restore the most recent iTerm2 prefs backup
 	  echo "No backups found in $(BACKUP_DIR)"; \
 	fi
 
-iterm-profile: ## Link iTerm2 Dynamic Profile JSON (colors, font, bell/notifications)
+iterm2-profile: iterm2-link ## Configure iTerm2 — profile + app prefs (offers to restart iTerm2)
+	@$(REPO_DIR)/scripts/iterm-defaults.sh
+
+# Symlink-only half of iterm2-profile. `make install` uses this so it never
+# stops on the restart prompt; the app-level prefs come from iterm2-profile.
+iterm2-link:
 	@mkdir -p "$(ITERM_DYNAMIC_DIR)"
 	@ln -sfn "$(ITERM_PROFILE)" "$(ITERM_PROFILE_LINK)"
 	@echo "✓ Linked iTerm2 profile → $(ITERM_PROFILE_LINK)"
-
-iterm-defaults: ## Apply app-level iTerm2 prefs (padding, vertical tabs, split dimming) — quit iTerm2 first
-	@$(REPO_DIR)/scripts/iterm-defaults.sh
 
 ##@ Homebrew
 
@@ -88,7 +90,7 @@ doctor: ## Quick sanity checks
 	@command -v brew >/dev/null || (echo "Homebrew not found" && exit 1)
 	@command -v hx >/dev/null || (echo "helix not found - run: brew install helix" && exit 1)
 	@[ -d "/Applications/iTerm.app" ] || (echo "iTerm2 not found - run: brew install --cask iterm2" && exit 1)
-	@[ -L "$(ITERM_PROFILE_LINK)" ] || (echo "iTerm2 profile not linked - run: make iterm-profile" && exit 1)
+	@[ -L "$(ITERM_PROFILE_LINK)" ] || (echo "iTerm2 profile not linked - run: make iterm2-profile" && exit 1)
 	@command -v zellij >/dev/null || (echo "zellij not found - run: brew install zellij" && exit 1)
 	@command -v lazygit >/dev/null || (echo "lazygit not found - run: brew install lazygit" && exit 1)
 	@command -v yazi >/dev/null || (echo "yazi not found - run: brew install yazi" && exit 1)

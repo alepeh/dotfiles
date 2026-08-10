@@ -36,6 +36,11 @@
       "Minimum Contrast": 0,
       "Badge Text": "",
 
+      "Subtitle": "\\(session.path)",
+
+      "Custom Directory": "Recycle",
+      "Working Directory": "",
+
       "Disable Window Resizing": false,
       "Use Lion Style Fullscreen": true,
       "Window Type": 0,

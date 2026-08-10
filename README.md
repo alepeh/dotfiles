@@ -339,27 +339,123 @@ make brew-lock
 
 ## Terminal: iTerm2
 
-iTerm2 is the terminal. Its configuration is split across two places, because
-iTerm2 separates per-profile settings from app-wide ones:
-
-| What | Setting | Applied by |
-| --- | --- | --- |
-| Theme | Catppuccin Mocha — full 16-colour palette + bg/fg/cursor/selection | `make iterm-profile` |
-| Font | `MesloLGSNF-Regular 14` (MesloLGS Nerd Font) | `make iterm-profile` |
-| Bell / notifications | see below | `make iterm-profile` |
-| Window padding | `TerminalMargin` / `TerminalVMargin` = 4 | `make iterm-defaults` |
-| Vertical tabs | `TabViewType = 2` (tabs on the left) | `make iterm-defaults` |
-| Tab chrome | `TabStyleWithAutomaticOption = 5` (Minimal) | `make iterm-defaults` |
-| Dim unfocused split | `DimInactiveSplitPanes` + 0.15 | `make iterm-defaults` |
+iTerm2 is the terminal. One command configures all of it:
 
 ```bash
-make iterm-profile    # Dynamic Profile: colours, font, bell/notification behaviour
-make iterm-defaults   # app-wide prefs — quit iTerm2 first, it clobbers external writes
+make iterm2-profile
 ```
 
-`make iterm-defaults` refuses to run while iTerm2 is open: iTerm2 holds its
-preferences in memory and rewrites the entire plist on quit, silently throwing
-away anything written from outside.
+It links the Dynamic Profile (live immediately) and then writes the app-wide
+preferences. Those can only be written while iTerm2 is *not* running — iTerm2
+holds its preferences in memory and rewrites the entire plist on quit, silently
+throwing away anything written from outside — so if iTerm2 is open the command
+asks whether to quit, apply and relaunch it. Answer `n` to link the profile only.
+Set `RESTART_ITERM=1` to skip the prompt, `RESTART_ITERM=0` to skip the writes.
+
+Under the hood the settings still live in two systems, which matters when you
+add one of your own:
+
+| What | Setting | Where |
+| --- | --- | --- |
+| Theme | Catppuccin Mocha — full 16-colour palette + bg/fg/cursor/selection | profile |
+| Font | `MesloLGSNF-Regular 14` (MesloLGS Nerd Font) | profile |
+| Bell / notifications | see below | profile |
+| Tab subtitle | `Subtitle` = `\(session.path)` | profile |
+| New tab/pane directory | `Custom Directory` = `Recycle` | profile |
+| Window padding | `TerminalMargin` / `TerminalVMargin` = 4 | app prefs |
+| Vertical tabs | `TabViewType = 2` (tabs on the left) | app prefs |
+| Tab chrome | `TabStyleWithAutomaticOption = 5` (Minimal) | app prefs |
+| Sidebar width | `LeftTabBarWidth = 380` | app prefs |
+| Dim unfocused split | `DimInactiveSplitPanes` + 0.15 | app prefs |
+| Sidebar row height | `defaultTabBarHeight = 72` (+ `useSequoiaStyleTabs`) | advanced |
+| Sidebar row height (newer builds) | `compactMinimalTabBarHeight = 72` | advanced |
+| Sidebar font size | `useCustomTabBarFontSize` + `customTabBarFontSize = 18` | advanced |
+| Title truncation | `tabTitlesUseSmartTruncation = true` | advanced |
+
+### PascalCase vs camelCase
+
+The two app-level groups above are not cosmetic. Settings-window preferences are
+PascalCase (`LeftTabBarWidth`); Settings › Advanced preferences are camelCase
+(`compactMinimalTabBarHeight`). There is no fallback between them — a
+PascalCase spelling of an advanced setting is just an unknown key iTerm2 never
+reads, and `defaults read` will still echo it back at you, so the mistake looks
+like a working setting. Check a key exists before trusting it:
+
+```bash
+strings -a /Applications/iTerm.app/Contents/MacOS/iTerm2 | grep -x compactMinimalTabBarHeight
+```
+
+### The sidebar
+
+The left tab bar is meant to read like cmux's session list: one row per
+session, two lines each — the tab title on top, the working directory below.
+
+That takes a handful of settings that have to agree with each other:
+
+* **`Subtitle`** (profile key, an interpolated string) is what puts a second
+  line in the tab. `\(session.path)` is the session's working directory; swap
+  in `\(session.jobName)`, `\(session.hostname)` or any other
+  [session variable](https://iterm2.com/documentation-variables.html) if you'd
+  rather see something else there.
+* **`defaultTabBarHeight`** is the row height, and it is the setting that has
+  to be right first — everything else is cosmetic next to it. For a vertical
+  tab bar this value *is* each tab's height. 72pt holds an 18pt title over a
+  14pt path; below roughly 50pt the two lines run into the next tab.
+* **`useSequoiaStyleTabs`** has to be on for the previous point to be true at
+  all on macOS 26 and later. See below.
+* **`compactMinimalTabBarHeight`** is written to the same value. iTerm2 3.6.11
+  never reads it for a left/right tab bar, but newer builds route Minimal side
+  tab bars through it, so matching the two keeps the sidebar from shrinking
+  back on an upgrade.
+* **`customTabBarFontSize`** (with `useCustomTabBarFontSize` on) sets the
+  sidebar text size; the subtitle is drawn at 0.8× it. Without it iTerm2 draws
+  tab labels at 11pt, which reads as tiny next to a 14pt terminal font.
+* **`LeftTabBarWidth`** is the sidebar width, 150pt by default, which is where
+  the aggressive truncation came from. 380pt fits a name at 18pt plus roughly a
+  40-character path on the line below. It is also draggable at runtime, and
+  iTerm2 writes the new value back to this same key — so drag it, then read it
+  back with `defaults read com.googlecode.iterm2 LeftTabBarWidth` if you want
+  to pin your own number here.
+
+#### Why `useSequoiaStyleTabs` is load-bearing
+
+On a vertical tab bar each tab is as tall as the tab bar control's `height`,
+which `PseudoTerminal -_desiredTabBarHeight` fills in. In iTerm2 3.6.11 that
+method never reaches `compactMinimalTabBarHeight` for a side tab bar — the
+`shouldHaveTallTabBar` check that guards it returns `NO` as soon as
+`TabViewType` is left or right. On macOS 26+ it instead falls through to
+`PSMTahoeTabStyle.horizontalTabBarHeight`, a hardcoded 36pt that no preference
+can move, *unless* `useSequoiaStyleTabs` is on — in which case it reads
+`defaultTabBarHeight`.
+
+36pt is not enough. The Minimal style draws the title at `centre - 6` and the
+subtitle a line below it, so at any readable font size the block runs past the
+bottom of the row and collides with the tab underneath. That is the overlapping,
+clipped sidebar; raising the font size on its own only makes it worse.
+
+Turning `useSequoiaStyleTabs` on does not change how these tabs look. With
+`TabStyleWithAutomaticOption = 5`, `iTermTheme` returns `PSMMinimalTabStyle`
+before the setting is ever consulted; the Tahoe style only applies to the
+light/dark themes.
+
+Subtitles are a Minimal-theme feature; on the other tab styles the second line
+is dropped.
+
+Paths are shown in full (`/Users/you/code/project`) — iTerm2's interpolated
+strings have no string functions, so there is no way to abbreviate `$HOME` to
+`~` in a subtitle.
+
+### New tabs, splits and windows
+
+`Custom Directory` = `Recycle` in the profile means a new session starts in the
+directory the session you spawned it from is in, rather than `$HOME`. It covers
+new tabs, splits and windows alike. The other values are `No` (always `$HOME`),
+`Yes` (always the fixed path in `Working Directory`) and `Advanced`, which takes
+a separate option per spawn type in the `AWDS Window/Tab/Pane Option` keys —
+use that if you ever want new *windows* at `$HOME` but new tabs inherited.
+
+This needs no shell integration: iTerm2 reads the working directory straight
+from the running process. It does not follow you over `ssh`.
 
 ### Agent notifications
 
@@ -496,7 +592,7 @@ exec zsh
 
 * **Weird glyphs**: Run `make fonts`, then check iTerm2 → Profiles → Text shows *MesloLGS Nerd Font* (the profile sets it as `MesloLGSNF-Regular`).
 * **iTerm2 looks unthemed**: the Dynamic Profile is only picked up on launch — quit and relaunch iTerm2. If it still looks wrong, confirm the profile is selected in Preferences → Profiles ("Dotfiles - Catppuccin Mocha").
-* **`make iterm-defaults` had no effect**: iTerm2 rewrites its plist on quit. Quit iTerm2 *before* running it, not after.
+* **`make iterm2-profile` had no effect**: either iTerm2 was running and the restart was declined (it rewrites its plist on quit, discarding outside writes), or the key is misspelled — advanced settings are camelCase, see [PascalCase vs camelCase](#pascalcase-vs-camelcase).
 * **"insecure completion-dependent directories"**: We set `ZSH_DISABLE_COMPFIX=true` and manage `fpath`/`compinit`; if warnings persist, check permissions on your repo path.
 * **fzf bindings not active**: Ensure `brew install fzf` ran and `$(brew --prefix)/opt/fzf/install` executed (installer does this). Restart the terminal.
 * **Helix LSP not working**: Run `hx --health` to check language server status. Install missing servers with your package manager.
