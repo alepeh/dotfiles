@@ -29,6 +29,7 @@ Minimal, reproducible terminal setup for macOS optimized for AI-assisted develop
 * **Java Version Management**: jenv with JDK 17, 21, and 24 support and convenient switching aliases.
 * **Cursor IDE**: AI-powered code editor with CLI (`cursor` command) for GUI-based development.
 * **Mistral Vibe**: Minimal CLI coding agent (`vibe` command) installed via Homebrew (`mistral-vibe`). Config and session logs live under `~/.vibe/`; add your `MISTRAL_API_KEY` to `~/.vibe/.env` (`make vibe-setup`) or run `vibe --setup`.
+* **Amp CLI**: Sourcegraph's coding agent (`amp` command), installed from the `ampcode/tap` Homebrew tap. Settings template in [`amp/settings.json.example`](amp/settings.json.example).
 * **Vault-resident agent skills** (opt-in, requires an Obsidian vault with an `agents/` directory): `make link-vault-skills` mirrors `<vault>/agents/<name>/commands/*.md` into `~/.claude/commands/` so agents whose recipe + knowledge + memory all live in the vault become available as slash commands in any Claude CLI session on the machine. Vault path defaults to `~/obsidian/brain`; override with `HUDSON_VAULT=/path/to/vault`. Full pattern + new-machine setup + MCP examples (Todoist, Atlassian/Jira, plain Obsidian tasks) in [`claude-code/VAULT-AGENTS.md`](claude-code/VAULT-AGENTS.md).
 
 ---
