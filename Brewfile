@@ -1,3 +1,5 @@
+tap "ampcode/tap"   # Amp CLI (ampcode.com)
+
 brew "zsh"
 brew "git"
 brew "fzf"
@@ -22,6 +24,7 @@ brew "sox"       # Audio recording for Claude Code voice mode
 brew "glow"      # Terminal markdown renderer
 brew "jenv"       # Java version manager
 brew "mvn"
+brew "ampcode/tap/ampcode"  # Amp coding agent CLI (`amp` command)
 
 # Language Servers for Helix
 brew "pyright"                    # Python LSP
