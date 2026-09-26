@@ -15,7 +15,7 @@ BACKUP_DIR := $(REPO_DIR)/backups/iterm2
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install update backup-iterm restore-iterm iterm2-profile iterm2-link claude-code-hooks brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install vibe vibe-setup link-vault-skills site-serve site-preview site-build site-new test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean
+.PHONY: help install update backup-iterm restore-iterm iterm2-profile iterm2-link claude-code-hooks brew-lock brew-update fonts doctor doctor-mcp helix zellij yazi git-config zed amp claude-code claude-code-settings claude-code-commands claude-code-mcp claude-code-mcp-wrappers mcp-gsuite-patch helix-lsp claude-tui claude-tui-install vibe vibe-setup link-vault-skills test-obsidian hudson-install hudson-uninstall cleanup cleanup-dry clean
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} /^[a-zA-Z0-9_-]+:.*?## / {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -395,22 +395,6 @@ helix-lsp: ## Install Helix language servers
 	@brew install pyright ruff typescript-language-server prettier jdtls
 	@echo "✓ Language servers installed"
 	@echo "→ Run 'hx --health python typescript java' to verify"
-
-##@ Hugo Site
-
-site-serve: ## Serve Hugo site locally with drafts and live reload
-	@cd "$(REPO_DIR)/site" && hugo server --buildDrafts --navigateToChanged --baseURL http://localhost:1313/
-
-site-preview: ## Build and open Hugo site in browser (live reload + drafts)
-	@cd "$(REPO_DIR)/site" && open http://localhost:1313/ && hugo server --buildDrafts --navigateToChanged --baseURL http://localhost:1313/
-
-site-build: ## Build Hugo site for production
-	@cd "$(REPO_DIR)/site" && hugo --gc --minify
-
-site-new: ## Create a new writing post (usage: make site-new TITLE=my-post-title)
-	@test -n "$(TITLE)" || (echo "Usage: make site-new TITLE=my-post-title" && exit 1)
-	@cd "$(REPO_DIR)/site" && hugo new "writing/$(TITLE).md"
-	@echo "✓ Created site/content/writing/$(TITLE).md"
 
 ##@ Testing
 

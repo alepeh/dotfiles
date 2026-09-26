@@ -19,8 +19,4 @@ amp/settings.json
 # shared subset in claude-code/settings.base.json is tracked.
 claude-code/settings.json
 
-# Hugo build artifacts
-site/public/
-site/resources/
-site/.hugo_build.lock
 .DS_Store

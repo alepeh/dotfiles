@@ -1,10 +1,9 @@
 ## Project Context
-- **Stack**: Shell (Zsh/Bash), Makefile, Hugo (site), Python (MCP servers)
+- **Stack**: Shell (Zsh/Bash), Makefile, Python (MCP servers)
 - **Type**: macOS dotfiles — terminal IDE config (Zellij, Helix, yazi, lazygit, Claude Code MCP)
 - **Install**: `make install` (symlinks configs, installs Homebrew packages)
 - **Update**: `make update` (Homebrew bundle + git submodules)
 - **Health check**: `make doctor` / `make doctor-mcp`
-- **Hugo site**: `make site-serve` / `make site-build`
 
 Run `make help` for all available commands.
 
@@ -16,7 +15,7 @@ Run `make help` for all available commands.
 - `mcp-servers/` — Custom MCP server implementations
 - `mcp-wrappers/` — Wrapper scripts for MCP servers (load secrets from ~/.env.mcp)
 - `scripts/` — install.sh, update-plugins.sh
-- `site/` — Hugo site (personal blog/changelog)
+- Personal site/blog lives in its own repo: `~/code/alepeh.github.io` (alepeh/alepeh.github.io)
 - `omz/` — Oh My Zsh + plugins (git submodules, don't edit directly)
 
 ## Conventions
