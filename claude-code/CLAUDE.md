@@ -74,7 +74,7 @@ Every project should have a Makefile (or Justfile) providing a standard command 
   mark completed only after verification
 
 ## Workflow Commands
-- `/new-diff` — Create a short-form changelog entry for the Hugo site
+- `/new-diff` — Create a short-form changelog entry for the Hugo site (alepeh.github.io repo)
 - `/morning-brief` — Chief-of-Staff daily briefing (Gmail, Calendar, Todoist, Obsidian)
 - `/evening-recap` — Chief-of-Staff end-of-day review and carry-over planning
 

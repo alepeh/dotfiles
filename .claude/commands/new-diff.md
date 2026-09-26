@@ -1,4 +1,4 @@
-Create a short-form changelog entry ("diff") for the Hugo site at `site/content/diff/`.
+Create a short-form changelog entry ("diff") for the Hugo site in the `alepeh/alepeh.github.io` repo (local checkout: `~/code/alepeh.github.io`), at `content/diff/`. The PR being described lives in whatever repo you are currently in (usually dotfiles).
 
 ## Steps
 
@@ -20,7 +20,7 @@ Create a short-form changelog entry ("diff") for the Hugo site at `site/content/
 
 5. **Iterate**: If the user wants changes, revise and re-present. Repeat until they approve the paragraph.
 
-6. **Write the file**: Once approved, create `site/content/diff/<slug>.md` with:
+6. **Write the file**: Once approved, create `~/code/alepeh.github.io/content/diff/<slug>.md` (clone `alepeh/alepeh.github.io` there first if missing) with:
    - `draft: false`
    - `date` set to the PR merge date (not today)
    - All frontmatter fields populated
