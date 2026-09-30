@@ -91,6 +91,7 @@ echo "→ Linking utility scripts..."
 mkdir -p "$HOME/.local/bin"
 ln -sfn "$DOTFILES/scripts/claude-sessions" "$HOME/.local/bin/claude-sessions"
 ln -sfn "$DOTFILES/scripts/zellij-help" "$HOME/.local/bin/zellij-help"
+ln -sfn "$DOTFILES/scripts/claude-rc" "$HOME/.local/bin/claude-rc"
 echo "✓ Utility scripts → ~/.local/bin/"
 
 echo "→ Installing fzf keybindings/completions..."
